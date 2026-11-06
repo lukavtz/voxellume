@@ -44,6 +44,7 @@ Required cases:
 - unsupported check reporting;
 - partial build/test failure diagnostics;
 - artifact path and checksum correctness;
+- journal HMAC authentication before recovery, kept distinct from unkeyed evidence `SHA256SUMS` coverage/tamper detection and read-only publication;
 - no implicit overwrite or network mutation where prohibited.
 
 ### 2.3 Security tests
@@ -65,6 +66,20 @@ Use adversarial fixtures:
 - untrusted MCP input and oversized structured results.
 
 Assertions verify containment, fail-closed behavior, redaction, process cleanup, bounded resource use, and accurate error reporting.
+
+#### Native path and process contracts
+
+The existing path/process supervisor suites exercise the host on which they run; their results do not transfer to another OS or architecture. macOS and Linux CI must each run the real Koffi prebuilt and assert:
+
+- host-granted root authority, read-only project roots, staging-only writes, realpath pinning, and rejection of forged capabilities;
+- traversal, absolute paths, NUL, missing parents, symlink leaves/parents, concurrent root/parent swaps, hard-linked mutation targets, archive links, revision conflicts, no-replace publication, and one-writer atomicity without outside-root mutation;
+- fixed argv with `shell:false`, scrubbed environment and isolated directories, exact timeouts/output limits, nonzero/output-overflow failures, pre-spawn cancellation, complete process-group cleanup, and `timed_out`/`cancelled`/`unavailable` never becoming `passed`;
+- missing prebuilt/native symbols and the Docker backend failing closed as unavailable, with no source-build, shell, pathname-mutation, or Windows single-PID/`taskkill` fallback;
+- exact EULA URL and network host/purpose/cache approval scopes, mode-`0600` persistence, and no implicit approval.
+
+Required Windows x64 and ARM64 NTFS CI probes must execute, not mock, the NTDLL and Job Object backends. They cover Koffi prebuilt resolution and ABI sizes/offsets; relative opens and missing/not-directory errors; junction/symlink leaves and intermediate hops; parent-swap races; mkdir/rename/no-replace/unlink/rmdir; cross-volume and sharing failures; hard-link refusal; positional I/O and short writes; file flush plus explicit unsupported directory flush; stable file identity/revision CAS; long paths and filesystem-defined case behavior. Process probes cover suspended creation and assignment before resume, child/grandchild cleanup on cancellation, timeout, normal supervisor close, and supervisor crash, bounded output, scrubbed environment, denied job assignment as `unavailable`, and no `taskkill`, `MoveFileExW`, or unsafe path fallback. Unsupported filesystem/API behavior must remain `unsupported` or `unavailable`, not pass.
+
+No Windows runtime probe has yet been executed and recorded. Both architectures therefore remain **unverified** and outside the qualified support matrix; source inspection, cross-compilation, mocks, or a probe on only one architecture cannot close this gate.
 
 ### 2.4 OMP contract tests
 
@@ -260,6 +275,7 @@ Test the exact distributed artifact, not the source checkout:
 ## 8. CI organization
 
 - **Fast gate:** static checks and core behavior on every change.
+- **Native execution gate:** real path/process contracts on macOS and Linux; required NTDLL/Job Object probes on Windows x64 and ARM64 before either Windows architecture can be declared verified.
 - **Host gate:** OMP, Harness, and MCP contracts on adapter changes and releases.
 - **Target gate:** affected real Minecraft toolchains on target/template changes.
 - **Runtime gate:** server/client scenarios on a scheduled and release matrix.

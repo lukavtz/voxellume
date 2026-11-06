@@ -78,6 +78,16 @@ A private `WeakMap` binds the verified candidate object to a deep-frozen snapsho
 
 Journals remain in the transaction workspace at `<workspaceRoot>/<transactionId>/journal.json`; no external journal location is implemented. Their persistent random 32-byte HMAC key is stored at `~/.config/voxellume/journal-secret`, with a `0700` parent directory and a `0600`, single-link regular file owned by the current UID. Pathname validation catches observed symlink and identity changes, but does not eliminate parent-directory swap TOCTOU between checks and mutation. The §3 directory-handle path supervisor must anchor operations to opened parent directories before complete race resistance can be claimed.
 
+### ADR-010: Native directory handles and supervised execution fail closed
+
+Only the trusted host grants an authorized root; copying its public fields cannot mint authority. Project roots are read-only through this API, and only transaction-staging roots permit writes. On macOS and Linux, `fs-at.ts` pins the root and every parent with per-component libc `openat`/`O_NOFOLLOW` traversal and uses `mkdirat`, `unlinkat`, and no-replace `renameat2`/`renameatx_np` for mutation. On Windows, `fs-at-win32.ts` uses NTDLL `NtCreateFile` relative to `RootDirectory`, one component per call, `FILE_OPEN_REPARSE_POINT` plus post-open reparse/type checks, and `FileRenameInformationEx`/`FileDispositionInformationEx`. Hard-linked mutation targets and unsupported filesystem semantics are rejected. Windows has no documented directory-handle flush, so file flush is not reported as directory durability.
+
+Koffi is pinned to `3.3.7`; `pnpm.ignoredBuiltDependencies` blocks its installer. Only the matching `@koromix/koffi-<os>-<arch>` prebuilt may load. Missing prebuilts, symbols, or ABI layout checks return `execution.native_dirfd_unavailable`; there is no source-build or pathname-based `fs` mutation fallback. The Windows x64/ARM64 NTDLL and process implementations are present but have not been runtime-verified, so Windows is not yet a qualified platform.
+
+Verification accepts only fixed `./gradlew --no-daemon <allowlisted-task>` argv with `shell:false`. POSIX runs use a detached process group and signal the negative PID; Windows creates the process suspended, assigns a Job Object before `ResumeThread`, and uses `TerminateJobObject` plus `KILL_ON_JOB_CLOSE`, never `taskkill /T`. Job setup failure is `unavailable`, never a pass. Limits are 15-minute builds, 10-minute server/client runs, 16 MiB captured output, 2 GiB evidence, one Gradle process per project, and container budgets of 2 CPUs, 4 GiB memory, and 512 PIDs. The environment is rebuilt from an allowlist with isolated home, Gradle cache, and temporary directories. Docker currently returns `backend_unavailable`; host execution must not be described as container or network isolation. EULA and network approvals are exact, persisted separately in mode-`0600` `approvals.json`, and never silently granted.
+
+Transaction journals and evidence bundles have different integrity purposes. Journal HMAC-SHA256 authenticates recovery state with the persistent secret. Final evidence uses unkeyed `SHA256SUMS` for complete-bundle checksum validation and read-only permissions; those checksums detect changes but do not authenticate provenance or replace immutable external evidence custody.
+
 ## 3. Repository layout
 
 ```text
@@ -143,7 +153,7 @@ Journals remain in the transaction workspace at `<workspaceRoot>/<transactionId>
     └── workflows/
 ```
 
-The execution/transaction path supervisor must use opened root and parent-directory handles for lookup, open, rename, and unlink operations. Current transaction pathname checks still have a parent-swap TOCTOU window; this section does not claim full race elimination until that supervisor is implemented.
+`src/core/execution/paths.ts` uses opened root and parent-directory handles for lookup, open, rename, and unlink operations. The transaction implementation still has separate pathname checks with a parent-swap TOCTOU window; the execution supervisor's race resistance must not be attributed to those legacy transaction paths. Windows directory-handle behavior remains unverified until the required native CI probes pass.
 
 `src/shared` is limited to types used by more than one module. It must not become a dumping ground for unrelated helpers.
 
