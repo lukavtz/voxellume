@@ -1,0 +1,164 @@
+{
+  "schemaVersion": "mod-spec-1.0.0",
+  "modId": "ruby_tools",
+  "namespace": "ruby_tools",
+  "javaPackage": "dev.voxellume.ruby_tools",
+  "metadata": {
+    "name": "Ruby Tools",
+    "version": "1.0.0",
+    "description": "A compact ruby toolset.",
+    "authors": ["Voxellume Tests"],
+    "license": "MIT"
+  },
+  "targetPackId": "java-fabric-1.21.1-r1",
+  "targetPackRevision": 1,
+  "dependencies": {
+    "required": [
+      {
+        "modId": "fabric-api",
+        "version": "0.116.17+1.21.1"
+      }
+    ],
+    "optional": [],
+    "incompatible": []
+  },
+  "compatibility": {
+    "singleplayer": true,
+    "multiplayer": "required",
+    "existingWorlds": "migrate"
+  },
+  "gameplay": {
+    "summary": "Mine rubies and craft durable tools.",
+    "progression": "Ruby blocks unlock ruby tools.",
+    "multiplayer": "Damage and drops are server authoritative.",
+    "failureCases": ["A broken blade cannot deal bonus damage."]
+  },
+  "features": [
+    {
+      "id": "ruby_blade",
+      "kind": "item",
+      "names": { "en_us": "Ruby Blade" },
+      "properties": { "attackDamage": 7, "durability": 512 },
+      "implementationUnitIds": ["unit_ruby_blade"],
+      "assetIds": ["asset_ruby_blade_model"],
+      "acceptanceIds": ["accept_ruby_blade_damage"]
+    },
+    {
+      "id": "ruby_block",
+      "kind": "block",
+      "names": { "en_us": "Ruby Block" },
+      "properties": { "hardness": 3, "requiresTool": true },
+      "implementationUnitIds": ["unit_ruby_block"],
+      "assetIds": ["asset_ruby_block_model"],
+      "acceptanceIds": ["accept_ruby_block_drops"]
+    }
+  ],
+  "implementationUnits": [
+    {
+      "id": "unit_ruby_blade",
+      "featureId": "ruby_blade",
+      "sourcePaths": ["src/main/java/dev/voxellume/ruby_tools/RubyBlade.java"]
+    },
+    {
+      "id": "unit_ruby_block",
+      "featureId": "ruby_block",
+      "sourcePaths": ["src/main/java/dev/voxellume/ruby_tools/RubyBlock.java"]
+    }
+  ],
+  "recipes": [
+    {
+      "id": "recipe_ruby_block",
+      "featureId": "ruby_block",
+      "kind": "crafting_shaped",
+      "result": { "item": "ruby_tools:ruby_block", "count": 1 }
+    }
+  ],
+  "configuration": {
+    "schemaVersion": 1,
+    "entries": [
+      {
+        "id": "ruby_blade_damage",
+        "kind": "integer",
+        "default": 7,
+        "minimum": 1,
+        "maximum": 100
+      }
+    ]
+  },
+  "persistence": {
+    "format": "nbt",
+    "version": 1,
+    "migrations": [
+      {
+        "id": "migration_initial_persistence",
+        "fromVersion": 0,
+        "toVersion": 1,
+        "description": "Initialize persisted ruby tool state."
+      }
+    ]
+  },
+  "assets": [
+    {
+      "id": "asset_ruby_blade_model",
+      "kind": "item_model",
+      "source": "assets/source/ruby_blade.bbmodel",
+      "generated": "assets/ruby_tools/models/item/ruby_blade.json"
+    },
+    {
+      "id": "asset_ruby_block_model",
+      "kind": "block_model",
+      "source": "assets/source/ruby_block.bbmodel",
+      "generated": "assets/ruby_tools/models/block/ruby_block.json"
+    }
+  ],
+  "acceptance": [
+    {
+      "id": "accept_ruby_blade_damage",
+      "featureId": "ruby_blade",
+      "behavior": "A ruby blade deals seven attack damage.",
+      "kind": "gameTest",
+      "implementationUnitIds": ["unit_ruby_blade"],
+      "checkIds": ["gametest.ruby_blade.damage"],
+      "fixture": "fixtures/gametest/ruby-blade.json",
+      "expected": { "damage": 7 }
+    },
+    {
+      "id": "accept_ruby_block_drops",
+      "featureId": "ruby_block",
+      "behavior": "A mined ruby block drops itself.",
+      "kind": "gameTest",
+      "implementationUnitIds": ["unit_ruby_block"],
+      "checkIds": ["gametest.ruby_block.drops"],
+      "fixture": "fixtures/gametest/ruby-block.json",
+      "expected": { "drops": ["ruby_tools:ruby_block"] }
+    }
+  ],
+  "runtime": {
+    "scenarios": [
+      {
+        "id": "scenario_ruby_tools_multiplayer",
+        "acceptanceIds": [
+          "accept_ruby_blade_damage",
+          "accept_ruby_block_drops"
+        ],
+        "steps": ["Give a blade", "Place and mine a ruby block"],
+        "expected": "Both players observe the same damage and drops."
+      }
+    ]
+  },
+  "visual": {
+    "rubric": "visual/ruby-tools-rubric.md",
+    "scenarioIds": ["scenario_ruby_tools_inventory"],
+    "required": true
+  },
+  "evidence": {
+    "required": ["build", "gameTest", "visual"],
+    "artifactGlobs": ["evidence/**"]
+  },
+  "delivery": {
+    "productionJar": "build/libs/ruby_tools-1.0.0.jar",
+    "includeSource": true,
+    "includeEditableAssets": true,
+    "buildTasks": ["clean", "build"]
+  }
+}
