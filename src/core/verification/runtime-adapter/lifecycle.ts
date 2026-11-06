@@ -17,7 +17,10 @@ import {
 
 const PROCESS_TERM_TIMEOUT_MS = 5_000;
 
-async function terminateOwnedPids(pids: readonly number[]): Promise<void> {
+async function terminateOwnedPids(pids: readonly number[]): Promise<{
+  terminatedOwnedPids: number[];
+  remainingOwnedPids: number[];
+}> {
   const unique = [...new Set(pids)];
   if (
     unique.some(
@@ -28,24 +31,27 @@ async function terminateOwnedPids(pids: readonly number[]): Promise<void> {
   }
 
   const pending = new Set<number>();
+  const terminated = new Set<number>();
   for (const pid of unique) {
     try {
       process.kill(pid, "SIGTERM");
       pending.add(pid);
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== "ESRCH") throw error;
+      terminated.add(pid);
     }
   }
 
-  const deadline = Date.now() + PROCESS_TERM_TIMEOUT_MS;
-  while (pending.size > 0 && Date.now() < deadline) {
+  const termDeadline = Date.now() + PROCESS_TERM_TIMEOUT_MS;
+  while (pending.size > 0 && Date.now() < termDeadline) {
     for (const pid of pending) {
       try {
         process.kill(pid, 0);
       } catch (error) {
-        if ((error as NodeJS.ErrnoException).code === "ESRCH")
+        if ((error as NodeJS.ErrnoException).code === "ESRCH") {
           pending.delete(pid);
-        else throw error;
+          terminated.add(pid);
+        } else throw error;
       }
     }
     if (pending.size > 0) await delay(25);
@@ -55,8 +61,29 @@ async function terminateOwnedPids(pids: readonly number[]): Promise<void> {
       process.kill(pid, "SIGKILL");
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== "ESRCH") throw error;
+      pending.delete(pid);
+      terminated.add(pid);
     }
   }
+
+  const killDeadline = Date.now() + PROCESS_TERM_TIMEOUT_MS;
+  while (pending.size > 0 && Date.now() < killDeadline) {
+    for (const pid of pending) {
+      try {
+        process.kill(pid, 0);
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code === "ESRCH") {
+          pending.delete(pid);
+          terminated.add(pid);
+        } else throw error;
+      }
+    }
+    if (pending.size > 0) await delay(25);
+  }
+  return {
+    terminatedOwnedPids: unique.filter((pid) => terminated.has(pid)),
+    remainingOwnedPids: unique.filter((pid) => pending.has(pid)),
+  };
 }
 
 export interface RuntimeLifecycle {
@@ -165,10 +192,17 @@ export function createRuntimeLifecycle(
       return failure(id, "cleanup", "failed", "unowned_pid");
     }
     try {
-      await terminateOwnedPids(tracked);
-      sessions.delete(input.sessionId);
-      pendingCalls.delete(input.sessionId);
-      return passed({ ownedPids: tracked });
+      const termination = await terminateOwnedPids(tracked);
+      if (termination.remainingOwnedPids.length === 0) {
+        sessions.delete(input.sessionId);
+        pendingCalls.delete(input.sessionId);
+      } else {
+        sessions.set(input.sessionId, {
+          id: input.sessionId,
+          ownedPids: termination.remainingOwnedPids,
+        });
+      }
+      return passed(termination);
     } catch {
       return failure(id, "cleanup", "failed", "cleanup_failed");
     }

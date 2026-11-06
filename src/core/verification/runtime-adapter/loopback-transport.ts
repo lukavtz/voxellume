@@ -68,10 +68,13 @@ export function createLoopbackRuntimeTransport(options: {
   } catch {
     throw new RuntimeTransportError("loopback_required");
   }
-  const authority = /^https?:\/\/([^\/?#]*)/.exec(options.endpoint)?.[1];
-  const rawHostname = authority?.startsWith("[")
+  const authority =
+    options.endpoint
+      .slice(options.endpoint.indexOf("://") + 3)
+      .split(/[/?#]/, 1)[0] ?? "";
+  const rawHostname = authority.startsWith("[")
     ? authority.slice(0, authority.indexOf("]") + 1)
-    : authority?.split(":", 1)[0];
+    : authority.split(":", 1)[0];
   if (
     (endpoint.protocol !== "http:" && endpoint.protocol !== "https:") ||
     (rawHostname !== "127.0.0.1" && rawHostname !== "[::1]") ||
