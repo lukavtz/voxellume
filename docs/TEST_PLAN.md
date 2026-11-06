@@ -36,9 +36,11 @@ Required cases:
 - ambiguous target handling;
 - inspection of valid, incomplete, foreign, and malformed projects;
 - scaffold creation, conflict refusal, and repeat invocation;
-- valid and malformed block/item/entity assets;
-- missing textures, invalid references, duplicate identifiers, and wrong resource roots;
-- verification report ordering and status transitions;
+- valid and malformed block/item/entity assets and `TextureSpec`/`AnimationSpec` documents;
+- `.grid`/`.mcpx`/`.bbmodel` source-to-export round trips, stale exports, missing textures, invalid references, duplicate identifiers, and wrong resource roots;
+- vertical frame-strip dimensions/order, `.png.mcmeta` timing/interpolation, loop deltas, palette/alpha/tiling, UV/orientation, rig pivots/roles, clip transitions, z-fighting, and planted animation defects;
+- deterministic cleanup and seeded regeneration hashes, including replacement of every adapted sosadly random path and normalization of editor UUID/state;
+- verification report ordering and status transitions, including `source`, `browser(surface=...)`, and `design_review` evidence classes and the prohibition on unchecked/preview-only passes;
 - unsupported check reporting;
 - partial build/test failure diagnostics;
 - artifact path and checksum correctness;
@@ -48,8 +50,11 @@ Required cases:
 
 Use adversarial fixtures:
 
-- `..` and absolute-path escape attempts;
-- symlink escapes inside an authorized project;
+- `..` and absolute-path escape attempts, including the output escapes demonstrated by raw mc-asset CLI/MCP;
+- symlink-parent escapes demonstrated by raw mc-asset, plus concurrent path-swap races and hardlinked inputs/outputs not exercised by its pilot;
+- oversized raster input before spawn/read, decoded pixel/dimension bombs, output/log/MCP-response floods, and ZIP/nested-archive bombs;
+- partial multi-artifact writes and failure/cancellation during staged journal publication, requiring no outside-root or partial canonical output;
+- raw sosadly outside-root requests, default-on `execute_script`, plugin installation, and unauthenticated loopback commands, all rejected by the absence of that server surface;
 - command and argument injection through metadata and target input;
 - malicious Gradle/build scripts attempting unexpected filesystem or network access;
 - archive traversal and unsafe extraction;
@@ -179,17 +184,48 @@ Proves the complete requested GitHub workflow without exposing credentials.
 
 ## 5. Visual and gameplay verification
 
+Every visual rule has a stable ID and one primary evidence class:
+
+- `source`: schemas, source/export bytes and hashes, deterministic metrics, import/export round trips, and independent evaluated-pose oracles;
+- `browser`: rendered-surface evidence with an explicit `surface`. Only `minecraft_client` closes in-game gates; `blockbench` and `blender` are supplementary previews;
+- `design_review`: reviewer decision, rubric, annotated captures/contact sheets, reasons, scope, and revision.
+
+Execution uses the common `passed|failed|timed_out|cancelled|unsupported|unavailable` statuses. An unexecuted check has `checked=false` and cannot pass. P0 security/load/missing-asset and P1 required-state/loop failures block acceptance. P2 visible seam, UV, clipping, or tint findings block asset approval without a scoped reviewed exception. Numeric image diffs do not decide aesthetics.
+
+### 5.1 Static asset gates
+
 For every model, texture, GUI, animation, or visual effect:
 
-- inspect the editable asset where applicable;
-- inspect the exported runtime asset;
-- launch the actual supported visual surface;
-- capture evidence at documented angles/states/resolutions;
-- verify texture references, z-fighting, transparency, scale, orientation, animation states, and GUI clipping;
-- compare against the design rubric;
-- record human review where subjective quality cannot be determined automatically.
+- validate `TextureSpec`/`AnimationSpec`, target revision, style-board provenance, and acceptance references before generation;
+- enforce input byte/pixel limits before decode, exact dimensions, integer-nearest scaling, palette and alpha policy, silhouette, and tiling wrap/seam metrics;
+- verify editable `.grid`/`.mcpx`/`.bbmodel` sources and exported runtime hashes, blockstate/model/entity references, UV bounds/orientation, nonzero faces, bone parents/pivots, and round-trip diffs;
+- require animated textures to have `height = width × frameCount`, nonempty frames, explicit valid order, integer `frametime >= 1`, matching interpolation, and measured last-to-first loop delta;
+- evaluate declared bone clips for loop seam, travel/strike direction, required movement, ground penetration, self-intersection, and unapproved coplanar/z-fighting pairs;
+- rerun deterministic cleanup and seeded generators and compare semantic/output hashes; hosted-AI seed repetition alone is not a reproducibility check;
+- inspect Blockbench/Blender previews and contact sheets where applicable, but label them preview evidence only.
 
-A screenshot alone does not prove gameplay behavior. Runtime assertions and screenshots serve different checks.
+### 5.2 Real Minecraft and design-review gates
+
+Run the packaged production JAR in a clean target instance and capture, where applicable:
+
+1. inventory icon and tooltip;
+2. first-person and third-person hand;
+3. dropped item and placed block;
+4. north/east/south/west and top/bottom;
+5. GUI open/close and animation state changes;
+6. every ModSpec-declared idle/walk/run/attack/hurt/death/fly/custom state, including transitions, mid-clip retrigger, once/hold-last behavior, and death final pose;
+7. tileable 3×3 surfaces, light/dark alpha backgrounds, and day/night/emissive states;
+8. multiplayer observer state synchronization and persistence/restart where required.
+
+Each scenario fixes resolution, GUI scale, FOV/camera, seed/world state, tick/time/weather, inputs, OS/renderer/GPU, production-JAR and baseline hashes, and tolerance. Runtime assertions prove state and behavior; screenshots prove only their declared rendered surface. Independent design review then evaluates style-board coherence, materials, silhouettes, UV distortion, clipping, z-fighting, animation quality, and GUI readability.
+
+Fabric screenshot GameTest assertions are target-local where the exact API exists. Their absence on `1.21.1` is `unsupported` for that method, not a pass. Other targets use their qualified client-capture path; every route still requires behavior assertions and human design review.
+
+### 5.3 Conditional tool pilots and evidence boundary
+
+Mosaicary must pass GLB/bone/channel/multi-texture/coplanar/curved-mesh conversion, import-report and round-trip diffs, complete network denial, and production-client review before ingress is enabled. Perfect-pixel/Unfaker must pass grid/palette/alpha and one-pixel-detail fixtures before use. Blender fixed scripts require planted loop/UV/z-fight defects, environment hashes, cancellation, and contact-sheet checks. None becomes production-qualified from upstream claims.
+
+The completed mc-asset pilot passed 22/22 pilot assertions and 19/19 deterministic artifact pairs; the sosadly pilot exercised rig/generator/analyzer/paint methods and found the planted open-loop gap. These are tool-selection evidence only. Neither executed real Minecraft nor obtained human aesthetic approval, so neither satisfies §5.2 or authorizes broader raw integration.
 
 ## 6. Performance and reliability
 

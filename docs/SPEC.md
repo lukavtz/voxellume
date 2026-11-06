@@ -58,6 +58,8 @@ Produce a design covering:
 - blocks, items, entities, effects, UI, world generation, and configuration as required;
 - progression, recipes, balance, multiplayer behavior, persistence, migrations, and failure cases;
 - art direction, palette, silhouettes, animation, sound, and accessibility;
+- a versioned `TextureSpec` for each texture and `AnimationSpec` for each animation set, tied to the exact target-pack revision and acceptance rules;
+- a reviewed style board with reference provenance, palette/ramps, silhouettes, light direction, material examples, and negative constraints; reference plates are not shipping pixels;
 - compatibility and dependency policy;
 - testable acceptance criteria for every requested feature.
 
@@ -84,12 +86,16 @@ Completion: the slice passes its public-interface tests and deterministic static
 
 ### 4.5 Create assets
 
-- Produce textures and graphical resources in the formats required by the target.
-- Produce editable models and exported runtime models.
-- Validate dimensions, paths, identifiers, texture references, model references, animation references, and resource-pack conventions.
-- Review visual output in Blockbench, screenshots, or the running game when available.
+- Start from approved `TextureSpec`/`AnimationSpec` contracts and a style board. Texture contracts cover role, target revision, texel grid, dimensions, palette, alpha, tiling, seed/RNG, cleanup, frame timing/order, exports, and acceptance rules. Animation contracts cover rig/bone roles and pivots, clips/states, tick timing, root motion, keyframes/interpolation, transitions, exports, and acceptance rules; arbitrary bone names, code, and command lines are not accepted.
+- Produce textures through an approved manual, `mc_asset`, host-AI, fal, or local ComfyUI route. Preserve the immutable concept/reference and use pinned `mc-asset` `v0.5.0` at `bedf67229ab0fdf304f6d40bc0000a27bd05e880` for recorded deterministic pixel cleanup, seeded operations, tiling, and frame export. Hosted generation is not assumed reproducible from its seed.
+- Preserve editable `.grid`/`.mcpx` texture sources and `.bbmodel` models. Keep the original AI concept and cleanup recipe as provenance; a generic atlas is diagnostic/editable only, never a second runtime source of truth.
+- Export ordinary target-local PNGs and models. Animated textures use a vertical frame strip with sibling `.png.mcmeta`, explicit frame order, integer tick timing, and deliberate interpolation/loop policy.
+- Use `jasonjgardner/blockbench-mcp-plugin` `1.10.1` at `97a8a80d3a37bf95c5e136d93d2c7da399fff753` as the sole external Blockbench engine. Adapt only the reviewed MIT rig, generator, analyzer, and paint methods from `sosadly/blockbench-mcp` `0.3.1` at `028cdd76589de2e2cea51bfd79495b50a3c7d1d2`; do not install or register its MCP server. All adapted random operations use versioned seeded RNG, never `Math.random()`.
+- Optionally use pinned Blender scripts for loop analysis, QA, and contact sheets; Blender/glTF is not a Minecraft runtime delivery format. Mosaicary `0.1.4` at `08bdba5252a378cf8e2111b0c2cb27cec4ea15ba` is conditional local glTF/Blender ingress only, pending fidelity/network-deny/runtime pilots, and cannot add bone animation to Java Block/Item models.
+- Validate source bytes and references, UV/orientation/scale, model round trips, rig and clip states, loop boundaries, clipping, z-fighting, tiling, alpha, and deterministic regeneration.
+- Review Blockbench/Blender previews separately from real-client evidence. Exercise the same assets and declared states in the production-JAR Minecraft client and obtain design review for subjective quality.
 
-Completion: every asset passes deterministic validation and its visual acceptance check.
+Completion: every asset passes deterministic source checks, required real-Minecraft runtime checks, and its independent design-review gate. Preview images, hashes, and numeric diffs alone do not establish in-game correctness or aesthetic approval.
 
 ### 4.6 Verify
 
@@ -214,6 +220,8 @@ A versioned rubric evaluates gameplay coherence, balance, art consistency, model
 - Keep credentials out of generated projects, logs, artifacts, and tool results.
 - Pin and verify downloaded toolchains and dependencies where the ecosystem supports it.
 - Treat Gradle scripts, plugins, generated code, and install scripts as executable trust boundaries.
+- Invoke `mc-asset` only as a pinned external process behind the shared Voxellume execution facade. Expose allowlisted operations, not raw CLI paths or raw MCP tools. Enforce facade-owned authorized roots, realpath and mutation-time symlink/race checks, hardlink rejection, pre-read/decode/output/log limits, transaction staging with journaled all-output publication, complete process-group cleanup, `shell:false`, offline/scrubbed environments, and SHA-256 evidence.
+- Run external Blockbench as a root-restricted process with `risky_eval` disabled and loopback-only desktop access. Never expose sosadly `execute_script`, plugin installation, arbitrary import/export paths, or its unauthenticated command bridge.
 - Require host approval for operations outside the project sandbox.
 - Do not expose a network service beyond loopback by default.
 - Preserve audit evidence for external mutations.
@@ -248,7 +256,7 @@ Permanent tests cover behavior, malformed input, path containment, cancellation,
 
 - Java Edition is the required edition; Bedrock is outside the complete release scope.
 - Fabric, NeoForge, Forge, and Quilt use separate target packs and real verification matrices.
-- Both editable Blockbench projects and direct JSON/PNG/Java asset generation are required.
+- Editable `.grid`/`.mcpx`/`.bbmodel` sources and direct JSON/PNG/Java asset generation are required; frame strips plus `.png.mcmeta` are the animated-texture runtime contract.
 - Public test seams: target resolution, scaffolding, verification, assets, OMP, Harness, and final report.
 - Base toolchain: pnpm, TypeScript, and the built-in Node test runner.
 - Repository: private [`lukavtz/voxellume`](https://github.com/lukavtz/voxellume).
@@ -256,7 +264,8 @@ Permanent tests cover behavior, malformed input, path containment, cancellation,
 - Required coverage is every official Minecraft release from 1.21 through 26.3, using JDK 21 and 25 as appropriate. Each loader/release combination still requires its own qualification evidence and an explicit unsupported result when no compatible loader/API exists.
 - ModLens and adhi minecraft-modding-mcp are compared on the same fixtures before one source/mapping integration is selected.
 - Real-client verification combines a minimal target-specific verification mod with suitable OSS adapters.
-- Asset generation supports host image tools, fal, and local ComfyUI.
+- Asset generation supports host image tools, fal, and local ComfyUI. Pinned `mc-asset` is an external-process implementation dependency behind the Voxellume facade; jasonjgardner is the only external Blockbench engine; sosadly is method adaptation only; Blender is optional QA/review tooling; Mosaicary remains conditional and unqualified.
+- The completed mc-asset and sosadly pilots establish only their recorded process/method behavior. Neither pilot establishes real-Minecraft correctness or human aesthetic approval.
 - MCreator and Player Games are optional integrations, not core dependencies.
 - Local prerequisites include JDK 21/25, Blockbench, Blender, ffmpeg, and Docker-based isolation.
 - EULA and network approval is confirmed once per environment, recorded, and reused with cached dependencies.

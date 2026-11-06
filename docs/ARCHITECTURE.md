@@ -60,6 +60,16 @@ MCP is not used for prompt text, static skills, or ordinary source editing alrea
 
 All project operations run inside an authorized root. Process execution uses argument arrays, explicit working directories, cancellation, deadlines, bounded output, and host policy. Network-enabled build steps and game launches are visible in the verification report.
 
+### ADR-008: Typed editable assets behind one execution facade
+
+`TextureSpec` and `AnimationSpec` are versioned, target-bound inputs to asset generation, not free-form tool requests. They link stable asset/clip/state IDs, editable sources, runtime exports, deterministic settings, provenance, and acceptance rules. Texture sources are `.grid` or layered `.mcpx`; models and bone animations use `.bbmodel`. Animated-texture delivery is a vertical PNG strip plus sibling `.png.mcmeta`. An atlas is only an editable or diagnostic sheet.
+
+Pinned `smile-minecraft/mc-asset` `v0.5.0` (`bedf67229ab0fdf304f6d40bc0000a27bd05e880`) runs as an external process for deterministic pixel cleanup, seeded generation, tiling, frame strips, and style/pack checks. The model sees allowlisted core operations only, never raw CLI paths or raw mc-asset MCP tools. The shared execution supervisor supplies fixed executable/argument arrays with `shell:false`, authorized-root and realpath checks, mutation-time symlink/path-swap and hardlink protection, pre-read/decode/output/log quotas, staging and journaled publication of the complete output set, process-group cancellation, offline/scrubbed environments, and hash evidence. This facade is required because the completed pilot demonstrated parent/absolute/symlink-parent output escapes, no effective general pre-read byte cap, and non-transactional multi-artifact writes.
+
+`jasonjgardner/blockbench-mcp-plugin` `1.10.1` (`97a8a80d3a37bf95c5e136d93d2c7da399fff753`) remains the sole external Blockbench engine, with restricted roots, revisions/atomic writes, `risky_eval=off`, and loopback-only desktop service. Reuse only the MIT rig/template, cycle-generator, evaluated-animation analyzer, orientation, model-check, and deterministic paint/UV methods from `sosadly/blockbench-mcp` `0.3.1` (`028cdd76589de2e2cea51bfd79495b50a3c7d1d2`) behind Voxellume's typed API and notices. Replace every random path with versioned seeded RNG. Do not install its server, MCP bridge, `execute_script`, or plugin installer.
+
+Blender uses reviewed fixed scripts only for optional loop/QA/contact-sheet analysis; it is not a Minecraft exporter. Mosaicary `0.1.4` (`08bdba5252a378cf8e2111b0c2cb27cec4ea15ba`) is a conditional, pinned, local, network-denied glTF/Blender ingress pending conversion and runtime pilots. Java Block/Item models never acquire bone animation through this route.
+
 ## 3. Repository layout
 
 ```text
@@ -131,9 +141,11 @@ Output: created files and detected conflicts. Existing files are never overwritt
 
 ### Asset validation
 
-Input: authorized project root and selected target.
+Input: authorized project root, selected target, `TextureSpec`/`AnimationSpec` revisions, and their source/export manifests.
 
-Output: structured findings with asset path, rule, severity, and source location where available.
+Output: structured findings with asset path, stable rule ID, `checkClass=source|browser|design_review`, severity, and source location where available. `browser` explicitly names the rendered surface; only `surface=minecraft_client` closes an in-game gate. Blockbench and Blender results remain source/preview evidence and cannot substitute for the production-JAR client or independent design review.
+
+Asset provenance links each runtime hash to its spec, editable-source hash, immutable concept/reference, provider and cleanup parameters, seeded-RNG algorithm/seed derivation, tool revisions, conversion reports, target revision, scenario IDs, and approval revision. Any source, palette, workflow, export, or converter change invalidates the previous approval.
 
 ### Verification
 
@@ -203,15 +215,15 @@ flowchart TD
 
 ## 8. Verification levels
 
-| Level              | Runs                       | Required evidence                                        |
-| ------------------ | -------------------------- | -------------------------------------------------------- |
-| Static             | Every change               | Format, lint, types, dependency/security checks          |
-| Unit               | Every TDD slice            | Public-interface behavior and failure cases              |
-| Host contract      | Adapter changes            | OMP and Harness calls, results, cancellation             |
-| Target integration | Target or template changes | Real clean Gradle build and resource validation          |
-| Runtime            | Supported target changes   | Server/client/game-test scenarios                        |
-| Visual             | Asset or UI changes        | Actual model/game surface inspection                     |
-| Release            | Every PR                   | Clean checkout, full required matrix, package inspection |
+| Level              | Runs                       | Required evidence                                                                                                 |
+| ------------------ | -------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Static             | Every change               | Format, lint, types, dependency/security checks                                                                   |
+| Unit               | Every TDD slice            | Public-interface behavior and failure cases                                                                       |
+| Host contract      | Adapter changes            | OMP and Harness calls, results, cancellation                                                                      |
+| Target integration | Target or template changes | Real clean Gradle build and resource validation                                                                   |
+| Runtime            | Supported target changes   | Server/client/game-test scenarios                                                                                 |
+| Visual             | Asset or UI changes        | Source gates, production-JAR Minecraft states/captures, and independent design review; previews are supplementary |
+| Release            | Every PR                   | Clean checkout, full required matrix, package inspection                                                          |
 
 CI separates fast deterministic checks from long Java/game jobs. Required support status depends on the real integration matrix, not mocked success.
 
