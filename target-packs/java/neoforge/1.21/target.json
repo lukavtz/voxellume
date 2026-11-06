@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "target-pack-1.0.0",
+  "id": "java-neoforge-1.21-r1",
+  "edition": "java",
+  "status": "candidate",
+  "revision": 1,
+  "packSha256": "9d80f997c4b6a509f49cb7298f970751319072f32e199b8ee08b203fc264f792",
+  "minecraft": {
+    "version": "1.21",
+    "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
+    "releaseJsonUrl": "https://piston-meta.mojang.com/v1/packages/f7840475dae7c9ca4968b8198055db8d708a162d/1.21.json",
+    "releaseJsonSha256": "9d1cb54bcb68a63137c563dea3e451a1184c74917374bb54e30b4f659a1f26bf",
+    "obfuscation": "obfuscated",
+    "dataPackVersion": 48,
+    "resourcePackVersion": 34
+  },
+  "loader": {
+    "id": "neoforge",
+    "version": "21.0.167",
+    "coordinates": "net.neoforged:neoforge:21.0.167:universal",
+    "artifactSha256": "9c68c9c2c8bb8314fde3f1a3cf890ff4ab74b804561ae6998a4b9308397725a5",
+    "apiDependencies": []
+  },
+  "mappings": {
+    "kind": "parchment-layer",
+    "artifacts": [
+      {
+        "coordinates": "org.parchmentmc.data:parchment-1.21:2024.11.10@zip",
+        "version": "2024.11.10",
+        "artifactSha256": "2ea8668677a6d398f313a4a27959d5cafffa6b6a75acf000ac3f9515d95e3f19"
+      }
+    ]
+  },
+  "java": {
+    "gradleJvm": 21,
+    "toolchain": 21,
+    "release": 21,
+    "architecture": "64-bit"
+  },
+  "gradle": {
+    "version": "9.2.1",
+    "distributionUrl": "https://services.gradle.org/distributions/gradle-9.2.1-bin.zip",
+    "distributionSha256": "72f44c9f8ebcb1af43838f45ee5c4aa9c5444898b3468ab3f4af7b6076c5bc3f",
+    "plugins": [
+      {
+        "id": "net.neoforged.moddev",
+        "version": "2.0.148"
+      }
+    ]
+  },
+  "metadata": {
+    "file": "META-INF/neoforge.mods.toml"
+  },
+  "resources": {
+    "modelFormat": "java-block-item-json",
+    "blockbench": {
+      "projectFormat": "Java Block/Item",
+      "applicationVersion": "5.2.2"
+    }
+  },
+  "knownLimitations": [
+    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+  ],
+  "template": {
+    "repository": "https://github.com/NeoForgeMDKs/MDK-1.21-ModDevGradle",
+    "revision": "1a8837b6ce8d795bac88e7720ef6ddf1af35259f",
+    "contentSha256": "b98fe6d760f0dc9f92870192e2c495def7042b670e2d1fdf21b1534e519e9974"
+  }
+}

@@ -1,0 +1,265 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://voxellume.invalid/schemas/target-pack.schema.json",
+  "title": "Voxellume target pack",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "id",
+    "edition",
+    "status",
+    "revision",
+    "packSha256",
+    "minecraft",
+    "loader",
+    "mappings",
+    "java",
+    "gradle",
+    "metadata",
+    "resources",
+    "knownLimitations"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "target-pack-1.0.0" },
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]*-r[1-9][0-9]*$" },
+    "edition": { "const": "java" },
+    "status": {
+      "enum": [
+        "draft",
+        "candidate",
+        "supported",
+        "legacy",
+        "rejected",
+        "unsupported"
+      ]
+    },
+    "reason": { "$ref": "#/$defs/reason" },
+    "revision": { "type": "integer", "minimum": 1 },
+    "packSha256": { "$ref": "#/$defs/sha256" },
+    "minecraft": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "releaseManifestUrl",
+        "releaseJsonUrl",
+        "releaseJsonSha256",
+        "obfuscation",
+        "dataPackVersion",
+        "resourcePackVersion"
+      ],
+      "properties": {
+        "version": { "$ref": "#/$defs/exactVersion" },
+        "releaseManifestUrl": { "$ref": "#/$defs/httpsUrl" },
+        "releaseJsonUrl": { "$ref": "#/$defs/httpsUrl" },
+        "releaseJsonSha256": { "$ref": "#/$defs/sha256" },
+        "obfuscation": { "enum": ["obfuscated", "unobfuscated"] },
+        "dataPackVersion": { "type": "number", "minimum": 0 },
+        "resourcePackVersion": { "type": "number", "minimum": 0 }
+      }
+    },
+    "loader": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "version",
+        "coordinates",
+        "artifactSha256",
+        "apiDependencies"
+      ],
+      "properties": {
+        "id": { "enum": ["fabric", "neoforge", "forge", "quilt"] },
+        "version": {
+          "anyOf": [{ "$ref": "#/$defs/exactVersion" }, { "type": "null" }]
+        },
+        "coordinates": {
+          "anyOf": [{ "$ref": "#/$defs/coordinates" }, { "type": "null" }]
+        },
+        "artifactSha256": {
+          "anyOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }]
+        },
+        "apiDependencies": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "version", "coordinates", "artifactSha256"],
+            "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "version": { "$ref": "#/$defs/exactVersion" },
+              "coordinates": { "$ref": "#/$defs/coordinates" },
+              "artifactSha256": { "$ref": "#/$defs/sha256" }
+            }
+          }
+        }
+      }
+    },
+    "mappings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "artifacts"],
+      "properties": {
+        "kind": {
+          "enum": ["yarn", "mojang", "quilt", "parchment-layer", "none"]
+        },
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["coordinates", "version", "artifactSha256"],
+            "properties": {
+              "coordinates": { "$ref": "#/$defs/coordinates" },
+              "version": { "$ref": "#/$defs/exactVersion" },
+              "artifactSha256": { "$ref": "#/$defs/sha256" }
+            }
+          }
+        }
+      }
+    },
+    "java": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gradleJvm", "toolchain", "release", "architecture"],
+      "properties": {
+        "gradleJvm": { "type": "integer", "enum": [21, 25] },
+        "toolchain": { "type": "integer", "enum": [21, 25] },
+        "release": { "type": "integer", "enum": [21, 25] },
+        "architecture": { "const": "64-bit" }
+      }
+    },
+    "gradle": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "distributionUrl",
+            "distributionSha256",
+            "plugins"
+          ],
+          "properties": {
+            "version": { "$ref": "#/$defs/exactVersion" },
+            "distributionUrl": { "$ref": "#/$defs/httpsUrl" },
+            "distributionSha256": { "$ref": "#/$defs/sha256" },
+            "plugins": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["id", "version"],
+                "properties": {
+                  "id": { "type": "string", "minLength": 1 },
+                  "version": { "$ref": "#/$defs/exactVersion" }
+                }
+              }
+            }
+          }
+        },
+        { "type": "null" }
+      ]
+    },
+    "template": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "revision", "contentSha256"],
+      "properties": {
+        "repository": { "$ref": "#/$defs/httpsUrl" },
+        "revision": {
+          "anyOf": [
+            { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+            {
+              "type": "string",
+              "pattern": "^[0-9]+(?:\\.[0-9]+)*-[0-9]+(?:\\.[0-9]+)+$"
+            }
+          ],
+          "description": "Immutable full Git commit or exact Forge MDK revision"
+        },
+        "path": { "type": "string", "minLength": 1 },
+        "contentSha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file"],
+      "properties": {
+        "file": { "type": "string", "minLength": 1 }
+      }
+    },
+    "resources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["modelFormat", "blockbench"],
+      "properties": {
+        "modelFormat": { "type": "string", "minLength": 1 },
+        "blockbench": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["projectFormat", "applicationVersion"],
+          "properties": {
+            "projectFormat": { "type": "string", "minLength": 1 },
+            "applicationVersion": { "$ref": "#/$defs/exactVersion" }
+          }
+        }
+      }
+    },
+    "knownLimitations": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "Lowercase hexadecimal SHA-256"
+    },
+    "exactVersion": {
+      "type": "string",
+      "pattern": "^(?!.*[Ss][Nn][Aa][Pp][Ss][Hh][Oo][Tt])[0-9]+(?:\\.[0-9]+)*(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+      "description": "Exact non-ranged version; latest, snapshot, and range operators are forbidden"
+    },
+    "coordinates": {
+      "type": "string",
+      "pattern": "^[^\\s:]+(?::[^\\s:]+)+(?::[^\\s@]+)?(?:@[^\\s]+)?$"
+    },
+    "httpsUrl": { "type": "string", "pattern": "^https://[^\\s]+$" },
+    "reason": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "detail", "evidence"],
+      "properties": {
+        "code": {
+          "enum": [
+            "unknown_minecraft_release",
+            "unknown_loader",
+            "no_qualified_pack",
+            "loader_release_unavailable",
+            "api_unavailable",
+            "mappings_unavailable",
+            "toolchain_unavailable",
+            "verification_failed"
+          ]
+        },
+        "detail": { "type": "string", "minLength": 1 },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["url", "sha256"],
+            "properties": {
+              "url": { "$ref": "#/$defs/httpsUrl" },
+              "sha256": { "$ref": "#/$defs/sha256" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

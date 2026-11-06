@@ -1,0 +1,83 @@
+{
+  "schemaVersion": "target-pack-1.0.0",
+  "id": "java-quilt-1.21-r1",
+  "edition": "java",
+  "status": "candidate",
+  "revision": 1,
+  "packSha256": "a84547cafe8ff3ff657e3768a33e8cc4859338e305c07b9b2de959131156121f",
+  "minecraft": {
+    "version": "1.21",
+    "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
+    "releaseJsonUrl": "https://piston-meta.mojang.com/v1/packages/f7840475dae7c9ca4968b8198055db8d708a162d/1.21.json",
+    "releaseJsonSha256": "9d1cb54bcb68a63137c563dea3e451a1184c74917374bb54e30b4f659a1f26bf",
+    "obfuscation": "obfuscated",
+    "dataPackVersion": 48,
+    "resourcePackVersion": 34
+  },
+  "loader": {
+    "id": "quilt",
+    "version": "0.20.0-beta.9",
+    "coordinates": "org.quiltmc:quilt-loader:0.20.0-beta.9",
+    "artifactSha256": "a475689ac9a5b9718c045972bb0f41381ce22315a87273a99f30ec1fa3aacb8a",
+    "apiDependencies": [
+      {
+        "id": "quilted-fabric-api",
+        "version": "11.0.0-alpha.3+0.102.0-1.21",
+        "coordinates": "org.quiltmc.quilted-fabric-api:quilted-fabric-api:11.0.0-alpha.3+0.102.0-1.21",
+        "artifactSha256": "d433ef5f5199b446827b642a5c7d504b6164a325d76e77c78b8c950d4e85b944"
+      },
+      {
+        "id": "qsl",
+        "version": "10.0.0-alpha.1+1.21",
+        "coordinates": "org.quiltmc:qsl:10.0.0-alpha.1+1.21",
+        "artifactSha256": "7f97dca6ce541a9312010310bfe7bb7184a34bcf9159fd496d735bfb84406c83"
+      }
+    ]
+  },
+  "mappings": {
+    "kind": "quilt",
+    "artifacts": [
+      {
+        "coordinates": "org.quiltmc:quilt-mappings:1.21+build.19:intermediary-v2",
+        "version": "1.21+build.19",
+        "artifactSha256": "d8efa4f1721f94ce79dccbf49aa1a14debfe75b492013e988b7fcb90e832591c"
+      }
+    ]
+  },
+  "java": {
+    "gradleJvm": 21,
+    "toolchain": 21,
+    "release": 21,
+    "architecture": "64-bit"
+  },
+  "gradle": {
+    "version": "8.9",
+    "distributionUrl": "https://services.gradle.org/distributions/gradle-8.9-bin.zip",
+    "distributionSha256": "d725d707bfabd4dfdc958c624003b3c80accc03f7037b5122c4b1d0ef15cecab",
+    "plugins": [
+      {
+        "id": "org.quiltmc.loom",
+        "version": "1.15.1"
+      }
+    ]
+  },
+  "metadata": {
+    "file": "quilt.mod.json"
+  },
+  "resources": {
+    "modelFormat": "java-block-item-json",
+    "blockbench": {
+      "projectFormat": "Java Block/Item",
+      "applicationVersion": "5.2.2"
+    }
+  },
+  "knownLimitations": [
+    "Only generic official template is available; its content declares Minecraft 1.20.6, so every target coordinate is an override. No target-local build/runtime compatibility claim.",
+    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+  ],
+  "template": {
+    "repository": "https://github.com/QuiltMC/quilt-template-mod",
+    "revision": "9a6f89cd481e3f58f128596b5b043353bee6b3f2",
+    "contentSha256": "a2afaa5ab8037021c4538fc8f1bbcca6e30b713c57359245c7eec315e0aaf849"
+  }
+}

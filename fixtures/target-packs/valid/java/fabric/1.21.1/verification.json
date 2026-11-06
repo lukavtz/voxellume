@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "target-verification-1.0.0",
+  "capabilities": {
+    "build": true,
+    "server": true,
+    "client": true,
+    "gameTest": true,
+    "visual": true
+  },
+  "required": ["build", "server", "client", "gameTest", "visual"],
+  "checks": {
+    "build": {
+      "argv": ["./gradlew", "--no-daemon", "clean", "build"],
+      "assertions": ["exitCode == 0"],
+      "artifactGlobs": ["build/libs/*.jar", "build/reports/**"]
+    },
+    "server": {
+      "argv": ["./gradlew", "--no-daemon", "runServer"],
+      "assertions": ["Dedicated server reached startup assertion"],
+      "artifactGlobs": ["run/logs/*.log"]
+    },
+    "client": {
+      "argv": ["./gradlew", "--no-daemon", "runClient"],
+      "assertions": ["Client reached main menu without mod errors"],
+      "artifactGlobs": ["run/logs/*.log"]
+    },
+    "gameTest": {
+      "argv": ["./gradlew", "--no-daemon", "runGametest"],
+      "assertions": ["All required GameTests passed"],
+      "artifactGlobs": ["build/reports/gametest/**"]
+    },
+    "visual": {
+      "argv": ["./gradlew", "--no-daemon", "runClient"],
+      "assertions": ["Reviewed item in inventory, hand, and world"],
+      "artifactGlobs": ["verification/screenshots/*.png"]
+    }
+  },
+  "testedPlatforms": [
+    {
+      "os": "macOS",
+      "arch": "arm64"
+    }
+  ],
+  "evidenceManifest": {
+    "path": "evidence/java-fabric-1.21.1-r1/manifest.json",
+    "sha256": "9b2e18a69c684e429f52ef93dc829b865b4e2986a6a21ea57a2c77a84ab15e21"
+  }
+}

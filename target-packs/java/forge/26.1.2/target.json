@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "target-pack-1.0.0",
+  "id": "java-forge-26.1.2-r1",
+  "edition": "java",
+  "status": "candidate",
+  "revision": 1,
+  "packSha256": "2b6853e86bc8016f2f3dc740489cd72bc50e73dcbdf8f603103de019db414870",
+  "minecraft": {
+    "version": "26.1.2",
+    "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
+    "releaseJsonUrl": "https://piston-meta.mojang.com/v1/packages/4e49d699db7dba839226d0ed1fcf36c465c2edbe/26.1.2.json",
+    "releaseJsonSha256": "ae0a4ad2843d0cb77a673ab6b16ff4d15f7f976fe7513af1d6a86545194cae73",
+    "obfuscation": "unobfuscated",
+    "dataPackVersion": 101.1,
+    "resourcePackVersion": 84
+  },
+  "loader": {
+    "id": "forge",
+    "version": "64.1.5",
+    "coordinates": "net.minecraftforge:forge:26.1.2-64.1.5:installer",
+    "artifactSha256": "6e01323837051176762bd466340a601da122f179fe6a00ac616e05429ae07648",
+    "apiDependencies": []
+  },
+  "mappings": {
+    "kind": "none",
+    "artifacts": []
+  },
+  "java": {
+    "gradleJvm": 25,
+    "toolchain": 25,
+    "release": 25,
+    "architecture": "64-bit"
+  },
+  "gradle": {
+    "version": "9.5.0",
+    "distributionUrl": "https://services.gradle.org/distributions/gradle-9.5.0-bin.zip",
+    "distributionSha256": "553c78f50dafcd54d65b9a444649057857469edf836431389695608536d6b746",
+    "plugins": [
+      {
+        "id": "net.minecraftforge.gradle",
+        "version": "7.0.40"
+      }
+    ]
+  },
+  "metadata": {
+    "file": "META-INF/mods.toml"
+  },
+  "resources": {
+    "modelFormat": "java-block-item-json",
+    "blockbench": {
+      "projectFormat": "Java Block/Item",
+      "applicationVersion": "5.2.2"
+    }
+  },
+  "knownLimitations": [
+    "MDK declares a ForgeGradle range; exact plugin pin is selected from official Forge Maven. No build/runtime compatibility claim.",
+    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+  ],
+  "template": {
+    "repository": "https://maven.minecraftforge.net/net/minecraftforge/forge/26.1.2-64.1.5/forge-26.1.2-64.1.5-mdk.zip",
+    "revision": "26.1.2-64.1.5",
+    "contentSha256": "7a75b45d976ff78909e0fc0c774029acc16f0143a212ace8228cac90ac41f40e"
+  }
+}

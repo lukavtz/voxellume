@@ -1,0 +1,70 @@
+{
+  "schemaVersion": "target-pack-1.0.0",
+  "id": "java-neoforge-1.21.1-r1",
+  "edition": "java",
+  "status": "candidate",
+  "revision": 1,
+  "packSha256": "39422d8ec157190273188949a3169c4fd47aa59619e20305fd4eca3dbb3865a1",
+  "minecraft": {
+    "version": "1.21.1",
+    "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
+    "releaseJsonUrl": "https://piston-meta.mojang.com/v1/packages/82ba6501da174a665c1787775f946487422f2432/1.21.1.json",
+    "releaseJsonSha256": "3636c26c20f1f0b7472ebef1a624ba1a6a2c4b003858c13224929898b5321437",
+    "obfuscation": "obfuscated",
+    "dataPackVersion": 48,
+    "resourcePackVersion": 34
+  },
+  "loader": {
+    "id": "neoforge",
+    "version": "21.1.265",
+    "coordinates": "net.neoforged:neoforge:21.1.265:universal",
+    "artifactSha256": "c12cf1a6cb0aa7792b13174b06088a4f54d8bcc92f6a32fcb03310b456936847",
+    "apiDependencies": []
+  },
+  "mappings": {
+    "kind": "parchment-layer",
+    "artifacts": [
+      {
+        "coordinates": "org.parchmentmc.data:parchment-1.21.1:2024.11.17@zip",
+        "version": "2024.11.17",
+        "artifactSha256": "7c240a37ab432213033b1113d75cb80dc22bffa631d979818b2da1585fa24a08"
+      }
+    ]
+  },
+  "java": {
+    "gradleJvm": 21,
+    "toolchain": 21,
+    "release": 21,
+    "architecture": "64-bit"
+  },
+  "gradle": {
+    "version": "9.2.1",
+    "distributionUrl": "https://services.gradle.org/distributions/gradle-9.2.1-bin.zip",
+    "distributionSha256": "72f44c9f8ebcb1af43838f45ee5c4aa9c5444898b3468ab3f4af7b6076c5bc3f",
+    "plugins": [
+      {
+        "id": "net.neoforged.moddev",
+        "version": "2.0.148"
+      }
+    ]
+  },
+  "metadata": {
+    "file": "META-INF/neoforge.mods.toml"
+  },
+  "resources": {
+    "modelFormat": "java-block-item-json",
+    "blockbench": {
+      "projectFormat": "Java Block/Item",
+      "applicationVersion": "5.2.2"
+    }
+  },
+  "knownLimitations": [
+    "Baseline build evidence: NeoForm Runtime decompile failed with Vineflower 1.10.1 exit code 1 on clean build and warm-cache retry; no production JAR was produced.",
+    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+  ],
+  "template": {
+    "repository": "https://github.com/NeoForgeMDKs/MDK-1.21.1-ModDevGradle",
+    "revision": "e93d7f09d4eec12c76d1d7be9bf4eaad0246e9e0",
+    "contentSha256": "1101d5f9baf5eb4dd31f826e4eef7f7380a01a776ce1af230133e32a95e46e13"
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "schemaVersion": "target-pack-1.0.0",
+  "id": "java-quilt-1.21.7-r1",
+  "edition": "java",
+  "status": "candidate",
+  "revision": 1,
+  "packSha256": "af9b4598782dd0bf21703218cb56946cedf4b8c7082fe6ff1070f9b8ccafd532",
+  "minecraft": {
+    "version": "1.21.7",
+    "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
+    "releaseJsonUrl": "https://piston-meta.mojang.com/v1/packages/1b478ff245de95b05e3c1a1589f391ade22e1bd3/1.21.7.json",
+    "releaseJsonSha256": "cd75ad0ef961f490aa967d61ffb2117d9c84bbf302e6e01e9adaa66b6ee57442",
+    "obfuscation": "obfuscated",
+    "dataPackVersion": 81,
+    "resourcePackVersion": 64
+  },
+  "loader": {
+    "id": "quilt",
+    "version": "0.20.0-beta.9",
+    "coordinates": "org.quiltmc:quilt-loader:0.20.0-beta.9",
+    "artifactSha256": "a475689ac9a5b9718c045972bb0f41381ce22315a87273a99f30ec1fa3aacb8a",
+    "apiDependencies": []
+  },
+  "mappings": {
+    "kind": "quilt",
+    "artifacts": [
+      {
+        "coordinates": "org.quiltmc:quilt-mappings:1.21.7+build.7:intermediary-v2",
+        "version": "1.21.7+build.7",
+        "artifactSha256": "1e43e887fa90035fa1c0fe8030487dd0a2c227066bba3c76ba226ceeb9ef9adb"
+      }
+    ]
+  },
+  "java": {
+    "gradleJvm": 21,
+    "toolchain": 21,
+    "release": 21,
+    "architecture": "64-bit"
+  },
+  "gradle": {
+    "version": "8.9",
+    "distributionUrl": "https://services.gradle.org/distributions/gradle-8.9-bin.zip",
+    "distributionSha256": "d725d707bfabd4dfdc958c624003b3c80accc03f7037b5122c4b1d0ef15cecab",
+    "plugins": [
+      {
+        "id": "org.quiltmc.loom",
+        "version": "1.15.1"
+      }
+    ]
+  },
+  "metadata": {
+    "file": "quilt.mod.json"
+  },
+  "resources": {
+    "modelFormat": "java-block-item-json",
+    "blockbench": {
+      "projectFormat": "Java Block/Item",
+      "applicationVersion": "5.2.2"
+    }
+  },
+  "knownLimitations": [
+    "Only generic official template is available; its content declares Minecraft 1.20.6, so every target coordinate is an override. No target-local build/runtime compatibility claim.",
+    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+  ],
+  "template": {
+    "repository": "https://github.com/QuiltMC/quilt-template-mod",
+    "revision": "9a6f89cd481e3f58f128596b5b043353bee6b3f2",
+    "contentSha256": "a2afaa5ab8037021c4538fc8f1bbcca6e30b713c57359245c7eec315e0aaf849"
+  }
+}

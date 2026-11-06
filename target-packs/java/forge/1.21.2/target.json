@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "target-pack-1.0.0",
+  "id": "java-forge-1.21.2-r1",
+  "edition": "java",
+  "status": "unsupported",
+  "revision": 1,
+  "packSha256": "28d127b410663e04b585328abba7bc0eceb78af79a128c1bc0e1f2580b2142ee",
+  "minecraft": {
+    "version": "1.21.2",
+    "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
+    "releaseJsonUrl": "https://piston-meta.mojang.com/v1/packages/5941d98532ff0c7de72bd3f514d226d66977b7f0/1.21.2.json",
+    "releaseJsonSha256": "7e5477d6b6543b84e3e9d1f40526d214eb76314a076adcef31a8928a6d765116",
+    "obfuscation": "obfuscated",
+    "dataPackVersion": 57,
+    "resourcePackVersion": 42
+  },
+  "loader": {
+    "id": "forge",
+    "version": null,
+    "coordinates": null,
+    "artifactSha256": null,
+    "apiDependencies": []
+  },
+  "mappings": {
+    "kind": "mojang",
+    "artifacts": [
+      {
+        "coordinates": "net.minecraft:client:1.21.2:mappings@txt",
+        "version": "1.21.2",
+        "artifactSha256": "e37560e4889168916a73dbc4922c563002eff70fbecfe1cf5c50a7b222f451b2"
+      },
+      {
+        "coordinates": "net.minecraft:server:1.21.2:mappings@txt",
+        "version": "1.21.2",
+        "artifactSha256": "0d80dc2239ee9fe5fc6e6c122b1a73178a4243fffe991754faa2a9581364bdbf"
+      }
+    ]
+  },
+  "java": {
+    "gradleJvm": 21,
+    "toolchain": 21,
+    "release": 21,
+    "architecture": "64-bit"
+  },
+  "gradle": null,
+  "metadata": {
+    "file": "META-INF/mods.toml"
+  },
+  "resources": {
+    "modelFormat": "java-block-item-json",
+    "blockbench": {
+      "projectFormat": "Java Block/Item",
+      "applicationVersion": "5.2.2"
+    }
+  },
+  "knownLimitations": [],
+  "reason": {
+    "code": "loader_release_unavailable",
+    "detail": "Official Forge promotions and Forge Maven metadata contain no exact 1.21.2 Forge release or MDK.",
+    "evidence": [
+      {
+        "url": "https://files.minecraftforge.net/net/minecraftforge/forge/promotions_slim.json",
+        "sha256": "33d01c1e8a8b5e53bd25b048b81dc42950c1e251078aa1361bf3ce79727c1e72"
+      },
+      {
+        "url": "https://maven.minecraftforge.net/net/minecraftforge/forge/maven-metadata.xml",
+        "sha256": "cbc1accd281218828cc4866d01bb5ef9b2fd1a7243a3400220f9844c8c552d92"
+      }
+    ]
+  }
+}

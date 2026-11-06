@@ -1,0 +1,65 @@
+{
+  "schemaVersion": "target-pack-1.0.0",
+  "id": "java-quilt-26.1-r1",
+  "edition": "java",
+  "status": "candidate",
+  "revision": 1,
+  "packSha256": "5cfb1a03c68245b3a23001f1f9aa7150414ab486172271e2a59b3d33a51ed468",
+  "minecraft": {
+    "version": "26.1",
+    "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
+    "releaseJsonUrl": "https://piston-meta.mojang.com/v1/packages/90d81d9cd00c1ce55eb2b40aad4f1112bb58f12a/26.1.json",
+    "releaseJsonSha256": "7680e85c9aee9cea1ec41370d9e7e93fbd1d527f88f8edbf7ec736f3184a9533",
+    "obfuscation": "unobfuscated",
+    "dataPackVersion": 101.1,
+    "resourcePackVersion": 84
+  },
+  "loader": {
+    "id": "quilt",
+    "version": "0.20.0-beta.9",
+    "coordinates": "org.quiltmc:quilt-loader:0.20.0-beta.9",
+    "artifactSha256": "a475689ac9a5b9718c045972bb0f41381ce22315a87273a99f30ec1fa3aacb8a",
+    "apiDependencies": []
+  },
+  "mappings": {
+    "kind": "none",
+    "artifacts": []
+  },
+  "java": {
+    "gradleJvm": 25,
+    "toolchain": 25,
+    "release": 25,
+    "architecture": "64-bit"
+  },
+  "gradle": {
+    "version": "9.8.2",
+    "distributionUrl": "https://services.gradle.org/distributions/gradle-9.8.2-bin.zip",
+    "distributionSha256": "21bd5da2de49b642904077f38c0efdc7778e92b3ed0889392dca61b97e389607",
+    "plugins": [
+      {
+        "id": "org.quiltmc.loom",
+        "version": "1.15.1"
+      }
+    ]
+  },
+  "metadata": {
+    "file": "quilt.mod.json"
+  },
+  "resources": {
+    "modelFormat": "java-block-item-json",
+    "blockbench": {
+      "projectFormat": "Java Block/Item",
+      "applicationVersion": "5.2.2"
+    }
+  },
+  "knownLimitations": [
+    "Only generic official template is available; its content declares Minecraft 1.20.6, so every target coordinate is an override. No target-local build/runtime compatibility claim.",
+    "Quilt Loom 1.15.1 and Gradle 9.8.2 are exact upstream artifacts but their combination is unverified for this target.",
+    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+  ],
+  "template": {
+    "repository": "https://github.com/QuiltMC/quilt-template-mod",
+    "revision": "9a6f89cd481e3f58f128596b5b043353bee6b3f2",
+    "contentSha256": "a2afaa5ab8037021c4538fc8f1bbcca6e30b713c57359245c7eec315e0aaf849"
+  }
+}

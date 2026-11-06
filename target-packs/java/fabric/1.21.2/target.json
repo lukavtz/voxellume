@@ -1,0 +1,82 @@
+{
+  "schemaVersion": "target-pack-1.0.0",
+  "id": "java-fabric-1.21.2-r1",
+  "edition": "java",
+  "status": "candidate",
+  "revision": 1,
+  "packSha256": "b4224deee89dd96fc0fa2c3b31ac165849dcd070af72e06209962a45d50fef02",
+  "minecraft": {
+    "version": "1.21.2",
+    "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
+    "releaseJsonUrl": "https://piston-meta.mojang.com/v1/packages/5941d98532ff0c7de72bd3f514d226d66977b7f0/1.21.2.json",
+    "releaseJsonSha256": "7e5477d6b6543b84e3e9d1f40526d214eb76314a076adcef31a8928a6d765116",
+    "obfuscation": "obfuscated",
+    "dataPackVersion": 57,
+    "resourcePackVersion": 42
+  },
+  "loader": {
+    "id": "fabric",
+    "version": "0.20.1",
+    "coordinates": "net.fabricmc:fabric-loader:0.20.1",
+    "artifactSha256": "d0c5a082e07410aaff9de7ab196aa6b4236002870f9ba3ad5c1260fcce5110ad",
+    "apiDependencies": [
+      {
+        "id": "fabric-api",
+        "version": "0.106.1+1.21.2",
+        "coordinates": "net.fabricmc.fabric-api:fabric-api:0.106.1+1.21.2",
+        "artifactSha256": "d306e1cf9348bc13292bbdcec19a417a50d6dc538121eec02d10704e6b9e2ee8"
+      }
+    ]
+  },
+  "mappings": {
+    "kind": "mojang",
+    "artifacts": [
+      {
+        "coordinates": "net.minecraft:client:1.21.2:mappings@txt",
+        "version": "1.21.2",
+        "artifactSha256": "e37560e4889168916a73dbc4922c563002eff70fbecfe1cf5c50a7b222f451b2"
+      },
+      {
+        "coordinates": "net.minecraft:server:1.21.2:mappings@txt",
+        "version": "1.21.2",
+        "artifactSha256": "0d80dc2239ee9fe5fc6e6c122b1a73178a4243fffe991754faa2a9581364bdbf"
+      }
+    ]
+  },
+  "java": {
+    "gradleJvm": 21,
+    "toolchain": 21,
+    "release": 21,
+    "architecture": "64-bit"
+  },
+  "gradle": {
+    "version": "9.8.2",
+    "distributionUrl": "https://services.gradle.org/distributions/gradle-9.8.2-bin.zip",
+    "distributionSha256": "21bd5da2de49b642904077f38c0efdc7778e92b3ed0889392dca61b97e389607",
+    "plugins": [
+      {
+        "id": "net.fabricmc.fabric-loom-remap",
+        "version": "1.20.0-alpha.19"
+      }
+    ]
+  },
+  "metadata": {
+    "file": "fabric.mod.json"
+  },
+  "resources": {
+    "modelFormat": "java-block-item-json",
+    "blockbench": {
+      "projectFormat": "Java Block/Item",
+      "applicationVersion": "5.2.2"
+    }
+  },
+  "knownLimitations": [
+    "Template declares floating Loom 1.19-SNAPSHOT; exact 1.20.0-alpha.19 is a required override. No build/runtime compatibility claim.",
+    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+  ],
+  "template": {
+    "repository": "https://github.com/FabricMC/fabric-example-mod",
+    "revision": "e4f1b0f585e33cffaf5d7b133bef4f668e1e2cfa",
+    "contentSha256": "02bee780fcc29737004aeaa55263078cf03e1c29d729c5193177309e2d09e47b"
+  }
+}

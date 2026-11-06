@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "target-docs-1.0.0",
+  "retrievedAt": "2026-11-06T14:50:17Z",
+  "minecraftRelease": {
+    "url": "https://www.minecraft.net/en-us/article/minecraft-java-edition-1-21-4",
+    "revision": "1.21.4",
+    "responseSha256": "fe5d013b0c56457942c1ce7796a9b25ea92c4bc73bea29b638f6af8500297529"
+  },
+  "loaderApi": [
+    {
+      "name": "Fabric Loader 0.20.1",
+      "url": "https://docs.fabricmc.net/develop/loader/",
+      "revision": "0.20.1",
+      "responseSha256": "c8372f85d2fb9e4f81259ec0445c13a421df0fea4ff22ba39a3691fe14a61a31"
+    },
+    {
+      "name": "fabric-api 0.119.4+1.21.4",
+      "url": "https://docs.fabricmc.net/develop/",
+      "revision": "0.119.4+1.21.4",
+      "responseSha256": "9dd82bb9af381c0f49f43253fb1b2bd1f94977df2a9e1c3f09ac991d8b9622b7"
+    }
+  ],
+  "gradlePlugins": [
+    {
+      "id": "net.fabricmc.fabric-loom-remap",
+      "version": "1.20.0-alpha.19",
+      "url": "https://docs.fabricmc.net/develop/loom/",
+      "revision": "1.20.0-alpha.19",
+      "responseSha256": "296ba8190907388981fd4e111fb81204d8397f81f90aa830cfda98f17067d126"
+    }
+  ],
+  "catalogs": [
+    {
+      "url": "https://maven.fabricmc.net/net/fabricmc/fabric-api/fabric-api/maven-metadata.xml",
+      "responseSha256": "329422f5ae847e329b14d2ae8e9091adf946a40b0f7b63266362e52e534bbaf4"
+    },
+    {
+      "url": "https://maven.fabricmc.net/net/fabricmc/fabric-loom/maven-metadata.xml",
+      "responseSha256": "f073b55e99d984be731b98dd9e84152d24a34abf935f7a47ba5c25cbd79dcc34"
+    },
+    {
+      "url": "https://meta.fabricmc.net/v2/versions",
+      "responseSha256": "b61b8aa6c97c807db711be36df5049fbc6a37a9fc388a6bc5b94addb100ba4b0"
+    },
+    {
+      "url": "https://meta.fabricmc.net/v2/versions/loader/1.21.4/0.20.1/profile/json",
+      "responseSha256": "f6590381e56a3913cbf4e77203b16b499417307988916018c3ea01ce492d06ff"
+    },
+    {
+      "url": "https://piston-meta.mojang.com/v1/packages/2e024c9834568a872f8c009a97b29d8d7381d00a/1.21.4.json",
+      "responseSha256": "110a9db5df120e614728e248ee0d705af07438d1de1d261bc7c3c85d17cf8e12"
+    }
+  ]
+}

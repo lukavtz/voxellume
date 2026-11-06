@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://voxellume.invalid/schemas/target-verification.schema.json",
+  "title": "Voxellume target verification contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "capabilities",
+    "required",
+    "checks",
+    "testedPlatforms"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "target-verification-1.0.0" },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "build": { "type": "boolean" },
+        "server": { "type": "boolean" },
+        "client": { "type": "boolean" },
+        "gameTest": { "type": "boolean" },
+        "visual": { "type": "boolean" }
+      }
+    },
+    "required": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/checkName" }
+    },
+    "checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "build": { "$ref": "#/$defs/check" },
+        "server": { "$ref": "#/$defs/check" },
+        "client": { "$ref": "#/$defs/check" },
+        "gameTest": { "$ref": "#/$defs/check" },
+        "visual": { "$ref": "#/$defs/check" }
+      }
+    },
+    "testedPlatforms": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["os", "arch"],
+        "properties": {
+          "os": { "type": "string", "minLength": 1 },
+          "arch": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "evidenceManifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "Qualification evidence manifest SHA-256"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "checkName": {
+      "enum": ["build", "server", "client", "gameTest", "visual"]
+    },
+    "check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["argv", "assertions", "artifactGlobs"],
+      "properties": {
+        "argv": {
+          "type": "array",
+          "minItems": 3,
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Fixed wrapper argv containing only allowlisted Gradle tasks"
+        },
+        "assertions": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "artifactGlobs": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

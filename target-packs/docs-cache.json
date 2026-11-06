@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "voxellume-target-docs-cache-1.0.0",
+  "responses": [
+    {
+      "url": "https://docs.fabricmc.net/develop/",
+      "sha256": "9dd82bb9af381c0f49f43253fb1b2bd1f94977df2a9e1c3f09ac991d8b9622b7"
+    },
+    {
+      "url": "https://docs.fabricmc.net/develop/loader/",
+      "sha256": "c8372f85d2fb9e4f81259ec0445c13a421df0fea4ff22ba39a3691fe14a61a31"
+    },
+    {
+      "url": "https://docs.fabricmc.net/develop/loom/",
+      "sha256": "296ba8190907388981fd4e111fb81204d8397f81f90aa830cfda98f17067d126"
+    },
+    {
+      "url": "https://docs.neoforged.net/docs/gettingstarted/",
+      "sha256": "8f2b62dd073941b9d2c1fd21d1b285e27ac7fa3531dccde43ea7f7c5517ff6ea"
+    },
+    {
+      "url": "https://docs.neoforged.net/toolchain/docs/plugins/mdg/",
+      "sha256": "7a37a8eab879862f34aa8e13c4b8efb3c224c5db1798cf206e8b3350793d116e"
+    },
+    {
+      "url": "https://github.com/MinecraftForge/Documentation",
+      "sha256": "d5b852336016405bf9c54cb9f415e1749b6c76e2fac29f76e06c39ee497de3ca"
+    },
+    {
+      "url": "https://github.com/MinecraftForge/ForgeGradle",
+      "sha256": "1667d4a2865100df352317181619fadf14aa156a74d4c08a7951e4bc7a49cff0"
+    },
+    {
+      "url": "https://github.com/QuiltMC/quilt-loom",
+      "sha256": "6bb2dd8c0d04d10546e548429cba600dd8aa4895575fd33bdd584cf2e5a1a1a3"
+    },
+    {
+      "url": "https://github.com/QuiltMC/quilt-standard-libraries",
+      "sha256": "a9dcd2a24ee9c11545183dc887f3a52806162e0f24b9339386bf25ee65dd3a62"
+    },
+    {
+      "url": "https://github.com/QuiltMC/quilted-fabric-api",
+      "sha256": "8bffaf5975aa97b799db4c3149220a1519f50a6e9e3aa1f5121b50def17b8acd"
+    },
+    {
+      "url": "https://wiki.quiltmc.org/en/introduction/setting-up",
+      "sha256": "7f2e2f62f7550600a302afbab11360c6ff82a8c166eaed1008d8d6649f168bf9"
+    }
+  ]
+}

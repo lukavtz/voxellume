@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "target-pack-1.0.0",
+  "id": "java-fabric-26.1-r1",
+  "edition": "java",
+  "status": "candidate",
+  "revision": 1,
+  "packSha256": "ffe7ee13a87ea61efab8437ad0dc9c26b8cf33a22bf08a47f328c3db5db17e92",
+  "minecraft": {
+    "version": "26.1",
+    "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
+    "releaseJsonUrl": "https://piston-meta.mojang.com/v1/packages/90d81d9cd00c1ce55eb2b40aad4f1112bb58f12a/26.1.json",
+    "releaseJsonSha256": "7680e85c9aee9cea1ec41370d9e7e93fbd1d527f88f8edbf7ec736f3184a9533",
+    "obfuscation": "unobfuscated",
+    "dataPackVersion": 101.1,
+    "resourcePackVersion": 84
+  },
+  "loader": {
+    "id": "fabric",
+    "version": "0.20.1",
+    "coordinates": "net.fabricmc:fabric-loader:0.20.1",
+    "artifactSha256": "d0c5a082e07410aaff9de7ab196aa6b4236002870f9ba3ad5c1260fcce5110ad",
+    "apiDependencies": [
+      {
+        "id": "fabric-api",
+        "version": "0.145.1+26.1",
+        "coordinates": "net.fabricmc.fabric-api:fabric-api:0.145.1+26.1",
+        "artifactSha256": "f80ee0909d820649d5b1b31c74f2ebd503530a0ed163447a4a5779b9fbe8716e"
+      }
+    ]
+  },
+  "mappings": {
+    "kind": "none",
+    "artifacts": []
+  },
+  "java": {
+    "gradleJvm": 25,
+    "toolchain": 25,
+    "release": 25,
+    "architecture": "64-bit"
+  },
+  "gradle": {
+    "version": "9.8.2",
+    "distributionUrl": "https://services.gradle.org/distributions/gradle-9.8.2-bin.zip",
+    "distributionSha256": "21bd5da2de49b642904077f38c0efdc7778e92b3ed0889392dca61b97e389607",
+    "plugins": [
+      {
+        "id": "net.fabricmc.fabric-loom",
+        "version": "1.20.0-alpha.19"
+      }
+    ]
+  },
+  "metadata": {
+    "file": "fabric.mod.json"
+  },
+  "resources": {
+    "modelFormat": "java-block-item-json",
+    "blockbench": {
+      "projectFormat": "Java Block/Item",
+      "applicationVersion": "5.2.2"
+    }
+  },
+  "knownLimitations": [
+    "Template declares floating Loom 1.19-SNAPSHOT; exact 1.20.0-alpha.19 is a required override. No build/runtime compatibility claim.",
+    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+  ],
+  "template": {
+    "repository": "https://github.com/FabricMC/fabric-example-mod",
+    "revision": "963826fd464ed2982680659d25623bdcfb4aa002",
+    "contentSha256": "120409d9e389ebde56ea30f9cab27ab479937c21a0e0e1b3fade2ad31ac90db5"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "target-docs-1.0.0",
+  "retrievedAt": "2026-11-06T14:50:17Z",
+  "minecraftRelease": {
+    "url": "https://www.minecraft.net/en-us/article/minecraft-java-edition-1-21-2",
+    "revision": "1.21.2",
+    "responseSha256": "b66f5182cf4cbe749832a5f1a1fb266f9f668f6b219aeeeceaabce6b9d1455d0"
+  },
+  "loaderApi": [],
+  "gradlePlugins": [],
+  "catalogs": [
+    {
+      "url": "https://files.minecraftforge.net/net/minecraftforge/forge/promotions_slim.json",
+      "responseSha256": "33d01c1e8a8b5e53bd25b048b81dc42950c1e251078aa1361bf3ce79727c1e72"
+    },
+    {
+      "url": "https://maven.minecraftforge.net/net/minecraftforge/forge/maven-metadata.xml",
+      "responseSha256": "cbc1accd281218828cc4866d01bb5ef9b2fd1a7243a3400220f9844c8c552d92"
+    },
+    {
+      "url": "https://piston-meta.mojang.com/v1/packages/5941d98532ff0c7de72bd3f514d226d66977b7f0/1.21.2.json",
+      "responseSha256": "7e5477d6b6543b84e3e9d1f40526d214eb76314a076adcef31a8928a6d765116"
+    }
+  ]
+}

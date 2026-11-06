@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "target-docs-1.0.0",
+  "retrievedAt": "2026-11-06T14:50:17Z",
+  "minecraftRelease": {
+    "url": "https://www.minecraft.net/en-us/article/minecraft-java-edition-26-2",
+    "revision": "26.2",
+    "responseSha256": "d92108bde88e08239b4b24be2f3bed7a18ab5209ba20e02562ca1cfe75f2a874"
+  },
+  "loaderApi": [
+    {
+      "name": "Fabric Loader 0.20.1",
+      "url": "https://docs.fabricmc.net/develop/loader/",
+      "revision": "0.20.1",
+      "responseSha256": "c8372f85d2fb9e4f81259ec0445c13a421df0fea4ff22ba39a3691fe14a61a31"
+    },
+    {
+      "name": "fabric-api 0.161.0+26.2",
+      "url": "https://docs.fabricmc.net/develop/",
+      "revision": "0.161.0+26.2",
+      "responseSha256": "9dd82bb9af381c0f49f43253fb1b2bd1f94977df2a9e1c3f09ac991d8b9622b7"
+    }
+  ],
+  "gradlePlugins": [
+    {
+      "id": "net.fabricmc.fabric-loom",
+      "version": "1.20.0-alpha.19",
+      "url": "https://docs.fabricmc.net/develop/loom/",
+      "revision": "1.20.0-alpha.19",
+      "responseSha256": "296ba8190907388981fd4e111fb81204d8397f81f90aa830cfda98f17067d126"
+    }
+  ],
+  "catalogs": [
+    {
+      "url": "https://maven.fabricmc.net/net/fabricmc/fabric-api/fabric-api/maven-metadata.xml",
+      "responseSha256": "329422f5ae847e329b14d2ae8e9091adf946a40b0f7b63266362e52e534bbaf4"
+    },
+    {
+      "url": "https://maven.fabricmc.net/net/fabricmc/fabric-loom/maven-metadata.xml",
+      "responseSha256": "f073b55e99d984be731b98dd9e84152d24a34abf935f7a47ba5c25cbd79dcc34"
+    },
+    {
+      "url": "https://meta.fabricmc.net/v2/versions",
+      "responseSha256": "b61b8aa6c97c807db711be36df5049fbc6a37a9fc388a6bc5b94addb100ba4b0"
+    },
+    {
+      "url": "https://meta.fabricmc.net/v2/versions/loader/26.2/0.20.1/profile/json",
+      "responseSha256": "82fb4029efaa3f5f2f2f0e6a1221a14d2ef2b82c15db2e03c9ab33861f2e10a7"
+    },
+    {
+      "url": "https://piston-meta.mojang.com/v1/packages/09165f570b16394790c4e37c93b0918729615d17/26.2.json",
+      "responseSha256": "894450538aaf0c3f106dd5a45b8756676a5156dc37b91ba41636dfba987cd5d8"
+    }
+  ]
+}

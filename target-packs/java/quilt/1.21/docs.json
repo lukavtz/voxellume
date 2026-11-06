@@ -1,0 +1,68 @@
+{
+  "schemaVersion": "target-docs-1.0.0",
+  "retrievedAt": "2026-11-06T14:50:17Z",
+  "minecraftRelease": {
+    "url": "https://www.minecraft.net/en-us/article/minecraft-java-edition-1-21",
+    "revision": "1.21",
+    "responseSha256": "70e8a0f992461c4349d77d7c15491cb46851a9f77b07c0fe7045a788108d3e6b"
+  },
+  "loaderApi": [
+    {
+      "name": "Quilt Loader 0.20.0-beta.9",
+      "url": "https://wiki.quiltmc.org/en/introduction/setting-up",
+      "revision": "0.20.0-beta.9",
+      "responseSha256": "7f2e2f62f7550600a302afbab11360c6ff82a8c166eaed1008d8d6649f168bf9"
+    },
+    {
+      "name": "quilted-fabric-api 11.0.0-alpha.3+0.102.0-1.21",
+      "url": "https://github.com/QuiltMC/quilted-fabric-api",
+      "revision": "11.0.0-alpha.3+0.102.0-1.21",
+      "responseSha256": "8bffaf5975aa97b799db4c3149220a1519f50a6e9e3aa1f5121b50def17b8acd"
+    },
+    {
+      "name": "qsl 10.0.0-alpha.1+1.21",
+      "url": "https://github.com/QuiltMC/quilt-standard-libraries",
+      "revision": "10.0.0-alpha.1+1.21",
+      "responseSha256": "a9dcd2a24ee9c11545183dc887f3a52806162e0f24b9339386bf25ee65dd3a62"
+    }
+  ],
+  "gradlePlugins": [
+    {
+      "id": "org.quiltmc.loom",
+      "version": "1.15.1",
+      "url": "https://github.com/QuiltMC/quilt-loom",
+      "revision": "1.15.1",
+      "responseSha256": "6bb2dd8c0d04d10546e548429cba600dd8aa4895575fd33bdd584cf2e5a1a1a3"
+    }
+  ],
+  "catalogs": [
+    {
+      "url": "https://maven.quiltmc.org/repository/release/org/quiltmc/loom/maven-metadata.xml",
+      "responseSha256": "ee5852ee0df1e2249c06c740a5c67c542c5b75828e32028fd1fe7694819d2ce9"
+    },
+    {
+      "url": "https://maven.quiltmc.org/repository/release/org/quiltmc/qsl/maven-metadata.xml",
+      "responseSha256": "5b00d07b12b4ebaaf49de34b5fbafe60df917ccbba29af50a5b35fef44bc06df"
+    },
+    {
+      "url": "https://maven.quiltmc.org/repository/release/org/quiltmc/quilt-mappings/maven-metadata.xml",
+      "responseSha256": "2975c862473dd09b87e14d0277219ae24ba21a530d740eb12da0fb8a85c94a44"
+    },
+    {
+      "url": "https://maven.quiltmc.org/repository/release/org/quiltmc/quilted-fabric-api/quilted-fabric-api/maven-metadata.xml",
+      "responseSha256": "d50168591fb9986ebe050527647b35521c8177d9d27cba84708d7986588a39b9"
+    },
+    {
+      "url": "https://meta.quiltmc.org/v3/versions",
+      "responseSha256": "100ed4aa4b8014b9ffd6153743b52b773ece4c87a955c0c1607293773a4c8845"
+    },
+    {
+      "url": "https://meta.quiltmc.org/v3/versions/loader/1.21/0.20.0-beta.9/profile/json",
+      "responseSha256": "2f462298fc49164a1dbb9a5cef675195776170774de5467bad2cac32940de87c"
+    },
+    {
+      "url": "https://piston-meta.mojang.com/v1/packages/f7840475dae7c9ca4968b8198055db8d708a162d/1.21.json",
+      "responseSha256": "9d1cb54bcb68a63137c563dea3e451a1184c74917374bb54e30b4f659a1f26bf"
+    }
+  ]
+}

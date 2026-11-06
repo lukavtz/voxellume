@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "target-pack-1.0.0",
+  "id": "java-forge-1.21.5-r1",
+  "edition": "java",
+  "status": "candidate",
+  "revision": 1,
+  "packSha256": "1753599b2c991dc42a297d00d14f3ca3a96df3463ce0e785b47467a7c09d54c8",
+  "minecraft": {
+    "version": "1.21.5",
+    "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
+    "releaseJsonUrl": "https://piston-meta.mojang.com/v1/packages/5ca2012338100e4dbfef0d2114a5fa66959ab1e5/1.21.5.json",
+    "releaseJsonSha256": "ea7ff2dbea92fba08b1a7d15412d912d9bcac68c610fe968882c512a8e934196",
+    "obfuscation": "obfuscated",
+    "dataPackVersion": 71,
+    "resourcePackVersion": 55
+  },
+  "loader": {
+    "id": "forge",
+    "version": "55.1.18",
+    "coordinates": "net.minecraftforge:forge:1.21.5-55.1.18:installer",
+    "artifactSha256": "a0ade41f4f385964fcd08f7096f35a1cba6f02256b9fa7d4f8ff43221de3a7d7",
+    "apiDependencies": []
+  },
+  "mappings": {
+    "kind": "mojang",
+    "artifacts": [
+      {
+        "coordinates": "net.minecraft:client:1.21.5:mappings@txt",
+        "version": "1.21.5",
+        "artifactSha256": "3907657ade3e61bc8cffb4ca0a1bcba15f57986be4e613900947119364a206e5"
+      },
+      {
+        "coordinates": "net.minecraft:server:1.21.5:mappings@txt",
+        "version": "1.21.5",
+        "artifactSha256": "ecd2f68afe3333a4db26e1fb1d1c31551c379fef2f3235007fa739f7be038a7c"
+      }
+    ]
+  },
+  "java": {
+    "gradleJvm": 21,
+    "toolchain": 21,
+    "release": 21,
+    "architecture": "64-bit"
+  },
+  "gradle": {
+    "version": "9.3.1",
+    "distributionUrl": "https://services.gradle.org/distributions/gradle-9.3.1-bin.zip",
+    "distributionSha256": "b266d5ff6b90eada6dc3b20cb090e3731302e553a27c5d3e4df1f0d76beaff06",
+    "plugins": [
+      {
+        "id": "net.minecraftforge.gradle",
+        "version": "7.0.40"
+      }
+    ]
+  },
+  "metadata": {
+    "file": "META-INF/mods.toml"
+  },
+  "resources": {
+    "modelFormat": "java-block-item-json",
+    "blockbench": {
+      "projectFormat": "Java Block/Item",
+      "applicationVersion": "5.2.2"
+    }
+  },
+  "knownLimitations": [
+    "MDK declares a ForgeGradle range; exact plugin pin is selected from official Forge Maven. No build/runtime compatibility claim.",
+    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+  ],
+  "template": {
+    "repository": "https://maven.minecraftforge.net/net/minecraftforge/forge/1.21.5-55.1.18/forge-1.21.5-55.1.18-mdk.zip",
+    "revision": "1.21.5-55.1.18",
+    "contentSha256": "92149d9e9a0889e0d6d51b927aa397f049b5346d7b087ad079a009e7277f7ece"
+  }
+}

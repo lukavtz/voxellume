@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "target-docs-1.0.0",
+  "retrievedAt": "2026-11-06T14:50:17Z",
+  "minecraftRelease": {
+    "url": "https://www.minecraft.net/en-us/article/minecraft-java-edition-26-2",
+    "revision": "26.2",
+    "responseSha256": "d92108bde88e08239b4b24be2f3bed7a18ab5209ba20e02562ca1cfe75f2a874"
+  },
+  "loaderApi": [
+    {
+      "name": "NeoForge 26.2.0.93",
+      "url": "https://docs.neoforged.net/docs/gettingstarted/",
+      "revision": "26.2.0.93",
+      "responseSha256": "8f2b62dd073941b9d2c1fd21d1b285e27ac7fa3531dccde43ea7f7c5517ff6ea"
+    }
+  ],
+  "gradlePlugins": [
+    {
+      "id": "net.neoforged.moddev",
+      "version": "2.0.148",
+      "url": "https://docs.neoforged.net/toolchain/docs/plugins/mdg/",
+      "revision": "2.0.148",
+      "responseSha256": "7a37a8eab879862f34aa8e13c4b8efb3c224c5db1798cf206e8b3350793d116e"
+    }
+  ],
+  "catalogs": [
+    {
+      "url": "https://maven.neoforged.net/releases/net/neoforged/neoforge/maven-metadata.xml",
+      "responseSha256": "2dffba1a6485d09a4ada3a72e7972ac8906517b8e052f017d6853fb841b9f178"
+    },
+    {
+      "url": "https://piston-meta.mojang.com/v1/packages/09165f570b16394790c4e37c93b0918729615d17/26.2.json",
+      "responseSha256": "894450538aaf0c3f106dd5a45b8756676a5156dc37b91ba41636dfba987cd5d8"
+    }
+  ]
+}

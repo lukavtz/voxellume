@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "target-pack-1.0.0",
+  "id": "java-neoforge-1.21.8-r1",
+  "edition": "java",
+  "status": "candidate",
+  "revision": 1,
+  "packSha256": "66598aeb4e0f996b4efd7d11195bf6798c8d8dd1b5811ad55e0fd8564d78d163",
+  "minecraft": {
+    "version": "1.21.8",
+    "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
+    "releaseJsonUrl": "https://piston-meta.mojang.com/v1/packages/17db9704e95a73d53452f07a9b472e428288defa/1.21.8.json",
+    "releaseJsonSha256": "5723a5d3ba121b44ea4e41d91e76494fc86ce83823d5cd89f28187ed99925dfa",
+    "obfuscation": "obfuscated",
+    "dataPackVersion": 81,
+    "resourcePackVersion": 64
+  },
+  "loader": {
+    "id": "neoforge",
+    "version": "21.8.57",
+    "coordinates": "net.neoforged:neoforge:21.8.57:universal",
+    "artifactSha256": "7ca66866927ec0f1d43706c4171b9de910ce5344e94b82d058e2fe1e634525df",
+    "apiDependencies": []
+  },
+  "mappings": {
+    "kind": "parchment-layer",
+    "artifacts": [
+      {
+        "coordinates": "org.parchmentmc.data:parchment-1.21.8:2025.09.14@zip",
+        "version": "2025.09.14",
+        "artifactSha256": "558fb7654ed6c994840dd9d634563d4d6a2a47b92e097b03a605450f3e3ce904"
+      }
+    ]
+  },
+  "java": {
+    "gradleJvm": 21,
+    "toolchain": 21,
+    "release": 21,
+    "architecture": "64-bit"
+  },
+  "gradle": {
+    "version": "9.2.1",
+    "distributionUrl": "https://services.gradle.org/distributions/gradle-9.2.1-bin.zip",
+    "distributionSha256": "72f44c9f8ebcb1af43838f45ee5c4aa9c5444898b3468ab3f4af7b6076c5bc3f",
+    "plugins": [
+      {
+        "id": "net.neoforged.moddev",
+        "version": "2.0.148"
+      }
+    ]
+  },
+  "metadata": {
+    "file": "META-INF/neoforge.mods.toml"
+  },
+  "resources": {
+    "modelFormat": "java-block-item-json",
+    "blockbench": {
+      "projectFormat": "Java Block/Item",
+      "applicationVersion": "5.2.2"
+    }
+  },
+  "knownLimitations": [
+    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+  ],
+  "template": {
+    "repository": "https://github.com/NeoForgeMDKs/MDK-1.21.8-ModDevGradle",
+    "revision": "696ada8840acf26b548bc2fd9f7c9f7a2424ba90",
+    "contentSha256": "e1e0ec782b516db5c887dab8900026c819140c3ee4d2ae02aeafbeea0e86c3bb"
+  }
+}

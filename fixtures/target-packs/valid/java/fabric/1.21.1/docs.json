@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "target-docs-1.0.0",
+  "retrievedAt": "2026-11-06T00:00:00.000Z",
+  "minecraftRelease": {
+    "url": "https://www.minecraft.net/en-us/article/minecraft-java-edition-1-21-1",
+    "revision": "1.21.1",
+    "responseSha256": "9b2e18a69c684e429f52ef93dc829b865b4e2986a6a21ea57a2c77a84ab15e21"
+  },
+  "loaderApi": [
+    {
+      "name": "Fabric Loader 0.20.1",
+      "url": "https://docs.fabricmc.net/1.21.1/develop/loader/",
+      "revision": "1.21.1",
+      "responseSha256": "9b2e18a69c684e429f52ef93dc829b865b4e2986a6a21ea57a2c77a84ab15e21"
+    },
+    {
+      "name": "Fabric API 0.116.17+1.21.1",
+      "url": "https://docs.fabricmc.net/1.21.1/develop/",
+      "revision": "0.116.17+1.21.1",
+      "responseSha256": "9b2e18a69c684e429f52ef93dc829b865b4e2986a6a21ea57a2c77a84ab15e21"
+    }
+  ],
+  "gradlePlugins": [
+    {
+      "id": "net.fabricmc.fabric-loom-remap",
+      "version": "1.20.0-alpha.19",
+      "url": "https://docs.fabricmc.net/develop/loom/",
+      "revision": "1.20.0-alpha.19",
+      "responseSha256": "9b2e18a69c684e429f52ef93dc829b865b4e2986a6a21ea57a2c77a84ab15e21"
+    }
+  ],
+  "catalogs": [
+    {
+      "url": "https://meta.fabricmc.net/v2/versions/loader/1.21.1",
+      "responseSha256": "9b2e18a69c684e429f52ef93dc829b865b4e2986a6a21ea57a2c77a84ab15e21"
+    }
+  ]
+}

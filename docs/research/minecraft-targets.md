@@ -13,6 +13,73 @@
 - Forge распространяет версионный MDK и использует ForgeGradle; Quilt использует собственный template, Quilt Loom и `quilt.mod.json` ([Forge Getting Started](https://docs.minecraftforge.net/en/1.21.x/gettingstarted/), [ForgeGradle 6](https://docs.minecraftforge.net/en/fg-6.x/), [Quilt setup](https://wiki.quiltmc.org/en/introduction/setting-up), [Quilt Loom](https://github.com/QuiltMC/quilt-loom)).
 - Сама игра меняет несовместимые параметры toolchain. Например, релиз 1.20.5 требует Java 21 и имеет Data Pack 41 / Resource Pack 32; релиз 26.1 требует Java 25, имеет Data Pack 101.1 / Resource Pack 84 и поставляется без обфускации ([1.20.5, Technical Changes](https://www.minecraft.net/en-us/article/minecraft-java-edition-1-20-5), [26.1, Technical Changes](https://www.minecraft.net/en-us/article/minecraft-java-edition-26-1)).
 
+## Подтверждённые baseline inputs для 1.21.1
+
+Это воспроизводимые входы для `java-fabric-1.21.1-r1` и `java-neoforge-1.21.1-r1`. **Оба pack имеют только статус `candidate`.** Переход в `supported` возможен лишь после успешных clean build, dedicated server, real client, configured GameTest, проверки packaged production JAR и visual review с сохранёнными evidence. Наличие артефактов и совместимых версий не доказывает runtime-поддержку.
+
+### Общие данные Minecraft 1.21.1
+
+| Поле                     | Точное значение                                                                                   | Официальный источник                                                                                                                           |
+| ------------------------ | ------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Тип релиза               | `release`                                                                                         | [Mojang version manifest v2](https://piston-meta.mojang.com/mc/game/version_manifest_v2.json)                                                  |
+| `releaseManifestUrl`     | `https://piston-meta.mojang.com/mc/game/version_manifest_v2.json`                                 | Mojang                                                                                                                                         |
+| `releaseJsonUrl`         | `https://piston-meta.mojang.com/v1/packages/82ba6501da174a665c1787775f946487422f2432/1.21.1.json` | Mojang                                                                                                                                         |
+| `releaseJsonSha256`      | `3636c26c20f1f0b7472ebef1a624ba1a6a2c4b003858c13224929898b5321437`                                | Скачанный release JSON, SHA-256                                                                                                                |
+| Обфускация / Java        | Obfuscated; официальные client/server mappings; Java major `21`                                   | Release JSON                                                                                                                                   |
+| Data / Resource Pack     | `48` / `34`                                                                                       | `version.json` внутри [официального client JAR](https://piston-data.mojang.com/v1/objects/30c73b1c5da787909b2f73340419fdf13b9def88/client.jar) |
+| Protocol / World version | `767` / `3955`                                                                                    | Тот же `version.json`                                                                                                                          |
+| Client mappings SHA-256  | `140c47931cccc8fc9e4c22d7603e2d714d1a953a146f51ea7397d95c955536ec`                                | [client.txt](https://piston-data.mojang.com/v1/objects/2244b6f072256667bcd9a73df124d6c58de77992/client.txt)                                    |
+| Server mappings SHA-256  | `9d0b04bead421c8229aff14b534432bbc927bea642e7c8593d1276b8df8ba53f`                                | [server.txt](https://piston-data.mojang.com/v1/objects/03f8985492bda0afc0898465341eb0acef35f570/server.txt)                                    |
+
+Официальная статья релиза: https://www.minecraft.net/en-us/article/minecraft-java-edition-1-21-1.
+
+### `java-fabric-1.21.1-r1`
+
+| Вход       | Точные координаты / URL                                                                                                                                                                                                        | SHA-256                                                                          |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------- |
+| Loader     | `net.fabricmc:fabric-loader:0.20.1`; [JAR](https://maven.fabricmc.net/net/fabricmc/fabric-loader/0.20.1/fabric-loader-0.20.1.jar)                                                                                              | `d0c5a082e07410aaff9de7ab196aa6b4236002870f9ba3ad5c1260fcce5110ad`               |
+| Fabric API | `net.fabricmc.fabric-api:fabric-api:0.116.17+1.21.1`; [JAR](https://maven.fabricmc.net/net/fabricmc/fabric-api/fabric-api/0.116.17%2B1.21.1/fabric-api-0.116.17%2B1.21.1.jar)                                                  | `79ac44b40780acbd884b34c50be1e39af682847e5f5cb3b1fddeeaa768dce800`               |
+| Mappings   | `loom.officialMojangMappings()`                                                                                                                                                                                                | Общие client/server hashes выше                                                  |
+| Loom       | Plugin `net.fabricmc.fabric-loom-remap:1.20.0-alpha.19`; implementation `net.fabricmc:fabric-loom:1.20.0-alpha.19`; [JAR](https://maven.fabricmc.net/net/fabricmc/fabric-loom/1.20.0-alpha.19/fabric-loom-1.20.0-alpha.19.jar) | `0a742bd8f3542f4058de52e40dcdebdbed6b135d8ac74a0917503c9db0c69bb0`               |
+| Gradle     | [gradle-9.8.2-bin.zip](https://services.gradle.org/distributions/gradle-9.8.2-bin.zip); [опубликованный checksum](https://services.gradle.org/distributions/gradle-9.8.2-bin.zip.sha256)                                       | `21bd5da2de49b642904077f38c0efdc7778e92b3ed0889392dca61b97e389607`               |
+| Template   | `FabricMC/fabric-example-mod@4c47210589a9ff72a6075c8dd1d73315dcc3e010`                                                                                                                                                         | `contentSha256=cfe3150f5e031a88a3cb33d3799810567b4b4cc6338481aad86c685c6dd76793` |
+
+[Fabric Meta](https://meta.fabricmc.net/v2/versions/loader/1.21.1/0.20.1) подтверждает Loader `0.20.1`, build `1`, `stable:true`. [Plugin marker](https://maven.fabricmc.net/net/fabricmc/fabric-loom-remap/net.fabricmc.fabric-loom-remap.gradle.plugin/1.20.0-alpha.19/net.fabricmc.fabric-loom-remap.gradle.plugin-1.20.0-alpha.19.pom) разрешается в implementation artifact выше. SHA-256 Loader и Fabric API совпадают с официальными `.sha256` sidecars.
+
+**Обязательная коррекция шаблона:** commit содержит `loom_version=1.19-SNAPSHOT`; scaffold должен заменить его на точный `1.20.0-alpha.19`. Не хешировать путь `net/fabricmc/fabric-loom-remap/...jar`: он возвращает 404; реальный JAR — `net.fabricmc:fabric-loom`. Остальные pins шаблона уже совпадают: Minecraft `1.21.1`, Loader `0.20.1`, API `0.116.17+1.21.1`, Gradle `9.8.2`, Java release `21`.
+
+Источники: [версионная настройка Fabric](https://docs.fabricmc.net/1.21.1/develop/getting-started/setting-up-a-development-environment), [template revision](https://github.com/FabricMC/fabric-example-mod/tree/4c47210589a9ff72a6075c8dd1d73315dcc3e010), [Gradle 9.8.2 compatibility](https://docs.gradle.org/9.8.2/userguide/compatibility.html) (запуск на Java 21).
+
+### `java-neoforge-1.21.1-r1`
+
+| Вход         | Точные координаты / URL                                                                                                                                                                                | SHA-256                                                                          |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------- |
+| NeoForge     | `net.neoforged:neoforge:21.1.265:universal`; [JAR](https://maven.neoforged.net/releases/net/neoforged/neoforge/21.1.265/neoforge-21.1.265-universal.jar)                                               | `c12cf1a6cb0aa7792b13174b06088a4f54d8bcc92f6a32fcb03310b456936847`               |
+| Parchment    | `org.parchmentmc.data:parchment-1.21.1:2024.11.17@zip`; [ZIP](https://maven.parchmentmc.org/org/parchmentmc/data/parchment-1.21.1/2024.11.17/parchment-1.21.1-2024.11.17.zip)                          | `7c240a37ab432213033b1113d75cb80dc22bffa631d979818b2da1585fa24a08`               |
+| ModDevGradle | Plugin `net.neoforged.moddev:2.0.148`; implementation `net.neoforged:moddev-gradle:2.0.148`; [JAR](https://maven.neoforged.net/releases/net/neoforged/moddev-gradle/2.0.148/moddev-gradle-2.0.148.jar) | `e4cab1e28fcede52101ffc5bb5052fe8a4dd41b699992c52c8ec1c267e306017`               |
+| Gradle       | [gradle-9.2.1-bin.zip](https://services.gradle.org/distributions/gradle-9.2.1-bin.zip); [опубликованный checksum](https://services.gradle.org/distributions/gradle-9.2.1-bin.zip.sha256)               | `72f44c9f8ebcb1af43838f45ee5c4aa9c5444898b3468ab3f4af7b6076c5bc3f`               |
+| Template     | `NeoForgeMDKs/MDK-1.21.1-ModDevGradle@e93d7f09d4eec12c76d1d7be9bf4eaad0246e9e0`                                                                                                                        | `contentSha256=1101d5f9baf5eb4dd31f826e4eef7f7380a01a776ce1af230133e32a95e46e13` |
+
+SHA-256 NeoForge и Parchment совпадают с официальными `.sha256` sidecars. [Parchment metadata](https://maven.parchmentmc.org/org/parchmentmc/data/parchment-1.21.1/maven-metadata.xml) называет `2024.11.17` и `latest`, и `release`; pack фиксирует саму версию, а не moving label. [MDG plugin marker](https://maven.neoforged.net/releases/net/neoforged/moddev/net.neoforged.moddev.gradle.plugin/2.0.148/net.neoforged.moddev.gradle.plugin-2.0.148.pom) разрешается в implementation artifact выше.
+
+Template уже содержит все pins: NeoForge `21.1.265`, Parchment Minecraft `1.21.1` / mappings `2024.11.17`, MDG `2.0.148`, Gradle `9.2.1`, Java toolchain `21`. Run `gameTestServer` даёт задачу `runGameTestServer`; это конфигурация для последующей квалификации, не пройденный test evidence.
+
+Источники: [NeoForge 1.21.1](https://docs.neoforged.net/docs/1.21.1/gettingstarted/), [ModDevGradle](https://docs.neoforged.net/toolchain/docs/plugins/mdg/), [Parchment](https://parchmentmc.org/docs/getting-started), [template revision](https://github.com/NeoForgeMDKs/MDK-1.21.1-ModDevGradle/tree/e93d7f09d4eec12c76d1d7be9bf4eaad0246e9e0), [Gradle 9.2.1 compatibility](https://docs.gradle.org/9.2.1/userguide/compatibility.html) (запуск на Java 21).
+
+### Воспроизведение `template.contentSha256`
+
+`contentSha256` — SHA-256 байтов ZIP-архива из `discovery.snapshot.json` → `template.archive`: codeload для GitHub templates или версионного MDK-архива. Это не hash распакованного дерева. Для baseline packs:
+
+```sh
+curl -fL https://codeload.github.com/FabricMC/fabric-example-mod/zip/4c47210589a9ff72a6075c8dd1d73315dcc3e010 | shasum -a 256
+# cfe3150f5e031a88a3cb33d3799810567b4b4cc6338481aad86c685c6dd76793
+
+curl -fL https://codeload.github.com/NeoForgeMDKs/MDK-1.21.1-ModDevGradle/zip/e93d7f09d4eec12c76d1d7be9bf4eaad0246e9e0 | shasum -a 256
+# 1101d5f9baf5eb4dd31f826e4eef7f7380a01a776ce1af230133e32a95e46e13
+```
+
+Отдельные SHA-256 несжатых `git archive --format=tar` потоков (`0e29551a…` для Fabric и `e3bc538f…` для NeoForge) относятся только к проверке входов baseline build в `docs/research/baseline-builds.md`. Они не являются `template.contentSha256` в pack.
+
 ## Различия toolchain
 
 Таблица описывает документированные примеры, **не матрицу поддержки всех версий**. Для каждой цели нужен отдельно проверенный набор точных версий.

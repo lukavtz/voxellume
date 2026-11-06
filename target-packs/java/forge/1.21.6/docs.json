@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "target-docs-1.0.0",
+  "retrievedAt": "2026-11-06T14:50:17Z",
+  "minecraftRelease": {
+    "url": "https://www.minecraft.net/en-us/article/minecraft-java-edition-1-21-6",
+    "revision": "1.21.6",
+    "responseSha256": "23b169483bb70f94594876e6a2544a4fdccc3d098b2d04676f78e5ca13cd96b5"
+  },
+  "loaderApi": [
+    {
+      "name": "Forge 56.0.9",
+      "url": "https://github.com/MinecraftForge/Documentation",
+      "revision": "56.0.9",
+      "responseSha256": "d5b852336016405bf9c54cb9f415e1749b6c76e2fac29f76e06c39ee497de3ca"
+    }
+  ],
+  "gradlePlugins": [
+    {
+      "id": "net.minecraftforge.gradle",
+      "version": "6.0.54",
+      "url": "https://github.com/MinecraftForge/ForgeGradle",
+      "revision": "6.0.54",
+      "responseSha256": "1667d4a2865100df352317181619fadf14aa156a74d4c08a7951e4bc7a49cff0"
+    }
+  ],
+  "catalogs": [
+    {
+      "url": "https://files.minecraftforge.net/net/minecraftforge/forge/promotions_slim.json",
+      "responseSha256": "33d01c1e8a8b5e53bd25b048b81dc42950c1e251078aa1361bf3ce79727c1e72"
+    },
+    {
+      "url": "https://maven.minecraftforge.net/net/minecraftforge/forge/maven-metadata.xml",
+      "responseSha256": "cbc1accd281218828cc4866d01bb5ef9b2fd1a7243a3400220f9844c8c552d92"
+    },
+    {
+      "url": "https://piston-meta.mojang.com/v1/packages/4eb09bebca2356f7505e45544087d3109e8ce0e3/1.21.6.json",
+      "responseSha256": "54430494f932b1bf9c7129ee6964e1ce43d8bcb2e1c501d25be99a303143648f"
+    }
+  ]
+}

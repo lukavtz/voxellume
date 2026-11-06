@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "target-docs-1.0.0",
+  "retrievedAt": "2026-11-06T14:50:17Z",
+  "minecraftRelease": {
+    "url": "https://www.minecraft.net/en-us/article/minecraft-java-edition-1-21-11",
+    "revision": "1.21.11",
+    "responseSha256": "86ce5144e25b1e78a1e40297a9062e3ee4a4bfd537aa6e8da8ad625a53562067"
+  },
+  "loaderApi": [
+    {
+      "name": "Quilt Loader 0.20.0-beta.9",
+      "url": "https://wiki.quiltmc.org/en/introduction/setting-up",
+      "revision": "0.20.0-beta.9",
+      "responseSha256": "7f2e2f62f7550600a302afbab11360c6ff82a8c166eaed1008d8d6649f168bf9"
+    }
+  ],
+  "gradlePlugins": [
+    {
+      "id": "org.quiltmc.loom",
+      "version": "1.15.1",
+      "url": "https://github.com/QuiltMC/quilt-loom",
+      "revision": "1.15.1",
+      "responseSha256": "6bb2dd8c0d04d10546e548429cba600dd8aa4895575fd33bdd584cf2e5a1a1a3"
+    }
+  ],
+  "catalogs": [
+    {
+      "url": "https://maven.quiltmc.org/repository/release/org/quiltmc/loom/maven-metadata.xml",
+      "responseSha256": "ee5852ee0df1e2249c06c740a5c67c542c5b75828e32028fd1fe7694819d2ce9"
+    },
+    {
+      "url": "https://maven.quiltmc.org/repository/release/org/quiltmc/qsl/maven-metadata.xml",
+      "responseSha256": "5b00d07b12b4ebaaf49de34b5fbafe60df917ccbba29af50a5b35fef44bc06df"
+    },
+    {
+      "url": "https://maven.quiltmc.org/repository/release/org/quiltmc/quilt-mappings/maven-metadata.xml",
+      "responseSha256": "2975c862473dd09b87e14d0277219ae24ba21a530d740eb12da0fb8a85c94a44"
+    },
+    {
+      "url": "https://maven.quiltmc.org/repository/release/org/quiltmc/quilted-fabric-api/quilted-fabric-api/maven-metadata.xml",
+      "responseSha256": "d50168591fb9986ebe050527647b35521c8177d9d27cba84708d7986588a39b9"
+    },
+    {
+      "url": "https://meta.quiltmc.org/v3/versions",
+      "responseSha256": "100ed4aa4b8014b9ffd6153743b52b773ece4c87a955c0c1607293773a4c8845"
+    },
+    {
+      "url": "https://meta.quiltmc.org/v3/versions/loader/1.21.11/0.20.0-beta.9/profile/json",
+      "responseSha256": "918a7464d2570ede4be13718fae782cc7de9cfa34843b0fca1a0112de1ac4ab4"
+    },
+    {
+      "url": "https://piston-meta.mojang.com/v1/packages/35f8a9bc4874e2c95e51b3ad21e043a33776f7c2/1.21.11.json",
+      "responseSha256": "cc717c0d11f2447690a13069401368969671a90d0503d2848b9e4438ae82d866"
+    }
+  ]
+}

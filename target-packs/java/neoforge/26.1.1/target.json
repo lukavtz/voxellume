@@ -1,0 +1,63 @@
+{
+  "schemaVersion": "target-pack-1.0.0",
+  "id": "java-neoforge-26.1.1-r1",
+  "edition": "java",
+  "status": "candidate",
+  "revision": 1,
+  "packSha256": "221063aafb363f5bc2371830a0a7d8c58c184be2bb4167ba36676ffc52c5353f",
+  "minecraft": {
+    "version": "26.1.1",
+    "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
+    "releaseJsonUrl": "https://piston-meta.mojang.com/v1/packages/f242283c7b8a4c2a75668578248aee60928d2613/26.1.1.json",
+    "releaseJsonSha256": "8c53765d6096983e227fb25b4c564ac2314ce34aa47319fda0af07e28c5aea0d",
+    "obfuscation": "unobfuscated",
+    "dataPackVersion": 101.1,
+    "resourcePackVersion": 84
+  },
+  "loader": {
+    "id": "neoforge",
+    "version": "26.1.1.15-beta",
+    "coordinates": "net.neoforged:neoforge:26.1.1.15-beta:universal",
+    "artifactSha256": "27b547078f4cd15fac189bb048931d435f37fd7563126a3fcbe910ad308e4c73",
+    "apiDependencies": []
+  },
+  "mappings": {
+    "kind": "none",
+    "artifacts": []
+  },
+  "java": {
+    "gradleJvm": 25,
+    "toolchain": 25,
+    "release": 25,
+    "architecture": "64-bit"
+  },
+  "gradle": {
+    "version": "9.2.1",
+    "distributionUrl": "https://services.gradle.org/distributions/gradle-9.2.1-bin.zip",
+    "distributionSha256": "72f44c9f8ebcb1af43838f45ee5c4aa9c5444898b3468ab3f4af7b6076c5bc3f",
+    "plugins": [
+      {
+        "id": "net.neoforged.moddev",
+        "version": "2.0.148"
+      }
+    ]
+  },
+  "metadata": {
+    "file": "META-INF/neoforge.mods.toml"
+  },
+  "resources": {
+    "modelFormat": "java-block-item-json",
+    "blockbench": {
+      "projectFormat": "Java Block/Item",
+      "applicationVersion": "5.2.2"
+    }
+  },
+  "knownLimitations": [
+    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+  ],
+  "template": {
+    "repository": "https://github.com/NeoForgeMDKs/MDK-26.1.1-ModDevGradle",
+    "revision": "77ca08963a1cb0d40d6b3d109a5d5bf592b5a80f",
+    "contentSha256": "7938ac61ac04053216c8e89ce15709ba3ef93fb8451e453d0cb88ee70b743331"
+  }
+}

@@ -20,12 +20,15 @@
     "test:e2e": "node --test --experimental-strip-types \"tests/e2e/**/*.test.ts\"",
     "test:targets": "node --test --experimental-strip-types \"tests/targets/**/*.test.ts\"",
     "pack:check": "pnpm pack --dry-run",
-    "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test:unit && pnpm pack:check"
+    "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test:unit && pnpm test:targets && pnpm pack:check"
   },
   "devDependencies": {
     "@types/node": "26.6.6",
     "oxlint": "1.91.0",
     "prettier": "3.9.10",
     "typescript": "7.0.2"
+  },
+  "dependencies": {
+    "ajv": "8.20.0"
   }
 }

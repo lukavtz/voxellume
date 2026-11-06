@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "target-pack-1.0.0",
+  "id": "java-neoforge-1.21.2-r1",
+  "edition": "java",
+  "status": "candidate",
+  "revision": 1,
+  "packSha256": "6601ce251db42e01fdacfbab667cdfb2c6f4ee134cbc6cbc03b05d7bffd0915a",
+  "minecraft": {
+    "version": "1.21.2",
+    "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
+    "releaseJsonUrl": "https://piston-meta.mojang.com/v1/packages/5941d98532ff0c7de72bd3f514d226d66977b7f0/1.21.2.json",
+    "releaseJsonSha256": "7e5477d6b6543b84e3e9d1f40526d214eb76314a076adcef31a8928a6d765116",
+    "obfuscation": "obfuscated",
+    "dataPackVersion": 57,
+    "resourcePackVersion": 42
+  },
+  "loader": {
+    "id": "neoforge",
+    "version": "21.2.1-beta",
+    "coordinates": "net.neoforged:neoforge:21.2.1-beta:universal",
+    "artifactSha256": "4616a73a23d27c02324117576875e5b8c22d2758865aa80842b77b1353d70c52",
+    "apiDependencies": []
+  },
+  "mappings": {
+    "kind": "mojang",
+    "artifacts": [
+      {
+        "coordinates": "net.minecraft:client:1.21.2:mappings@txt",
+        "version": "1.21.2",
+        "artifactSha256": "e37560e4889168916a73dbc4922c563002eff70fbecfe1cf5c50a7b222f451b2"
+      },
+      {
+        "coordinates": "net.minecraft:server:1.21.2:mappings@txt",
+        "version": "1.21.2",
+        "artifactSha256": "0d80dc2239ee9fe5fc6e6c122b1a73178a4243fffe991754faa2a9581364bdbf"
+      }
+    ]
+  },
+  "java": {
+    "gradleJvm": 21,
+    "toolchain": 21,
+    "release": 21,
+    "architecture": "64-bit"
+  },
+  "gradle": {
+    "version": "9.2.1",
+    "distributionUrl": "https://services.gradle.org/distributions/gradle-9.2.1-bin.zip",
+    "distributionSha256": "72f44c9f8ebcb1af43838f45ee5c4aa9c5444898b3468ab3f4af7b6076c5bc3f",
+    "plugins": [
+      {
+        "id": "net.neoforged.moddev",
+        "version": "2.0.148"
+      }
+    ]
+  },
+  "metadata": {
+    "file": "META-INF/neoforge.mods.toml"
+  },
+  "resources": {
+    "modelFormat": "java-block-item-json",
+    "blockbench": {
+      "projectFormat": "Java Block/Item",
+      "applicationVersion": "5.2.2"
+    }
+  },
+  "knownLimitations": [
+    "Official template declares Parchment for 1.21.1, not 1.21.2; discovery does not substitute that layer for target mappings.",
+    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+  ],
+  "template": {
+    "repository": "https://github.com/NeoForgeMDKs/MDK-1.21.2-ModDevGradle",
+    "revision": "f09ad338c250a5797436d81c6c8609a2616c9670",
+    "contentSha256": "04d2608e176dd4c0d1fadd4f476f62f8221efdec8a2011a0a415d2e2d26369da"
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "target-pack-1.0.0",
+  "id": "java-fabric-1.21.1-r1",
+  "edition": "java",
+  "status": "supported",
+  "revision": 1,
+  "packSha256": "357fde58dfd99d51e86f57ca3016bc8068db035fb914029f7fc295215a01109a",
+  "minecraft": {
+    "version": "1.21.1",
+    "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
+    "releaseJsonUrl": "https://piston-meta.mojang.com/v1/packages/82ba6501da174a665c1787775f946487422f2432/1.21.1.json",
+    "releaseJsonSha256": "3636c26c20f1f0b7472ebef1a624ba1a6a2c4b003858c13224929898b5321437",
+    "obfuscation": "obfuscated",
+    "dataPackVersion": 48,
+    "resourcePackVersion": 34
+  },
+  "loader": {
+    "id": "fabric",
+    "version": "0.20.1",
+    "coordinates": "net.fabricmc:fabric-loader:0.20.1",
+    "artifactSha256": "68c0bfa2b8f546c195f874dd7b97e82a60c7d4eb5e1a1e3ae5c9d43bb23871d4",
+    "apiDependencies": [
+      {
+        "id": "fabric-api",
+        "version": "0.116.17+1.21.1",
+        "coordinates": "net.fabricmc.fabric-api:fabric-api:0.116.17+1.21.1",
+        "artifactSha256": "e52c7f29bc7846c192f4ee5b5b3f52cf4f6d8f43a59c2f0de3ba4fc18d97a6b0"
+      }
+    ]
+  },
+  "mappings": {
+    "kind": "mojang",
+    "artifacts": [
+      {
+        "coordinates": "net.minecraft:client:1.21.1:mappings@txt",
+        "version": "1.21.1",
+        "artifactSha256": "140c47931cccc8fc9e4c22d7603e2d714d1a953a146f51ea7397d95c955536ec"
+      }
+    ]
+  },
+  "java": {
+    "gradleJvm": 21,
+    "toolchain": 21,
+    "release": 21,
+    "architecture": "64-bit"
+  },
+  "gradle": {
+    "version": "9.8.2",
+    "distributionUrl": "https://services.gradle.org/distributions/gradle-9.8.2-bin.zip",
+    "distributionSha256": "21bd5da2de49b642904077f38c0efdc7778e92b3ed0889392dca61b97e389607",
+    "plugins": [
+      {
+        "id": "net.fabricmc.fabric-loom-remap",
+        "version": "1.20.0-alpha.19"
+      }
+    ]
+  },
+  "template": {
+    "repository": "https://github.com/FabricMC/fabric-example-mod",
+    "revision": "4c47210589a9ff72a6075c8dd1d73315dcc3e010",
+    "contentSha256": "0e29551a0acc38f4907081c77b8af68da8a73f2cfa862c0af40f0c92b4d346ea"
+  },
+  "metadata": {
+    "file": "fabric.mod.json"
+  },
+  "resources": {
+    "modelFormat": "java-block-item-json",
+    "blockbench": {
+      "projectFormat": "Java Block/Item",
+      "applicationVersion": "5.0.0"
+    }
+  },
+  "knownLimitations": []
+}

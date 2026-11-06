@@ -1,0 +1,63 @@
+{
+  "schemaVersion": "target-pack-1.0.0",
+  "id": "java-neoforge-26.1.2-r1",
+  "edition": "java",
+  "status": "candidate",
+  "revision": 1,
+  "packSha256": "7963ccc41d23933283d33cb609e6702a827dff6b61a4eab3b1de9dc914b4cc6e",
+  "minecraft": {
+    "version": "26.1.2",
+    "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
+    "releaseJsonUrl": "https://piston-meta.mojang.com/v1/packages/4e49d699db7dba839226d0ed1fcf36c465c2edbe/26.1.2.json",
+    "releaseJsonSha256": "ae0a4ad2843d0cb77a673ab6b16ff4d15f7f976fe7513af1d6a86545194cae73",
+    "obfuscation": "unobfuscated",
+    "dataPackVersion": 101.1,
+    "resourcePackVersion": 84
+  },
+  "loader": {
+    "id": "neoforge",
+    "version": "26.1.2.126",
+    "coordinates": "net.neoforged:neoforge:26.1.2.126:universal",
+    "artifactSha256": "6d480a6b83d279b85b8e8069a05528c4f69e9bee6b67e72358efa035ee47cedf",
+    "apiDependencies": []
+  },
+  "mappings": {
+    "kind": "none",
+    "artifacts": []
+  },
+  "java": {
+    "gradleJvm": 25,
+    "toolchain": 25,
+    "release": 25,
+    "architecture": "64-bit"
+  },
+  "gradle": {
+    "version": "9.2.1",
+    "distributionUrl": "https://services.gradle.org/distributions/gradle-9.2.1-bin.zip",
+    "distributionSha256": "72f44c9f8ebcb1af43838f45ee5c4aa9c5444898b3468ab3f4af7b6076c5bc3f",
+    "plugins": [
+      {
+        "id": "net.neoforged.moddev",
+        "version": "2.0.148"
+      }
+    ]
+  },
+  "metadata": {
+    "file": "META-INF/neoforge.mods.toml"
+  },
+  "resources": {
+    "modelFormat": "java-block-item-json",
+    "blockbench": {
+      "projectFormat": "Java Block/Item",
+      "applicationVersion": "5.2.2"
+    }
+  },
+  "knownLimitations": [
+    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+  ],
+  "template": {
+    "repository": "https://github.com/NeoForgeMDKs/MDK-26.1.2-ModDevGradle",
+    "revision": "b7040ef34422615a879cfb015feeeb04a6284ddb",
+    "contentSha256": "ba0149e62f2761e813765c9fe5f6ca35147434de013d5a8534e96f12e753aa55"
+  }
+}
