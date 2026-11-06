@@ -203,6 +203,9 @@ function validateRelationships(
   }
 
   if (target.status === "supported") {
+    if (target.gradle?.wrapperJarSha256 === undefined) {
+      invalid(path, "supported pack requires gradle.wrapperJarSha256");
+    }
     if (docs.loaderApi.length === 0)
       invalid(path, "supported pack requires loaderApi documentation");
     if (docs.gradlePlugins.length === 0 || docs.catalogs.length === 0) {

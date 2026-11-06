@@ -111,6 +111,7 @@ export interface TargetGradle {
   readonly version: string;
   readonly distributionUrl: string;
   readonly distributionSha256: string;
+  readonly wrapperJarSha256?: string;
   readonly plugins: readonly TargetGradlePlugin[];
 }
 

@@ -450,6 +450,26 @@ test("rejects missing or malformed wrapper distribution hashes", async (t) => {
   }
 });
 
+test("requires wrapper JAR hashes for supported packs while keeping them optional for candidates", async (t) => {
+  const missingWrapper = {
+    file: "target.json",
+    path: ["gradle", "wrapperJarSha256"],
+    remove: true,
+  } as const;
+  await assertInvalid(
+    await mutatedPack(t, [missingWrapper]),
+    /wrapperJarSha256|wrapper.*sha-?256/i,
+  );
+
+  const candidate = await mutatedPack(t, [
+    { file: "target.json", path: ["status"], value: "candidate" },
+    missingWrapper,
+  ]);
+  const packs = await loadTargetPacks(candidate);
+  assert.equal(packs[0]?.status, "candidate");
+  assert.equal(packs[0]?.gradle?.wrapperJarSha256, undefined);
+});
+
 test("rejects supported packs without immutable pack and qualification evidence", async (t) => {
   const cases: readonly [string, readonly Mutation[], RegExp][] = [
     [

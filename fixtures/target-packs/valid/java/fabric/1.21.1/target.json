@@ -4,7 +4,7 @@
   "edition": "java",
   "status": "supported",
   "revision": 1,
-  "packSha256": "357fde58dfd99d51e86f57ca3016bc8068db035fb914029f7fc295215a01109a",
+  "packSha256": "c74b4c3e534cb75b747ce76e34ab47b28efe416ff4011768b9e9ecdd81fb57df",
   "minecraft": {
     "version": "1.21.1",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -48,6 +48,7 @@
     "version": "9.8.2",
     "distributionUrl": "https://services.gradle.org/distributions/gradle-9.8.2-bin.zip",
     "distributionSha256": "21bd5da2de49b642904077f38c0efdc7778e92b3ed0889392dca61b97e389607",
+    "wrapperJarSha256": "3b8a25775a69158b5ad2b1d17a80a88dc7b40a352a73eb27d06c612a7ce68e98",
     "plugins": [
       {
         "id": "net.fabricmc.fabric-loom-remap",

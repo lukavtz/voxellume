@@ -242,6 +242,8 @@ test("Fabric 1.21.1 r1 is a candidate with the verified immutable pins", () => {
       "https://services.gradle.org/distributions/gradle-9.8.2-bin.zip",
     distributionSha256:
       "21bd5da2de49b642904077f38c0efdc7778e92b3ed0889392dca61b97e389607",
+    wrapperJarSha256:
+      "3b8a25775a69158b5ad2b1d17a80a88dc7b40a352a73eb27d06c612a7ce68e98",
     plugins: [
       {
         id: "net.fabricmc.fabric-loom-remap",
@@ -304,6 +306,8 @@ test("NeoForge 1.21.1 r1 is a candidate with the verified immutable pins", () =>
       "https://services.gradle.org/distributions/gradle-9.2.1-bin.zip",
     distributionSha256:
       "72f44c9f8ebcb1af43838f45ee5c4aa9c5444898b3468ab3f4af7b6076c5bc3f",
+    wrapperJarSha256:
+      "7d3a4ac4de1c32b59bc6a4eb8ecb8e612ccd0cf1ae1e99f66902da64df296172",
     plugins: [{ id: "net.neoforged.moddev", version: "2.0.148" }],
   });
   assert.deepEqual(pack.template, {
