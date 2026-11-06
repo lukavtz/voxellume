@@ -1,0 +1,13 @@
+NeoForgeMDKs MDK-1.21.1-ModDevGradle
+===================================
+
+Source: https://github.com/NeoForgeMDKs/MDK-1.21.1-ModDevGradle
+Immutable revision: e93d7f09d4eec12c76d1d7be9bf4eaad0246e9e0
+Source archive: https://github.com/NeoForgeMDKs/MDK-1.21.1-ModDevGradle/archive/e93d7f09d4eec12c76d1d7be9bf4eaad0246e9e0.tar.gz
+Source archive SHA-256: 6d40cb9a22675daae87f4cc1b07ba4738f06089ee3b7a566f2ed4ad7c5292d09
+Vendored at: target-packs/java/neoforge/1.21.1/templates
+License: MIT License, copyright (c) 2023 NeoForged project; retained verbatim in templates/TEMPLATE_LICENSE.txt.
+
+Modifications:
+- README.md: changed the Installation information heading underline from ======= to ------- and removed trailing whitespace (formatting only; text and meaning preserved).
+- All other vendored files, including Gradle wrapper files and GitHub workflow files, are unchanged from the immutable revision.

@@ -1,0 +1,14 @@
+FabricMC fabric-example-mod
+==========================
+
+Source: https://github.com/FabricMC/fabric-example-mod
+Immutable revision: 4c47210589a9ff72a6075c8dd1d73315dcc3e010
+Source archive: https://github.com/FabricMC/fabric-example-mod/archive/4c47210589a9ff72a6075c8dd1d73315dcc3e010.tar.gz
+Source archive SHA-256: d2e1ceed9a20b47288320cfd226d0064b274ff57caea25fbde07b583e82b475f
+Vendored at: target-packs/java/fabric/1.21.1/templates
+License: Creative Commons CC0 1.0 Universal; retained verbatim in templates/LICENSE.
+
+Modifications:
+- gradle.properties: changed loom_version from 1.19-SNAPSHOT to 1.20.0-alpha.19.
+- .gitattributes: removed the extra blank line at EOF (formatting only).
+- All other vendored files, including Gradle wrapper files and GitHub workflow files, are unchanged from the immutable revision.
