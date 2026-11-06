@@ -191,7 +191,7 @@ Asset provenance links each runtime hash to its spec, editable-source hash, immu
 
 Input: authorized project root, resolved target, requested verification profile, cancellation signal, and execution policy.
 
-Output: ordered check results and artifact references. Domain failures are data; infrastructure failures use explicit errors.
+Output: ordered check results and artifact references. Profiles compose `static → build → server → gameTest → client → productionJar → visual → package`; `release` omits visual, while `full` requires every stage and returns `verified` only after all required checks pass. A non-pass stops downstream claims and leaves skipped checks unexecuted. Runtime evidence binds server/client surface and scenario; production-JAR visual checks additionally require authenticated human design approval. Bounded repair makes one vertical change, restores last-good after each failed attempt, and never exceeds three attempts. Domain failures are data; infrastructure failures use explicit errors.
 
 ## 5. Target-pack contract
 
