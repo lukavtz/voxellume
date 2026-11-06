@@ -16,25 +16,22 @@
 | uv               | установлен                                         | `command -v uv`                        |
 | Docker CLI       | `/opt/homebrew/bin/docker`                         | `command -v docker`                    |
 
-## Отсутствующие prerequisites
+## Текущие prerequisites
 
-- Java runtime: `/usr/bin/java` является системной заглушкой и сообщает `Unable to locate a Java Runtime`.
-- Gradle: отсутствует; target-проекты должны использовать собственный pinned wrapper.
-- Blockbench desktop: `/Applications/Blockbench.app` отсутствует.
-- Blender: отсутствует.
-- ffmpeg: отсутствует.
+Первоначальное исследование фиксировало отсутствие JDK, Docker daemon, Blockbench, Blender и ffmpeg. После установки состояние проверено повторно:
 
-Docker daemon также недоступен: `docker version --format '{{.Server.Version}}'` не смог подключиться к `unix:///Users/luxvtz/.colima/default/docker.sock`.
+- JDK `21.0.13` и `25.0.5` зарегистрированы в `~/Library/Java/JavaVirtualMachines`; оба обнаруживаются через `/usr/libexec/java_home`.
+- Colima работает; Docker client `29.9.2` подключается к server `29.5.2`.
+- `/Applications/Blockbench.app` версии `5.2.2` присутствует.
+- Blender `5.2.3`, ffmpeg `9.0.2`, gitleaks `8.30.1`, osv-scanner `2.7.0` и semgrep `1.183.0` установлены.
 
-Эти ограничения блокируют реальные Gradle/Minecraft, Blockbench desktop, 3D rendering, video verification и container-based isolation до установки и запуска соответствующих зависимостей.
-
-Одобренная подготовка: JDK 21 и 25, Blockbench, Blender, ffmpeg и Docker/Colima. Gradle устанавливать глобально не требуется: используются target-specific wrappers.
+Глобальный Gradle не требуется: target-проекты используют собственные pinned wrappers.
 
 ## GitHub
 
 - Приватный репозиторий: https://github.com/lukavtz/voxellume
 - Рабочая ветка: `feat/plugin-foundation`.
-- На момент исследования реализация первого target-resolution slice существует локально; push и PR не выполнялись.
+- Baseline `main` на commit `e291e3a` отправлен через HTTPS после ошибки SSH `publickey`.
 
 ## Доступность внешних справочных сервисов
 

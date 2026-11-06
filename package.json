@@ -1,0 +1,31 @@
+{
+  "name": "voxellume",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.18.0",
+  "engines": {
+    "node": ">=24.9.0"
+  },
+  "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "oxlint .",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test --experimental-strip-types \"tests/**/*.test.ts\"",
+    "test:unit": "node --test --experimental-strip-types \"tests/unit/**/*.test.ts\"",
+    "test:integration": "node --test --experimental-strip-types \"tests/integration/**/*.test.ts\"",
+    "test:host": "node --test --experimental-strip-types \"tests/host/**/*.test.ts\"",
+    "test:security": "node --test --experimental-strip-types \"tests/security/**/*.test.ts\"",
+    "test:e2e": "node --test --experimental-strip-types \"tests/e2e/**/*.test.ts\"",
+    "test:targets": "node --test --experimental-strip-types \"tests/targets/**/*.test.ts\"",
+    "pack:check": "pnpm pack --dry-run",
+    "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test:unit && pnpm pack:check"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.6",
+    "oxlint": "1.91.0",
+    "prettier": "3.9.10",
+    "typescript": "7.0.2"
+  }
+}
