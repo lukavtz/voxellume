@@ -32,10 +32,13 @@
   "dependencies": {
     "@fal-ai/client": "1.10.1",
     "ajv": "8.20.0",
+    "fflate": "0.8.3",
     "koffi": "3.3.7",
     "mc-asset": "0.5.0",
+    "mineflayer": "4.39.0",
     "pixelmatch": "8.0.0",
     "pngjs": "7.0.0",
+    "rcon-client": "4.2.5",
     "smol-toml": "1.9.1"
   }
 }
