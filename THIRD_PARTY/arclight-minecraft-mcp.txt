@@ -1,0 +1,10 @@
+Source: https://github.com/ArclightPowered/minecraft-mcp
+Revision: d9387740f005fb5f3fe3c4d2cc97787588448f36
+Integration: pinned external process/protocol methods; no upstream source file is vendored here.
+Upstream declares MIT in LICENSE, gradle.properties, and fabric.mod.json. The pinned LICENSE file is reproduced verbatim below.
+
+MIT License
+
+Copyright (c) 2026 IzzelAliz
+
+Permission is hereby granted, free of charge, to any person obtaining a copy...

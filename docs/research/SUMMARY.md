@@ -83,6 +83,7 @@
 - [Существующие решения и конкуренты](existing-solutions.md)
 - [OSS, skills, MCP и dependencies](oss-inventory.md)
 - [Texture/animation pipeline и runtime pilots](asset-generation.md)
+- [Real-client adapter capabilities и ограничения](runtime-adapters.md)
 - [Официальные target toolchains](minecraft-targets.md)
 - [Universal Modder — детальный разбор](universal-modder.md)
 - [AI-mod creator — детальный разбор](ai-mod-creator.md)
