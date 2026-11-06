@@ -25,6 +25,7 @@ import {
 import {
   finalizeEvidence,
   readEvidence,
+  type EvidenceCheckSubject,
 } from "../../src/core/verification/evidence.ts";
 
 const eulaUrl = "https://aka.ms/MinecraftEULA";
@@ -96,6 +97,11 @@ async function evidenceOptions(
         requestedArgv: ["./gradlew", "--no-daemon", "clean", "build"],
         executedArgv: ["./gradlew", "--no-daemon", "clean", "build"],
         exitCode: 0,
+        subject: {
+          class: "source",
+          sourceSha256: "1".repeat(64),
+          exportSha256: "2".repeat(64),
+        },
         logs: [{ name: "stdout.log", path: logPath }],
       },
     ],
@@ -213,6 +219,11 @@ test("final evidence records identities, exact execution, artifacts, and environ
     requestedArgv: ["./gradlew", "--no-daemon", "clean", "build"],
     executedArgv: ["./gradlew", "--no-daemon", "clean", "build"],
     exitCode: 0,
+    subject: {
+      class: "source",
+      sourceSha256: "1".repeat(64),
+      exportSha256: "2".repeat(64),
+    },
     logs: [
       {
         name: "stdout.log",
@@ -270,6 +281,11 @@ test("timed-out and cancelled checks remain non-passing evidence", async (t) => 
     requestedArgv: ["./gradlew", "--no-daemon", "runServer"],
     executedArgv: ["./gradlew", "--no-daemon", "runServer"],
     exitCode: null,
+    subject: {
+      class: "source",
+      sourceSha256: "1".repeat(64),
+      exportSha256: "2".repeat(64),
+    },
     logs: [],
   }));
   const manifest = await finalizeEvidence(options);
@@ -398,4 +414,181 @@ test("an artifact containing a secret is rejected rather than persisted", async 
     stat(join(options.evidenceRoot, options.transactionId)),
     { code: "ENOENT" },
   );
+});
+
+test("typed review subjects roundtrip with authenticated human approval", async (t) => {
+  const subjects: EvidenceCheckSubject[] = [
+    {
+      class: "source",
+      sourceSha256: "1".repeat(64),
+      exportSha256: "2".repeat(64),
+    },
+    {
+      class: "browser",
+      surface: "blockbench",
+      sourceSha256: "1".repeat(64),
+      exportSha256: "2".repeat(64),
+    },
+    {
+      class: "browser",
+      surface: "minecraft_client",
+      productionJarSha256: "3".repeat(64),
+      baselineSha256: "4".repeat(64),
+      scenario: { id: "idle-production", state: "idle", kind: "state" },
+    },
+    {
+      class: "design_review",
+      sourceSha256: "1".repeat(64),
+      exportSha256: "2".repeat(64),
+      reviewer: {
+        id: "human-reviewer",
+        revision: 1,
+        rubric: "silhouette, UV, clipping, and animation quality",
+        decision: "approved",
+        kind: "human",
+      },
+    },
+  ];
+
+  for (const subject of subjects) {
+    await t.test(`${subject.class}:${subject.surface ?? "none"}`, async (t) => {
+      const options = await evidenceOptions(t);
+      options.checks[0]!.subject = subject;
+      const manifest = await finalizeEvidence(options);
+      assert.match(manifest.integrity, /^[a-f0-9]{64}$/);
+      assert.deepEqual(manifest.checks[0]!.subject, subject);
+      assert.deepEqual(
+        (await readEvidence(options)).checks[0]!.subject,
+        subject,
+      );
+    });
+  }
+});
+
+test("a stand-in or rejected reviewer cannot pass human design review", async (t) => {
+  for (const reviewer of [
+    {
+      id: "agent-stand-in",
+      revision: 1,
+      rubric: "animation quality",
+      decision: "approved",
+      kind: "stand_in",
+    },
+    {
+      id: "human-reviewer",
+      revision: 1,
+      rubric: "animation quality",
+      decision: "rejected",
+      kind: "human",
+    },
+  ] as const) {
+    await t.test(`${reviewer.kind}:${reviewer.decision}`, async (t) => {
+      const options = await evidenceOptions(t);
+      options.checks[0]!.subject = {
+        class: "design_review",
+        sourceSha256: "1".repeat(64),
+        exportSha256: "2".repeat(64),
+        reviewer,
+      };
+      await assert.rejects(finalizeEvidence(options), {
+        code: "human_review_required",
+      });
+    });
+  }
+});
+
+test("review subjects enforce class requirements and exact field formats", async (t) => {
+  const cases: { name: string; subject: EvidenceCheckSubject }[] = [
+    {
+      name: "source export hash",
+      subject: { class: "source", sourceSha256: "1".repeat(64) },
+    },
+    {
+      name: "browser surface",
+      subject: { class: "browser", sourceSha256: "1".repeat(64) },
+    },
+    {
+      name: "preview export hash",
+      subject: {
+        class: "browser",
+        surface: "blender",
+        sourceSha256: "1".repeat(64),
+      },
+    },
+    {
+      name: "client scenario",
+      subject: {
+        class: "browser",
+        surface: "minecraft_client",
+        productionJarSha256: "3".repeat(64),
+        baselineSha256: "4".repeat(64),
+      },
+    },
+    {
+      name: "design reviewer",
+      subject: {
+        class: "design_review",
+        sourceSha256: "1".repeat(64),
+        exportSha256: "2".repeat(64),
+      },
+    },
+    {
+      name: "exact hash",
+      subject: {
+        class: "source",
+        sourceSha256: "not-a-sha256",
+        exportSha256: "2".repeat(64),
+      },
+    },
+    {
+      name: "scenario state",
+      subject: {
+        class: "browser",
+        surface: "minecraft_client",
+        productionJarSha256: "3".repeat(64),
+        baselineSha256: "4".repeat(64),
+        scenario: { id: "idle", state: "", kind: "state" },
+      },
+    },
+    {
+      name: "reviewer revision",
+      subject: {
+        class: "design_review",
+        sourceSha256: "1".repeat(64),
+        exportSha256: "2".repeat(64),
+        reviewer: {
+          id: "human-reviewer",
+          revision: 0,
+          rubric: "animation quality",
+          decision: "approved",
+          kind: "human",
+        },
+      },
+    },
+    {
+      name: "reviewer rubric",
+      subject: {
+        class: "design_review",
+        sourceSha256: "1".repeat(64),
+        exportSha256: "2".repeat(64),
+        reviewer: {
+          id: "human-reviewer",
+          revision: 1,
+          rubric: " ",
+          decision: "approved",
+          kind: "human",
+        },
+      },
+    },
+  ];
+
+  for (const { name, subject } of cases) {
+    await t.test(name, async (t) => {
+      const options = await evidenceOptions(t);
+      options.checks[0]!.subject = subject;
+      await assert.rejects(finalizeEvidence(options), {
+        code: "invalid_evidence_subject",
+      });
+    });
+  }
 });

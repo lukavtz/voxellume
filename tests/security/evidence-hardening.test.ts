@@ -30,7 +30,9 @@ import {
 } from "../../src/core/execution/paths.ts";
 import {
   finalizeEvidence,
+  readEvidence,
   type EvidenceCheckInput,
+  type EvidenceManifest,
   type FinalizeEvidenceOptions,
 } from "../../src/core/verification/evidence.ts";
 
@@ -118,6 +120,11 @@ async function evidenceOptions(
           requestedArgv: ["./gradlew", "clean", "build"],
           executedArgv: ["./gradlew", "--no-daemon", "clean", "build"],
           exitCode: 0,
+          subject: {
+            class: "source",
+            sourceSha256: "1".repeat(64),
+            exportSha256: "2".repeat(64),
+          },
           logs: [{ name: "stdout.log", path: logPath }],
         },
       ],
@@ -135,6 +142,33 @@ async function assertNoEvidence(options: {
     stat(join(options.evidenceRoot, options.transactionId)),
     { code: "ENOENT" },
   );
+}
+
+async function tamperManifest(
+  options: FinalizeEvidenceOptions,
+  mutate: (manifest: EvidenceManifest) => void,
+): Promise<void> {
+  const directory = join(options.evidenceRoot, options.transactionId);
+  const resultPath = join(directory, "result.json");
+  const checksumsPath = join(directory, "SHA256SUMS");
+  await chmod(resultPath, 0o644);
+  await chmod(checksumsPath, 0o644);
+  const manifest = JSON.parse(
+    await readFile(resultPath, "utf8"),
+  ) as EvidenceManifest;
+  mutate(manifest);
+  const result = `${JSON.stringify(manifest, null, 2)}\n`;
+  await writeFile(resultPath, result);
+  const digest = createHash("sha256").update(result).digest("hex");
+  const checksums = (await readFile(checksumsPath, "utf8"))
+    .split("\n")
+    .map((line) =>
+      line.endsWith("  result.json") ? `${digest}  result.json` : line,
+    )
+    .join("\n");
+  await writeFile(checksumsPath, checksums);
+  await chmod(resultPath, 0o444);
+  await chmod(checksumsPath, 0o444);
 }
 
 async function waitForStagingEntry(
@@ -256,6 +290,11 @@ test("evidence preserves distinct requested and executed command records", async
     requestedArgv: ["./gradlew", "clean", "build"],
     executedArgv: ["./gradlew", "--no-daemon", "clean", "build"],
     exitCode: 0,
+    subject: {
+      class: "source",
+      sourceSha256: "1".repeat(64),
+      exportSha256: "2".repeat(64),
+    },
     logs: [
       {
         name: "stdout.log",
@@ -425,4 +464,118 @@ test("replacement after temporary-file preparation is a revision conflict", asyn
   );
   assert.equal(await readFile(target, "utf8"), "external replacement\n");
   assert.equal(await readFile(retired, "utf8"), "original\n");
+});
+
+test("unsigned and forged manifests fail after checksum repair", async (t) => {
+  for (const kind of ["unsigned", "forged"] as const) {
+    await t.test(kind, async (t) => {
+      const { options } = await evidenceOptions(t);
+      await finalizeEvidence(options);
+      await tamperManifest(options, (manifest) => {
+        if (kind === "unsigned") {
+          delete (manifest as Partial<EvidenceManifest>).integrity;
+        } else {
+          manifest.integrity = "0".repeat(64);
+        }
+      });
+      await assert.rejects(readEvidence(options), {
+        code: "evidence_integrity",
+      });
+    });
+  }
+});
+
+test("authenticated evidence binds stored log and artifact bytes", async (t) => {
+  for (const relative of [
+    "checks/build/stdout.log",
+    "artifacts/ruby-blade.jar",
+  ]) {
+    await t.test(relative, async (t) => {
+      const { options } = await evidenceOptions(t);
+      await finalizeEvidence(options);
+      const directory = join(options.evidenceRoot, options.transactionId);
+      const path = join(directory, relative);
+      const checksumsPath = join(directory, "SHA256SUMS");
+      await chmod(path, 0o644);
+      await chmod(checksumsPath, 0o644);
+      await writeFile(path, "forged stored bytes\n");
+      const digest = createHash("sha256")
+        .update("forged stored bytes\n")
+        .digest("hex");
+      const checksums = (await readFile(checksumsPath, "utf8"))
+        .split("\n")
+        .map((line) =>
+          line.endsWith(`  ${relative}`) ? `${digest}  ${relative}` : line,
+        )
+        .join("\n");
+      await writeFile(checksumsPath, checksums);
+      await chmod(path, 0o444);
+      await chmod(checksumsPath, 0o444);
+
+      await assert.rejects(readEvidence(options), {
+        code: "evidence_integrity",
+      });
+    });
+  }
+});
+
+test("authenticated evidence rejects altered review identity and execution", async (t) => {
+  await t.test("subject hash", async (t) => {
+    const { options } = await evidenceOptions(t);
+    await finalizeEvidence(options);
+    await tamperManifest(options, (manifest) => {
+      manifest.checks[0]!.subject.sourceSha256 = "3".repeat(64);
+    });
+    await assert.rejects(readEvidence(options), { code: "evidence_integrity" });
+  });
+
+  await t.test("reviewer", async (t) => {
+    const { options } = await evidenceOptions(t);
+    options.checks[0]!.subject = {
+      class: "design_review",
+      sourceSha256: "1".repeat(64),
+      exportSha256: "2".repeat(64),
+      reviewer: {
+        id: "human-reviewer",
+        revision: 1,
+        rubric: "animation quality",
+        decision: "approved",
+        kind: "human",
+      },
+    };
+    await finalizeEvidence(options);
+    await tamperManifest(options, (manifest) => {
+      manifest.checks[0]!.subject.reviewer!.revision = 2;
+    });
+    await assert.rejects(readEvidence(options), { code: "evidence_integrity" });
+  });
+
+  await t.test("scenario", async (t) => {
+    const { options } = await evidenceOptions(t);
+    options.checks[0]!.subject = {
+      class: "browser",
+      surface: "minecraft_client",
+      productionJarSha256: "4".repeat(64),
+      baselineSha256: "5".repeat(64),
+      scenario: { id: "idle", state: "idle", kind: "state" },
+    };
+    await finalizeEvidence(options);
+    await tamperManifest(options, (manifest) => {
+      manifest.checks[0]!.subject.scenario!.state = "walk";
+    });
+    await assert.rejects(readEvidence(options), { code: "evidence_integrity" });
+  });
+
+  await t.test("caller-authored unexecuted pass", async (t) => {
+    const { options } = await evidenceOptions(t);
+    await finalizeEvidence(options);
+    await tamperManifest(options, (manifest) => {
+      const check = manifest.checks[0]!;
+      check.executed = false;
+      check.executedArgv = null;
+      check.exitCode = null;
+      check.status = "passed";
+    });
+    await assert.rejects(readEvidence(options), { code: "evidence_integrity" });
+  });
 });

@@ -56,6 +56,8 @@ Use adversarial fixtures:
 - oversized raster input before spawn/read, decoded pixel/dimension bombs, output/log/MCP-response floods, and ZIP/nested-archive bombs;
 - partial multi-artifact writes and failure/cancellation during staged journal publication, requiring no outside-root or partial canonical output;
 - raw sosadly outside-root requests, default-on `execute_script`, plugin installation, and unauthenticated loopback commands, all rejected by the absence of that server surface;
+- fal model-as-URL credential exfiltration, self-attested ComfyUI workflow approval, loopback redirects, stalled providers, cancellation during final download, and secret-bearing request/workflow manifests;
+- unsigned or MAC-repaired evidence, altered review subjects/scenarios/reviewers, unexecuted passes, preview-only client claims, and stand-in human approvals;
 - command and argument injection through metadata and target input;
 - malicious Gradle/build scripts attempting unexpected filesystem or network access;
 - archive traversal and unsafe extraction;
@@ -213,7 +215,8 @@ For every model, texture, GUI, animation, or visual effect:
 
 - validate `TextureSpec`/`AnimationSpec`, target revision, style-board provenance, and acceptance references before generation;
 - enforce input byte/pixel limits before decode, exact dimensions, integer-nearest scaling, palette and alpha policy, silhouette, and tiling wrap/seam metrics;
-- verify editable `.grid`/`.mcpx`/`.bbmodel` sources and exported runtime hashes, blockstate/model/entity references, UV bounds/orientation, nonzero faces, bone parents/pivots, and round-trip diffs;
+- verify editable `.grid`/`.mcpx`/`.bbmodel` sources and exported runtime hashes, blockstate/model/entity references, UV bounds/orientation, nonzero faces, bone parents/pivots, and independent round-trip diffs;
+- validate actual Fabric `~1.21.1` and NeoForge/Forge singleton/range metadata across all dependency tables; parse GeckoLib `1.12.0` geometry and `1.8.0` animation schemas rather than accepting internal envelopes;
 - require animated textures to have `height = width × frameCount`, nonempty frames, explicit valid order, integer `frametime >= 1`, matching interpolation, and measured last-to-first loop delta;
 - evaluate declared bone clips for loop seam, travel/strike direction, required movement, ground penetration, self-intersection, and unapproved coplanar/z-fighting pairs;
 - rerun deterministic cleanup and seeded generators and compare semantic/output hashes; hosted-AI seed repetition alone is not a reproducibility check;

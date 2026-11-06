@@ -1,3 +1,5 @@
+export const EVIDENCE_INTEGRITY_PURPOSE = "voxellume-evidence-1";
+
 export const STATUSES = [
   "passed",
   "failed",
@@ -14,6 +16,31 @@ export interface EvidenceInputFile {
   path: string;
 }
 
+export interface EvidenceReviewScenario {
+  id: string;
+  state: string;
+  kind: "state" | "multiplayer" | "restart";
+}
+
+export interface EvidenceReviewer {
+  id: string;
+  revision: number;
+  rubric: string;
+  decision: "approved" | "rejected";
+  kind: "human" | "stand_in";
+}
+
+export interface EvidenceCheckSubject {
+  class: "source" | "browser" | "design_review";
+  surface?: "blockbench" | "blender" | "minecraft_client";
+  sourceSha256?: string;
+  exportSha256?: string;
+  productionJarSha256?: string;
+  baselineSha256?: string;
+  scenario?: EvidenceReviewScenario;
+  reviewer?: EvidenceReviewer;
+}
+
 export interface EvidenceCheckInput {
   id: string;
   requested: boolean;
@@ -22,6 +49,7 @@ export interface EvidenceCheckInput {
   requestedArgv: string[];
   executedArgv: string[] | null;
   exitCode: number | null;
+  subject: EvidenceCheckSubject;
   logs: EvidenceInputFile[];
 }
 
@@ -55,6 +83,7 @@ export interface EvidenceCheck {
   requestedArgv: string[];
   executedArgv: string[] | null;
   exitCode: number | null;
+  subject: EvidenceCheckSubject;
   logs: EvidenceStoredFile[];
 }
 
@@ -67,6 +96,7 @@ export interface EvidenceManifest {
   environment: Record<string, unknown>;
   checks: EvidenceCheck[];
   artifacts: EvidenceStoredFile[];
+  integrity: string;
 }
 
 export class EvidenceError extends Error {

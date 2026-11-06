@@ -57,6 +57,115 @@ function validArgv(value: unknown): value is string[] {
   );
 }
 
+const SHA256 = /^[a-f0-9]{64}$/;
+
+function invalidSubject(): never {
+  return fail("invalid_evidence_subject", "Invalid evidence check subject.");
+}
+
+function validateSubject(check: EvidenceCheckInput): void {
+  const subject = check.subject;
+  if (
+    subject === null ||
+    typeof subject !== "object" ||
+    Array.isArray(subject)
+  ) {
+    invalidSubject();
+  }
+  for (const key of [
+    "sourceSha256",
+    "exportSha256",
+    "productionJarSha256",
+    "baselineSha256",
+  ] as const) {
+    const value = subject[key];
+    if (
+      value !== undefined &&
+      (typeof value !== "string" || !SHA256.test(value))
+    ) {
+      invalidSubject();
+    }
+  }
+  if (
+    !["source", "browser", "design_review"].includes(subject.class) ||
+    (subject.surface !== undefined &&
+      !["blockbench", "blender", "minecraft_client"].includes(subject.surface))
+  ) {
+    invalidSubject();
+  }
+  if (subject.scenario !== undefined) {
+    const scenario = subject.scenario;
+    if (
+      scenario === null ||
+      typeof scenario !== "object" ||
+      Array.isArray(scenario) ||
+      typeof scenario.id !== "string" ||
+      scenario.id.trim().length === 0 ||
+      typeof scenario.state !== "string" ||
+      scenario.state.trim().length === 0 ||
+      !["state", "multiplayer", "restart"].includes(scenario.kind)
+    ) {
+      invalidSubject();
+    }
+  }
+  if (subject.reviewer !== undefined) {
+    const reviewer = subject.reviewer;
+    if (
+      reviewer === null ||
+      typeof reviewer !== "object" ||
+      Array.isArray(reviewer) ||
+      typeof reviewer.id !== "string" ||
+      reviewer.id.trim().length === 0 ||
+      !Number.isInteger(reviewer.revision) ||
+      reviewer.revision <= 0 ||
+      typeof reviewer.rubric !== "string" ||
+      reviewer.rubric.trim().length === 0 ||
+      !["approved", "rejected"].includes(reviewer.decision) ||
+      !["human", "stand_in"].includes(reviewer.kind)
+    ) {
+      invalidSubject();
+    }
+  }
+
+  const required = (
+    fields: (
+      | "sourceSha256"
+      | "exportSha256"
+      | "productionJarSha256"
+      | "baselineSha256"
+      | "scenario"
+      | "reviewer"
+    )[],
+  ): void => {
+    if (fields.some((key) => subject[key] === undefined)) invalidSubject();
+  };
+  if (subject.class === "source") {
+    required(["sourceSha256", "exportSha256"]);
+  } else if (subject.class === "browser") {
+    if (subject.surface === undefined) invalidSubject();
+    if (subject.surface === "minecraft_client") {
+      required(["productionJarSha256", "baselineSha256", "scenario"]);
+    } else {
+      required(["sourceSha256", "exportSha256"]);
+    }
+  } else {
+    required(["sourceSha256", "exportSha256", "reviewer"]);
+  }
+
+  if (
+    check.status === "passed" &&
+    subject.reviewer !== undefined &&
+    subject.class !== "source" &&
+    (subject.reviewer.kind !== "human" ||
+      subject.reviewer.decision !== "approved")
+  ) {
+    fail(
+      "human_review_required",
+      "A passed review requires an approved human reviewer.",
+    );
+  }
+}
+
 function validateCheck(check: EvidenceCheckInput): void {
   component(check.id, "check ID");
   if (
@@ -95,6 +204,7 @@ function validateCheck(check: EvidenceCheckInput): void {
       "Execution flags, status, command, and exit code must agree.",
     );
   }
+  validateSubject(check);
 }
 
 function contained(root: string, path: string): boolean {

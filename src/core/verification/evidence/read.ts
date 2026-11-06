@@ -3,8 +3,14 @@ import { createReadStream } from "node:fs";
 import { lstat, readFile, readdir } from "node:fs/promises";
 import { join } from "node:path";
 
+import { authenticateCanonical } from "../../spec/transactions/journal-integrity.ts";
 import { transactionComponent } from "./paths.ts";
-import { EvidenceError, type EvidenceManifest, fail } from "./types.ts";
+import {
+  EvidenceError,
+  type EvidenceManifest,
+  EVIDENCE_INTEGRITY_PURPOSE,
+  fail,
+} from "./types.ts";
 
 export async function hashFile(path: string): Promise<string> {
   const hash = createHash("sha256");
@@ -100,11 +106,32 @@ export async function readEvidence(options: {
         fail("evidence_integrity", "Evidence checksum mismatch.");
       }
     }
-    const manifest = JSON.parse(
-      await readFile(join(directory, "result.json"), "utf8"),
-    ) as EvidenceManifest;
+    const manifest = await authenticateCanonical<EvidenceManifest>(
+      JSON.parse(await readFile(join(directory, "result.json"), "utf8")),
+      EVIDENCE_INTEGRITY_PURPOSE,
+    );
     if (manifest.transactionId !== options.transactionId) {
       fail("evidence_integrity", "Evidence transaction identity mismatch.");
+    }
+    const storedFiles = [
+      ...manifest.artifacts,
+      ...manifest.checks.flatMap((check) => check.logs),
+    ];
+    const storedPaths = new Set<string>();
+    for (const file of storedFiles) {
+      if (
+        storedPaths.has(file.path) ||
+        expected.get(file.path) !== file.sha256
+      ) {
+        fail("evidence_integrity", "Evidence stored-file identity mismatch.");
+      }
+      storedPaths.add(file.path);
+    }
+    if (storedPaths.size !== expected.size - 1) {
+      fail(
+        "evidence_integrity",
+        "Evidence manifest file coverage is incomplete.",
+      );
     }
     return manifest;
   } catch (error) {

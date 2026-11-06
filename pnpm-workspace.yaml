@@ -1,0 +1,5 @@
+allowBuilds:
+  koffi: false
+overrides:
+  "@modelcontextprotocol/sdk": 1.32.0
+  zod: 4.6.6

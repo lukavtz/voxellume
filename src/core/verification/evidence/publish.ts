@@ -10,15 +10,18 @@ import {
 } from "node:fs/promises";
 import { join } from "node:path";
 
+import { sealCanonical } from "../../spec/transactions/journal-integrity.ts";
 import { copyArtifact, preflight, writeLog } from "./inputs.ts";
 import { assertEvidenceRoot } from "./paths.ts";
 import { hashFile, walkFiles } from "./read.ts";
 import { redactText, redactValue } from "./redaction.ts";
 import {
   type EvidenceCheck,
+  type EvidenceCheckSubject,
   type EvidenceManifest,
   type EvidenceStoredFile,
   type FinalizeEvidenceOptions,
+  EVIDENCE_INTEGRITY_PURPOSE,
   fail,
 } from "./types.ts";
 
@@ -108,6 +111,7 @@ async function publishEvidence(
                 redactText(argument, secrets),
               ),
         exitCode: input.exitCode,
+        subject: redactValue(input.subject, secrets) as EvidenceCheckSubject,
         logs,
       };
       checks.push(check);
@@ -125,7 +129,7 @@ async function publishEvidence(
       artifacts.push({ name: artifact.name, path: relative, ...stored });
     }
 
-    const manifest: EvidenceManifest = {
+    const unsignedManifest: Omit<EvidenceManifest, "integrity"> = {
       transactionId: options.transactionId,
       baseProjectSha256: options.baseProjectSha256,
       modSpecSha256: options.modSpecSha256,
@@ -138,6 +142,10 @@ async function publishEvidence(
       checks,
       artifacts,
     };
+    const manifest = await sealCanonical(
+      unsignedManifest,
+      EVIDENCE_INTEGRITY_PURPOSE,
+    );
     const result = Buffer.from(
       `${JSON.stringify(manifest, null, 2)}\n`,
       "utf8",

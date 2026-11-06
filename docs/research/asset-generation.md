@@ -110,7 +110,7 @@ Reference plate — **не shipping pixels**. После замены plate, pal
 Все вызовы mc-asset идут через Voxellume facade: allowlisted operation, facade-owned relative paths, isolated staging, journaled publication, resource limits и hash evidence. Модель не получает raw CLI path arguments или raw MCP tools. [S14](#s14-runtime-evidence-mc-asset)
 
 1. Утвердить `TextureSpec` и `StyleBoard`.
-2. Получить concept через один approved provider. Сохранить exact prompt, model/version, provider seed, request/response hashes и workflow hash. Hosted seed не считать гарантией воспроизводимости.
+2. Получить concept через один approved provider. Сохранить exact prompt, model/version, provider seed, request/response hashes и workflow hash. Hosted seed не считать гарантией воспроизводимости. `requestAsset` использует host callback, официальный `@fal-ai/client` `1.10.1` или ComfyUI только на `127.0.0.1:8188`; fal принимает строгий endpoint ID, не URL. ComfyUI workflow digest и parameter bindings задаёт trusted host config, все запросы имеют общий deadline и запрещают redirects. Manifest хранит hashes и allowlisted non-secret projection, не raw workflow/input или credentials.
 3. Для AI raster применить один выбранный grid-recovery route:
    - `perfect-pixel` — FFT grid detection + edge refinement;
    - ComfyUI Unfaker — exact fit, background/palette cleanup, manifest.
@@ -362,7 +362,7 @@ Evidence: `~/.local/share/voxellume/evidence/sosadly-blockbench-20261106-1/repor
 - Перенести минимальные pure functions за own typed API под MIT notice, без MCP bridge, `execute_script` и `install_plugin`.
 - Прогнать все random paths через явный seed; повторный generation с одинаковым AnimationSpec/seed должен дать одинаковый semantic export hash. Editor UUID/state нормализуются, а не игнорируются молча.
 - Добавить planted defects для off-joint pivot, mirrored arm, reversed strike, z-fight, missing UV/texture; сравнить analyzer с независимым evaluated-pose oracle.
-- Проверить GeckoLib/target export и все required states в production-JAR Minecraft, затем отдельно провести human visual review.
+- Статический GeckoLib `1.12.0` geometry и `1.8.0` animation export/re-import проверяется по официальным schema definitions `bernie-g/geckolib` `7c96bef7e1658e4158453c17eb464f0fb7f92426`; это не runtime evidence. Проверить все required states в production-JAR Minecraft, затем отдельно провести human visual review.
 
 ### 10.3. Остальные conditional pilots
 
