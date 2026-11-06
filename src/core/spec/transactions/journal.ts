@@ -15,6 +15,7 @@ import {
   safeRelativePath,
   temporaryPath,
 } from "./paths.ts";
+import { authenticateJournal, sealJournal } from "./journal-integrity.ts";
 import { InjectedCrash, TransactionFault } from "./state.ts";
 
 export async function atomicProjectWrite(
@@ -86,18 +87,26 @@ export async function writeJournal(
   candidate: TransactionCandidate,
   journal: TransactionJournal,
 ): Promise<void> {
+  const stored = await sealJournal(journal);
   await atomicWrite(
     candidate.journalPath,
-    `${JSON.stringify(journal, null, 2)}\n`,
+    `${JSON.stringify(stored, null, 2)}\n`,
   );
 }
 
 export async function readJournal(
   candidate: TransactionCandidate,
 ): Promise<TransactionJournal> {
-  const journal = JSON.parse(
-    await readFile(candidate.journalPath, "utf8"),
-  ) as TransactionJournal;
+  let stored: unknown;
+  try {
+    stored = JSON.parse(await readFile(candidate.journalPath, "utf8"));
+  } catch {
+    throw new TransactionFault(
+      "recovery_required",
+      "Transaction journal is unreadable",
+    );
+  }
+  const journal = await authenticateJournal(stored);
   const keys = [
     "appliedFiles",
     "backups",

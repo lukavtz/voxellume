@@ -283,3 +283,80 @@ test("cancellation after final apply and new-project rename rolls back instead o
     await assertOutsideBytes(fixture);
   });
 });
+
+test("commit uses its verified snapshot when the public candidate mutates asynchronously", async (t) => {
+  const fixture = await setup(t);
+  const candidate = await verifiedCandidate(fixture);
+  const manifest = structuredClone(candidate.manifest);
+  let mutated = false;
+  const committing = commitCandidate({
+    candidate,
+    hooks: {
+      beforeApplyFile: async () => {
+        if (mutated) return;
+        mutated = true;
+        await Promise.resolve();
+        candidate.manifest.files[0]!.sha256 = "0".repeat(64);
+        candidate.manifest.artifacts[0]!.sha256 = "0".repeat(64);
+      },
+    },
+  });
+  const result = await committing;
+  assert.equal(mutated, true);
+  assert.equal(result.status, "committed", result.error.detail);
+  assert.deepEqual(result.manifest, manifest);
+  assert.equal(
+    await readFile(join(fixture.projectRoot, sourcePath), "utf8"),
+    generatedSource("candidate"),
+  );
+  assert.equal(
+    await readFile(join(fixture.projectRoot, artifactPath), "utf8"),
+    "production:candidate\n",
+  );
+});
+
+test("unowned staging additions before or after verification never publish", async (t) => {
+  await t.test("created by the verifier before passed", async (t) => {
+    const fixture = await setup(t, { newProject: true });
+    const candidate = await buildCandidate(
+      makeOptions(fixture, {
+        verify: async ({ stagingRoot }) => {
+          await writeFile(join(stagingRoot, "unowned.txt"), "unowned\n");
+          return { status: "passed" };
+        },
+      }),
+    );
+    assert.equal(candidate.status, "failed");
+    const result = await commitCandidate({ candidate });
+    assert.notEqual(result.status, "committed");
+    assert.equal(await snapshotTree(fixture.projectRoot), null);
+  });
+
+  await t.test("created after verification before commit", async (t) => {
+    const fixture = await setup(t, { newProject: true });
+    const candidate = await verifiedCandidate(fixture);
+    await writeFile(join(candidate.stagingRoot, "unowned.txt"), "unowned\n");
+    const result = await commitCandidate({ candidate });
+    assert.notEqual(result.status, "committed");
+    assert.equal(await snapshotTree(fixture.projectRoot), null);
+  });
+});
+
+test("directory swap revalidates staging after the before-swap hook", async (t) => {
+  const fixture = await setup(t, { newProject: true });
+  const candidate = await verifiedCandidate(fixture);
+  const result = await commitCandidate({
+    candidate,
+    hooks: {
+      beforeDirectorySwap: async ({ stagingRoot }) => {
+        await writeFile(join(stagingRoot, "unowned.txt"), "unowned\n");
+        await writeFile(
+          join(stagingRoot, sourcePath),
+          generatedSource("swap-hook-tamper"),
+        );
+      },
+    },
+  });
+  assert.notEqual(result.status, "committed");
+  assert.equal(await snapshotTree(fixture.projectRoot), null);
+});

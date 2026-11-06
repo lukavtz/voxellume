@@ -147,6 +147,12 @@ export async function commitExistingProject(
     journal.status = "committed";
     await writeJournal(candidate, journal);
     await transition(candidate, "committed", options.hooks);
+    if (isCancelled(options.signal)) {
+      throw new TransactionFault(
+        "cancelled",
+        "Cancellation after committed transition",
+      );
+    }
     return candidate;
   } catch (error) {
     if (error instanceof InjectedCrash) {

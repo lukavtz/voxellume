@@ -17,7 +17,26 @@ export class TransactionFault extends Error {
 export class InjectedCrash extends Error {}
 
 export const MOD_SPEC_PATH = "mod-spec.json";
-export const verificationBindings = new WeakMap<TransactionCandidate, string>();
+export const verificationBindings = new WeakMap<
+  TransactionCandidate,
+  {
+    candidate: TransactionCandidate;
+    completeStagingTreeSha256: string;
+  }
+>();
+
+export function freezeCandidateSnapshot(
+  candidate: TransactionCandidate,
+): TransactionCandidate {
+  const snapshot = structuredClone(candidate);
+  const freeze = (value: unknown): void => {
+    if (value === null || typeof value !== "object") return;
+    for (const nested of Object.values(value)) freeze(nested);
+    Object.freeze(value);
+  };
+  freeze(snapshot);
+  return snapshot;
+}
 
 export function detail(error: unknown): string {
   return error instanceof Error ? error.message : String(error);

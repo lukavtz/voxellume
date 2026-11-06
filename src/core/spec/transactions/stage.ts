@@ -21,10 +21,10 @@ import {
   validateTransactionId,
 } from "./paths.ts";
 import {
-  candidateDigest,
   cancelled,
   errorCode,
   failed,
+  freezeCandidateSnapshot,
   isCancelled,
   MOD_SPEC_PATH,
   TransactionFault,
@@ -54,10 +54,17 @@ function operationFailure(
 
 export async function assertStagingUnchanged(
   candidate: TransactionCandidate,
+  completeStagingTreeSha256: string,
 ): Promise<void> {
   await assertSafeDirectory(candidate.realStagingRoot);
   const tree = await snapshotTree(candidate.realStagingRoot);
   if (tree === null) throw new Error("Candidate staging tree is missing");
+  if (projectHash(tree) !== completeStagingTreeSha256) {
+    throw new TransactionFault(
+      "candidate_tampered",
+      "Complete staging tree changed after verification",
+    );
+  }
   for (const file of candidate.manifest.files) {
     const expected = file.sha256 as string | null;
     if (
@@ -194,6 +201,7 @@ export async function stageCandidate(
     const stagingTree = await snapshotTree(candidate.realStagingRoot);
     if (stagingTree === null)
       throw new Error("Generator removed the staging root");
+    const completeStagingTreeSha256 = projectHash(stagingTree);
     const artifacts = new Map<string, string>();
     const productionJar = (options.modSpec.delivery as Record<string, unknown>)
       .productionJar;
@@ -269,10 +277,17 @@ export async function stageCandidate(
         verification.detail ?? `Verification returned ${verification.status}`,
       );
     }
-    const verificationBinding = candidateDigest(candidate);
+    await assertStagingUnchanged(candidate, completeStagingTreeSha256);
+    const verifiedSnapshot = freezeCandidateSnapshot({
+      ...candidate,
+      status: "verified",
+    });
     await transition(candidate, "verified", options.hooks);
     if (isCancelled(options.signal)) return cancelled(candidate);
-    verificationBindings.set(candidate, verificationBinding);
+    verificationBindings.set(candidate, {
+      candidate: verifiedSnapshot,
+      completeStagingTreeSha256,
+    });
     return candidate;
   } catch (error) {
     return failed(candidate, errorCode(error, "staging_failed"), error);

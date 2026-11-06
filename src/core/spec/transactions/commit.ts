@@ -29,6 +29,7 @@ import { projectHash, snapshotTree } from "./tree.ts";
 async function commitNewProject(
   candidate: TransactionCandidate,
   options: CommitCandidateOptions,
+  completeStagingTreeSha256: string,
 ): Promise<TransactionCandidate> {
   const journal: TransactionJournal = {
     schemaVersion: "transaction-journal-1.0.0",
@@ -76,6 +77,7 @@ async function commitNewProject(
         options.faults,
       );
     }
+    await assertStagingUnchanged(candidate, completeStagingTreeSha256);
     await rename(candidate.stagingRoot, candidate.projectRoot);
     journal.directoryRenamed = true;
     await options.hooks?.afterDirectorySwap?.({
@@ -101,6 +103,12 @@ async function commitNewProject(
     journal.status = "committed";
     await writeJournal(candidate, journal);
     await transition(candidate, "committed", options.hooks);
+    if (isCancelled(options.signal)) {
+      throw new TransactionFault(
+        "cancelled",
+        "Cancellation after committed transition",
+      );
+    }
     return candidate;
   } catch (error) {
     return recover(
@@ -116,7 +124,8 @@ async function commitNewProject(
 export async function commit(
   options: CommitCandidateOptions,
 ): Promise<TransactionCandidate> {
-  const candidate = options.candidate;
+  let candidate = options.candidate;
+  let completeStagingTreeSha256: string | undefined;
   if (candidate.status === "verified") {
     const binding = verificationBindings.get(candidate);
     if (binding === undefined) {
@@ -126,13 +135,15 @@ export async function commit(
         "Candidate has no private successful verification binding",
       );
     }
-    if (binding !== candidateDigest(candidate)) {
+    if (candidateDigest(binding.candidate) !== candidateDigest(candidate)) {
       return failed(
         candidate,
         "candidate_tampered",
         "Candidate changed after successful verification",
       );
     }
+    candidate = structuredClone(binding.candidate);
+    completeStagingTreeSha256 = binding.completeStagingTreeSha256;
   } else if (!recoveryCandidate(candidate)) {
     return failed(
       candidate,
@@ -140,6 +151,7 @@ export async function commit(
       `Cannot commit from ${candidate.status}`,
     );
   }
+  const commitOptions = { ...options, candidate };
   if (isCancelled(options.signal)) return cancelled(candidate);
 
   const release = await acquireProjectLock(candidate.projectRoot);
@@ -153,7 +165,7 @@ export async function commit(
           candidate.error?.code ?? "recovery_required",
           candidate.error?.detail ?? "Recovery is required",
           journal,
-          options.faults,
+          commitOptions.faults,
         );
       } catch (error) {
         candidate.status = "recovery_required";
@@ -170,9 +182,14 @@ export async function commit(
         "Canonical project changed after candidate verification",
       );
     }
-    await assertStagingUnchanged(candidate);
-    if (currentTree === null) return await commitNewProject(candidate, options);
-    return await commitExistingProject(candidate, options);
+    await assertStagingUnchanged(candidate, completeStagingTreeSha256!);
+    if (currentTree === null)
+      return await commitNewProject(
+        candidate,
+        commitOptions,
+        completeStagingTreeSha256!,
+      );
+    return await commitExistingProject(candidate, commitOptions);
   } catch (error) {
     return failed(candidate, "commit_failed", error);
   } finally {

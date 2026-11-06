@@ -76,6 +76,7 @@ export interface TestJournal {
   status: string;
   baseProjectSha256: string;
   appliedFiles: string[];
+  temporaryFiles: string[];
   backups: Record<string, { data: string | null }>;
 }
 

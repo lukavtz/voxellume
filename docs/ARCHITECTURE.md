@@ -70,6 +70,14 @@ Pinned `smile-minecraft/mc-asset` `v0.5.0` (`bedf67229ab0fdf304f6d40bc0000a27bd0
 
 Blender uses reviewed fixed scripts only for optional loop/QA/contact-sheet analysis; it is not a Minecraft exporter. Mosaicary `0.1.4` (`08bdba5252a378cf8e2111b0c2cb27cec4ea15ba`) is a conditional, pinned, local, network-denied glTF/Blender ingress pending conversion and runtime pilots. Java Block/Item models never acquire bone animation through this route.
 
+### ADR-009: Decompose transactions behind two public entry points
+
+`src/core/spec/transactions.ts` exposes only `buildCandidate` and `commitCandidate`. `transaction-types.ts` owns their shared contracts; `transactions/` contains focused staging, commit, apply, recovery, journal, ownership, lock, path, tree, and state modules. Dependencies flow from the public facade to stage/commit orchestration, then to apply/recovery and journal/ownership helpers, down to path/tree/lock/state primitives. Internal modules are not a second public API.
+
+A private `WeakMap` binds the verified candidate object to a deep-frozen snapshot and its complete staging-tree hash. Commit requires that binding, rejects candidate digest changes, restores the snapshot, and rechecks both canonical base and complete staging trees. Ownership covers declared implementation, asset, artifact, and ModSpec paths, including staged deletions; unrelated user files are not apply targets. A lock keyed by the canonical project path serializes staging and commit. Journals are strictly validated for identity, base hash, owned apply prefix, matching backups, and owned temporary files. Recovery restores backups in reverse order and reports conflicts as `recovery_required`. Cancellation observed after the committed transition enters recovery instead of returning false success.
+
+Journals remain in the transaction workspace at `<workspaceRoot>/<transactionId>/journal.json`; no external journal location is implemented. Pathname validation catches observed symlink and identity changes, but does not eliminate parent-directory swap TOCTOU between checks and mutation. The §3 directory-handle path supervisor must anchor operations to opened parent directories before complete race resistance can be claimed.
+
 ## 3. Repository layout
 
 ```text
@@ -83,7 +91,21 @@ Blender uses reviewed fixed scripts only for optional loop/QA/contact-sheet anal
 │   │   ├── projects/
 │   │   ├── assets/
 │   │   ├── execution/
-│   │   └── verification/
+│   │   ├── verification/
+│   │   └── spec/
+│   │       ├── transactions.ts
+│   │       ├── transaction-types.ts
+│   │       └── transactions/
+│   │           ├── state.ts
+│   │           ├── stage.ts
+│   │           ├── ownership.ts
+│   │           ├── paths.ts
+│   │           ├── lock.ts
+│   │           ├── tree.ts
+│   │           ├── journal.ts
+│   │           ├── apply.ts
+│   │           ├── commit.ts
+│   │           └── recovery.ts
 │   ├── adapters/
 │   │   ├── omp/
 │   │   ├── dsh/
@@ -104,7 +126,13 @@ Blender uses reviewed fixed scripts only for optional loop/QA/contact-sheet anal
 │   ├── projects/
 │   └── verification/
 ├── tests/
+│   ├── helpers/
+│   │   └── transaction-fixture.ts
 │   ├── unit/
+│   │   ├── transactions.test.ts
+│   │   ├── transaction-commit.test.ts
+│   │   ├── transaction-recovery.test.ts
+│   │   └── transaction-security.test.ts
 │   ├── integration/
 │   └── host-contract/
 ├── docs/
@@ -114,6 +142,8 @@ Blender uses reviewed fixed scripts only for optional loop/QA/contact-sheet anal
 └── .github/
     └── workflows/
 ```
+
+The execution/transaction path supervisor must use opened root and parent-directory handles for lookup, open, rename, and unlink operations. Current transaction pathname checks still have a parent-swap TOCTOU window; this section does not claim full race elimination until that supervisor is implemented.
 
 `src/shared` is limited to types used by more than one module. It must not become a dumping ground for unrelated helpers.
 

@@ -105,9 +105,12 @@ test("crash after new-project rename recovers by renaming the destination back t
 });
 
 test("rejects tampered journal paths, status, backups, and base hash before recovery mutations", async (t) => {
+  const forgedTemporaryPath =
+    "build/libs/.ruby-blade.jar.voxellume-424242-7.tmp";
   const cases: Array<{
     name: string;
     crashAfterApplyFiles?: number;
+    preexistingTemporary?: boolean;
     tamper: (journal: TestJournal) => void;
   }> = [
     {
@@ -115,6 +118,19 @@ test("rejects tampered journal paths, status, backups, and base hash before reco
       tamper: (journal) => {
         journal.appliedFiles = ["user-notes.txt"];
         journal.backups["user-notes.txt"] = { data: null };
+      },
+    },
+    {
+      name: "a forged temporary path cannot delete pre-existing user bytes",
+      tamper: (journal) => {
+        journal.temporaryFiles = ["user-notes.txt"];
+      },
+    },
+    {
+      name: "an owned-pattern forged temporary cannot delete pre-existing user bytes",
+      preexistingTemporary: true,
+      tamper: (journal) => {
+        journal.temporaryFiles = [forgedTemporaryPath];
       },
     },
     {
@@ -146,9 +162,19 @@ test("rejects tampered journal paths, status, backups, and base hash before reco
     },
   ];
 
-  for (const { name, crashAfterApplyFiles = 1, tamper } of cases) {
+  for (const {
+    name,
+    crashAfterApplyFiles = 1,
+    preexistingTemporary = false,
+    tamper,
+  } of cases) {
     await t.test(name, async (t) => {
       const fixture = await setup(t);
+      if (preexistingTemporary)
+        await writeFile(
+          join(fixture.projectRoot, forgedTemporaryPath),
+          "user-owned temporary bytes\n",
+        );
       const before = await snapshotTree(fixture.projectRoot);
       assert.ok(before);
       const candidate = await verifiedCandidate(fixture);
@@ -179,6 +205,14 @@ test("rejects tampered journal paths, status, backups, and base hash before reco
         partial,
         "journal validation must finish before any delete or restore",
       );
+      if (preexistingTemporary)
+        assert.equal(
+          await readFile(
+            join(fixture.projectRoot, forgedTemporaryPath),
+            "utf8",
+          ),
+          "user-owned temporary bytes\n",
+        );
       await assertUserBytes(fixture);
       await assertOutsideBytes(fixture);
     });
@@ -246,4 +280,57 @@ test("crash after sibling temporary creation removes only the tracked temporary 
   );
   await assertUserBytes(fixture);
   await assertOutsideBytes(fixture);
+});
+
+test("cancellation during finalization rolls back and never remains committed", async (t) => {
+  await t.test("during the final journal write", async (t) => {
+    const fixture = await setup(t);
+    const before = await snapshotTree(fixture.projectRoot);
+    const candidate = await verifiedCandidate(fixture);
+    const finalPath = [
+      ...new Set([
+        ...candidate.manifest.files.map((file) => file.path),
+        "mod-spec.json",
+      ]),
+    ]
+      .sort((left, right) => left.localeCompare(right))
+      .at(-1);
+    assert.ok(finalPath);
+    const controller = new AbortController();
+    const result = await commitCandidate({
+      candidate,
+      signal: controller.signal,
+      hooks: {
+        afterApplyFile: ({ path }) => {
+          if (path === finalPath) setImmediate(() => controller.abort());
+        },
+      },
+    });
+    assert.equal(result.status, "rolled_back");
+    assert.equal(result.error.code, "cancelled");
+    assert.notEqual(result.status, "committed");
+    assert.deepEqual(await snapshotTree(fixture.projectRoot), before);
+    assert.equal((await readJournal(candidate)).status, "rolled_back");
+  });
+
+  await t.test("after the committed transition hook", async (t) => {
+    const fixture = await setup(t);
+    const before = await snapshotTree(fixture.projectRoot);
+    const candidate = await verifiedCandidate(fixture);
+    const controller = new AbortController();
+    const result = await commitCandidate({
+      candidate,
+      signal: controller.signal,
+      hooks: {
+        onTransition: (status) => {
+          if (status === "committed") controller.abort();
+        },
+      },
+    });
+    assert.equal(result.status, "rolled_back");
+    assert.equal(result.error.code, "cancelled");
+    assert.notEqual(result.status, "committed");
+    assert.deepEqual(await snapshotTree(fixture.projectRoot), before);
+    assert.equal((await readJournal(candidate)).status, "rolled_back");
+  });
 });

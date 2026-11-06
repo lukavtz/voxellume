@@ -150,3 +150,7 @@ export interface TransactionJournal {
   temporaryFiles: string[];
   backups: Record<string, JournalBackup>;
 }
+
+export interface StoredTransactionJournal extends TransactionJournal {
+  integrity: string;
+}
