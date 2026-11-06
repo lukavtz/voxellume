@@ -271,6 +271,26 @@ test("an unexecuted check can never be recorded as passed", async (t) => {
   );
 });
 
+test("an unexecuted runtime check can never be recorded as passed", async (t) => {
+  const options = await evidenceOptions(t);
+  options.checks[0] = {
+    ...options.checks[0]!,
+    executed: false,
+    status: "passed",
+    executedArgv: null,
+    exitCode: null,
+    subject: {
+      class: "runtime",
+      surface: "minecraft_server",
+      scenario: { id: "server-state", state: "initialized", kind: "state" },
+    },
+    logs: [],
+  };
+  await assert.rejects(finalizeEvidence(options), {
+    code: "invalid_evidence_status",
+  });
+});
+
 test("timed-out and cancelled checks remain non-passing evidence", async (t) => {
   const options = await evidenceOptions(t);
   options.checks = (["timed_out", "cancelled"] as const).map((status) => ({
@@ -437,6 +457,30 @@ test("typed review subjects roundtrip with authenticated human approval", async 
       scenario: { id: "idle-production", state: "idle", kind: "state" },
     },
     {
+      class: "runtime",
+      surface: "minecraft_server",
+      productionJarSha256: "3".repeat(64),
+      scenario: { id: "dedicated-state", state: "initialized", kind: "state" },
+    },
+    {
+      class: "runtime",
+      surface: "minecraft_client",
+      scenario: {
+        id: "multiplayer-sync",
+        state: "two-clients",
+        kind: "multiplayer",
+      },
+    },
+    {
+      class: "runtime",
+      surface: "minecraft_server",
+      scenario: {
+        id: "restart-persistence",
+        state: "restarted",
+        kind: "restart",
+      },
+    },
+    {
       class: "design_review",
       sourceSha256: "1".repeat(64),
       exportSha256: "2".repeat(64),
@@ -522,6 +566,27 @@ test("review subjects enforce class requirements and exact field formats", async
         surface: "minecraft_client",
         productionJarSha256: "3".repeat(64),
         baselineSha256: "4".repeat(64),
+      },
+    },
+    {
+      name: "runtime surface",
+      subject: {
+        class: "runtime",
+        surface: "blender",
+        scenario: { id: "preview", state: "initialized", kind: "state" },
+      },
+    },
+    {
+      name: "runtime scenario",
+      subject: { class: "runtime", surface: "minecraft_server" },
+    },
+    {
+      name: "runtime production JAR hash",
+      subject: {
+        class: "runtime",
+        surface: "minecraft_client",
+        productionJarSha256: "ABC123",
+        scenario: { id: "client", state: "initialized", kind: "state" },
       },
     },
     {

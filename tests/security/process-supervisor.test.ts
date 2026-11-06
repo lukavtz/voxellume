@@ -14,6 +14,7 @@ import test, { type TestContext } from "node:test";
 import { setImmediate as yieldToEventLoop } from "node:timers/promises";
 import { setTimeout as delay } from "node:timers/promises";
 
+import { runDockerVerification } from "../../src/core/execution/docker.ts";
 import {
   PROCESS_LIMITS,
   runVerificationProcess,
@@ -64,6 +65,7 @@ function run(
     argv?: readonly string[];
     capability?: TargetCapability;
     signal?: AbortSignal;
+    javaHome?: string;
   } = {},
 ) {
   const capability = options.capability ?? "build";
@@ -80,6 +82,7 @@ function run(
     containerRuntime: "node",
     allowHostExecution: true,
     ...(options.signal === undefined ? {} : { signal: options.signal }),
+    ...(options.javaHome === undefined ? {} : { javaHome: options.javaHome }),
   });
 }
 
@@ -180,6 +183,64 @@ for (const key of ["HOME", "GRADLE_USER_HOME", "TMPDIR", "SSH_AUTH_SOCK", "GITHU
   assert.equal(lines.NPM_TOKEN, "<unset>");
 });
 
+test("trusted javaHome overrides inherited JAVA_HOME only", async (t) => {
+  const fixture = await setup(
+    t,
+    'console.log("JAVA_HOME=" + process.env.JAVA_HOME); console.log("GITHUB_TOKEN=" + (process.env.GITHUB_TOKEN ?? "<unset>"));',
+  );
+  const inherited = {
+    JAVA_HOME: process.env.JAVA_HOME,
+    GITHUB_TOKEN: process.env.GITHUB_TOKEN,
+  };
+  process.env.JAVA_HOME = "/untrusted/inherited-jdk";
+  process.env.GITHUB_TOKEN = "must-not-leak";
+  t.after(() => {
+    for (const [key, value] of Object.entries(inherited)) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
+  });
+  const javaHome = join(fixture.root, "trusted JDK 25");
+
+  const result = await run(fixture, { javaHome });
+
+  assert.equal(
+    result.status,
+    "passed",
+    result.error?.detail ?? "expected passed",
+  );
+  assert.ok(result.stdout.includes(`JAVA_HOME=${javaHome}`));
+  assert.doesNotMatch(result.stdout, /untrusted\/inherited-jdk/);
+  assert.match(result.stdout, /GITHUB_TOKEN=<unset>/);
+});
+
+test("process accepts exact clean build task sequence", async (t) => {
+  const fixture = await setup(
+    t,
+    "console.log(JSON.stringify(process.argv.slice(2)));",
+  );
+
+  const result = await run(fixture, {
+    argv: ["./gradlew", "--no-daemon", "clean", "build"],
+  });
+
+  assert.equal(
+    result.status,
+    "passed",
+    result.error?.detail ?? "expected passed",
+  );
+  assert.deepEqual(result.executed?.argv, [
+    "./gradlew",
+    "--no-daemon",
+    "clean",
+    "build",
+  ]);
+  assert.equal(
+    result.stdout.trim(),
+    JSON.stringify(["--no-daemon", "clean", "build"]),
+  );
+});
+
 test("process revalidates executable and task allowlists before any mutation", async (t) => {
   const fixture = await setup(
     t,
@@ -190,6 +251,10 @@ test("process revalidates executable and task allowlists before any mutation", a
     ["shell executable", ["/bin/sh", "-c", "touch ran"]],
     ["unknown task", ["./gradlew", "--no-daemon", "publish"]],
     ["shell task", ["./gradlew", "--no-daemon", "build; touch ran"]],
+    ["empty task list", ["./gradlew", "--no-daemon"]],
+    ["unknown extra task", ["./gradlew", "--no-daemon", "clean", "publish"]],
+    ["extra flag", ["./gradlew", "--no-daemon", "build", "--stacktrace"]],
+    ["flag before task", ["./gradlew", "--no-daemon", "--info", "build"]],
     ["extra argv", ["./gradlew", "build", ";", "touch ran"]],
   ] as const;
   for (const [name, argv] of cases) {
@@ -197,6 +262,35 @@ test("process revalidates executable and task allowlists before any mutation", a
       await rejectsCode(run(fixture, { argv }), "command_not_allowed");
       assert.equal(await exists(marker), false);
     });
+  }
+});
+
+test("Docker applies the same variable task-sequence allowlist", async (t) => {
+  const fixture = await setup(t, "");
+  const request = (argv: readonly string[]) =>
+    runDockerVerification({
+      transactionId: "tx-docker-argv",
+      projectRoot: join(fixture.root, "missing-project"),
+      isolationRoot: fixture.isolationRoot,
+      verification: verification(argv),
+      capability: "build",
+    });
+
+  for (const argv of [
+    ["./gradlew", "--no-daemon", "build"],
+    ["./gradlew", "--no-daemon", "clean", "build"],
+  ] as const) {
+    const result = await request(argv);
+    assert.equal(result.status, "unavailable");
+    assert.equal(result.error?.code, "backend_unavailable");
+  }
+
+  for (const argv of [
+    ["./gradlew", "--no-daemon"],
+    ["./gradlew", "--no-daemon", "clean", "publish"],
+    ["./gradlew", "--no-daemon", "clean", "build", "--stacktrace"],
+  ] as const) {
+    await assert.rejects(request(argv), { message: "command_not_allowed" });
   }
 });
 

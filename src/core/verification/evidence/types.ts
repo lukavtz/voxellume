@@ -31,8 +31,8 @@ export interface EvidenceReviewer {
 }
 
 export interface EvidenceCheckSubject {
-  class: "source" | "browser" | "design_review";
-  surface?: "blockbench" | "blender" | "minecraft_client";
+  class: "source" | "browser" | "runtime" | "design_review";
+  surface?: "blockbench" | "blender" | "minecraft_server" | "minecraft_client";
   sourceSha256?: string;
   exportSha256?: string;
   productionJarSha256?: string;

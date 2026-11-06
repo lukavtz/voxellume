@@ -54,6 +54,8 @@ export interface RunVerificationProcessOptions {
   readonly backend?: "host" | "docker";
   readonly containerRuntime?: "jdk21" | "jdk25" | "node";
   readonly allowHostExecution?: boolean;
+  readonly javaHome?: string;
+  readonly lockRoot?: string;
 }
 
 const allowedTasks = new Set<string>(ALLOWED_GRADLE_TASKS);
@@ -78,22 +80,25 @@ class ProcessError extends Error {
 
 function validateArgv(argv: readonly string[]): void {
   if (
-    argv.length !== 3 ||
+    argv.length < 3 ||
     argv[0] !== "./gradlew" ||
     argv[1] !== "--no-daemon" ||
-    typeof argv[2] !== "string" ||
-    !allowedTasks.has(argv[2])
+    argv.slice(2).some((task) => !allowedTasks.has(task))
   ) {
     throw new ProcessError("command_not_allowed");
   }
 }
 
-function isolatedEnvironment(isolationRoot: string): NodeJS.ProcessEnv {
+function isolatedEnvironment(
+  isolationRoot: string,
+  javaHome?: string,
+): NodeJS.ProcessEnv {
   const environment: NodeJS.ProcessEnv = {};
   for (const key of inheritedEnvironmentKeys) {
     const value = process.env[key];
     if (value !== undefined) environment[key] = value;
   }
+  if (javaHome !== undefined) environment.JAVA_HOME = javaHome;
   environment.HOME = join(isolationRoot, "home");
   environment.GRADLE_USER_HOME = join(isolationRoot, "gradle-user-home");
   environment.TMPDIR = join(isolationRoot, "tmp");
@@ -132,20 +137,25 @@ export async function runVerificationProcess(
   }
 
   let projectRoot: string;
+  let lockRoot: string;
   try {
     projectRoot = await realpath(resolve(options.projectRoot));
+    lockRoot =
+      options.lockRoot === undefined
+        ? projectRoot
+        : await realpath(resolve(options.lockRoot));
   } catch (error: unknown) {
     return {
       ...base,
       status: "unavailable",
       error: {
         code: "process_spawn_unavailable",
-        detail: `Cannot resolve project root ${options.projectRoot}: ${String(error)}`,
+        detail: `Cannot resolve project or lock root: ${String(error)}`,
       },
     };
   }
 
-  const releaseLock = await acquireProjectLock(projectRoot, options.signal);
+  const releaseLock = await acquireProjectLock(lockRoot, options.signal);
   if (releaseLock === null) return { ...base, status: "cancelled" };
 
   try {
@@ -180,7 +190,7 @@ function executeHost(
       capability: options.capability,
       projectRoot,
       argv,
-      environment: isolatedEnvironment(options.isolationRoot),
+      environment: isolatedEnvironment(options.isolationRoot, options.javaHome),
       timeoutMs,
       outputBytes: PROCESS_LIMITS.outputBytes,
       ...(options.signal === undefined ? {} : { signal: options.signal }),
@@ -192,7 +202,7 @@ function executeHost(
     projectRoot,
     executedCwd: options.projectRoot,
     argv,
-    environment: isolatedEnvironment(options.isolationRoot),
+    environment: isolatedEnvironment(options.isolationRoot, options.javaHome),
     timeoutMs,
     outputBytes: PROCESS_LIMITS.outputBytes,
     ...(options.signal === undefined ? {} : { signal: options.signal }),

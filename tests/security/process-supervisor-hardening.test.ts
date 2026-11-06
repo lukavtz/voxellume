@@ -35,6 +35,7 @@ interface RunOptions {
   signal?: AbortSignal;
   backend?: "host" | "docker";
   allowHostExecution?: boolean;
+  lockRoot?: string;
 }
 
 const posixOnly = {
@@ -86,6 +87,7 @@ function request(fixture: Fixture, options: RunOptions = {}) {
     ...(options.allowHostExecution === undefined
       ? {}
       : { allowHostExecution: options.allowHostExecution }),
+    ...(options.lockRoot === undefined ? {} : { lockRoot: options.lockRoot }),
   });
 }
 
@@ -244,6 +246,50 @@ fs.appendFileSync("starts", process.pid + "\\n");
     assert.equal(firstResult.status, "passed");
     assert.equal(secondResult.status, "cancelled");
     assert.equal((await readFile(starts, "utf8")).trim().split("\n").length, 1);
+  },
+);
+
+test(
+  "trusted lockRoot real path and symlink alias serialize distinct staging roots",
+  posixOnly,
+  async (t) => {
+    const script = `
+const fs = require("node:fs");
+const watcher = fs.watch(".", (_event, filename) => {
+  if (filename === "release") {
+    watcher.close();
+    process.exit(0);
+  }
+});
+fs.writeFileSync("started", process.pid + "\\n");
+`;
+    const firstFixture = await setup(t, script);
+    const secondFixture = await setup(t, script);
+    const lockRoot = join(firstFixture.root, "canonical-project");
+    const lockAlias = join(firstFixture.root, "canonical-project-alias");
+    await mkdir(lockRoot);
+    await symlink(lockRoot, lockAlias, "dir");
+
+    const first = runTrustedHost(firstFixture, { lockRoot });
+    await waitFor(join(firstFixture.projectRoot, "started"));
+    const second = runTrustedHost(secondFixture, { lockRoot: lockAlias });
+    const secondStarted = join(secondFixture.projectRoot, "started");
+    const deadline = Date.now() + 1_000;
+    let secondStartedBeforeRelease = await exists(secondStarted);
+    while (!secondStartedBeforeRelease && Date.now() < deadline) {
+      await delay(10);
+      secondStartedBeforeRelease = await exists(secondStarted);
+    }
+
+    await writeFile(join(firstFixture.projectRoot, "release"), "release\n");
+    const firstResult = await first;
+    await waitFor(join(secondFixture.projectRoot, "started"));
+    await writeFile(join(secondFixture.projectRoot, "release"), "release\n");
+    const secondResult = await second;
+
+    assert.equal(firstResult.status, "passed");
+    assert.equal(secondResult.status, "passed");
+    assert.equal(secondStartedBeforeRelease, false);
   },
 );
 

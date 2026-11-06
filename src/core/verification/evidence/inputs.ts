@@ -87,9 +87,16 @@ function validateSubject(check: EvidenceCheckInput): void {
     }
   }
   if (
-    !["source", "browser", "design_review"].includes(subject.class) ||
+    !["source", "browser", "runtime", "design_review"].includes(
+      subject.class,
+    ) ||
     (subject.surface !== undefined &&
-      !["blockbench", "blender", "minecraft_client"].includes(subject.surface))
+      ![
+        "blockbench",
+        "blender",
+        "minecraft_server",
+        "minecraft_client",
+      ].includes(subject.surface))
   ) {
     invalidSubject();
   }
@@ -141,6 +148,14 @@ function validateSubject(check: EvidenceCheckInput): void {
   };
   if (subject.class === "source") {
     required(["sourceSha256", "exportSha256"]);
+  } else if (subject.class === "runtime") {
+    if (
+      subject.surface !== "minecraft_server" &&
+      subject.surface !== "minecraft_client"
+    ) {
+      invalidSubject();
+    }
+    required(["scenario"]);
   } else if (subject.class === "browser") {
     if (subject.surface === undefined) invalidSubject();
     if (subject.surface === "minecraft_client") {

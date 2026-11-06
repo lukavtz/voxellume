@@ -60,10 +60,12 @@ export async function runDockerVerification(
   const base = baseResult(options, requested);
   if (
     check === undefined ||
-    requested.length !== 3 ||
+    requested.length < 3 ||
     requested[0] !== "./gradlew" ||
     requested[1] !== "--no-daemon" ||
-    !ALLOWED_GRADLE_TASKS.includes(requested[2] as never)
+    requested
+      .slice(2)
+      .some((task) => !ALLOWED_GRADLE_TASKS.includes(task as never))
   ) {
     throw new Error("command_not_allowed");
   }
