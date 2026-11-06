@@ -21,6 +21,13 @@ const { createBot: createMineflayerBot, testedVersions } = createRequire(
   testedVersions: string[];
 };
 
+const UUID_SOURCE =
+  "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}";
+const UUID_PATTERN = new RegExp(`^${UUID_SOURCE}$(?![\\s\\S])`, "i");
+const VERIFICATION_COMMAND = new RegExp(
+  `^voxellume (?:(?:test|status|assert) [a-z0-9_-]+|assert [a-z0-9_-]+ [a-z0-9_-]+ -?(?:\\d+(?:\\.\\d+)?|\\.\\d+)|test identity ${UUID_SOURCE})$(?![\\s\\S])`,
+);
+
 interface RconConfig {
   readonly host: string;
   readonly port: number;
@@ -35,31 +42,50 @@ interface BotConfig {
 }
 
 interface RconClient {
+  connect(): Promise<unknown>;
   send(command: string): Promise<string>;
   end(): Promise<void>;
+  destroy(): void;
+}
+
+interface ProbeInventory {
+  items(): Array<{ name: string; count: number }>;
 }
 
 interface ProbeBot {
   readonly username: string;
-  readonly inventory: {
-    items(): Array<{ name: string; count: number }>;
-  };
+  readonly inventory: ProbeInventory;
+  confirmServerInstance?(
+    id: string,
+  ):
+    | { instanceId: string; version: string }
+    | Promise<{ instanceId: string; version: string }>;
   blockAt(position: {
     x: number;
     y: number;
     z: number;
   }): { name: string } | null;
   readonly players: Record<string, { username: string } | undefined>;
+  synchronizedState?(
+    players: readonly string[],
+    oracle: { kind: "inventory"; item: string; count: number },
+  ): boolean | Promise<boolean>;
   quit(reason?: string): void;
-  once?(event: string, listener: (...args: never[]) => void): unknown;
-  off?(event: string, listener: (...args: never[]) => void): unknown;
+  once?(event: string, listener: (...args: unknown[]) => void): unknown;
+  off?(event: string, listener: (...args: unknown[]) => void): unknown;
+}
+
+interface ServerInstance {
+  readonly id: string;
+  readonly version: string;
 }
 
 export interface ServerBehaviorOptions {
+  readonly serverInstance: ServerInstance;
   readonly rcon: RconConfig;
   readonly bot?: BotConfig;
   readonly timeoutMs?: number;
-  readonly connectRcon?: (config: RconConfig) => Promise<RconClient>;
+  readonly createRcon?: (config: RconConfig) => RconClient;
   readonly createBot?: (config: BotConfig) => ProbeBot;
 }
 
@@ -71,11 +97,15 @@ type ServerAssertion =
       position: { x: number; y: number; z: number };
       block: string;
     }
-  | { kind: "multiplayer"; players: string[] };
+  | {
+      kind: "multiplayer";
+      players: string[];
+      oracle: { kind: "inventory"; item: string; count: number };
+    };
 
 interface AssertionEntry {
   readonly id: string;
-  readonly acceptanceId: string;
+  readonly scenarioId: string;
   readonly assertion: ServerAssertion;
   lines: string[];
 }
@@ -88,6 +118,8 @@ class Interruption extends Error {
     this.status = status;
   }
 }
+
+class IdentityUnavailable extends Error {}
 
 function isObject(value: unknown): value is JsonObject {
   return value !== null && typeof value === "object" && !Array.isArray(value);
@@ -128,9 +160,24 @@ function assertionFrom(value: unknown): ServerAssertion | undefined {
       : undefined;
   }
   if (value.kind === "multiplayer") {
+    const oracle = value.oracle;
     return Array.isArray(value.players) &&
-      value.players.every((player) => typeof player === "string")
-      ? { kind: "multiplayer", players: [...value.players] }
+      value.players.length > 0 &&
+      value.players.every((player) => typeof player === "string") &&
+      isObject(oracle) &&
+      oracle.kind === "inventory" &&
+      typeof oracle.item === "string" &&
+      Number.isSafeInteger(oracle.count) &&
+      (oracle.count as number) >= 0
+      ? {
+          kind: "multiplayer",
+          players: [...value.players],
+          oracle: {
+            kind: "inventory",
+            item: oracle.item,
+            count: oracle.count as number,
+          },
+        }
       : undefined;
   }
   return undefined;
@@ -138,15 +185,30 @@ function assertionFrom(value: unknown): ServerAssertion | undefined {
 
 function entries(
   context: VerificationStageContext,
-): AssertionEntry[] | undefined {
+): AssertionEntry[] | "invalid" | "unlinked" {
   const result: AssertionEntry[] = [];
+  const scenarios = (context.modSpec.runtime as JsonObject)
+    .scenarios as JsonObject[];
   for (const acceptance of context.modSpec.acceptance) {
     if (acceptance.kind !== "server") continue;
-    if (!isObject(acceptance.expected)) return undefined;
+    if (!isObject(acceptance.expected)) return "invalid";
     const assertion = assertionFrom(acceptance.expected.assertion);
     const acceptanceId = acceptance.id;
     if (assertion === undefined || typeof acceptanceId !== "string")
-      return undefined;
+      return "invalid";
+    if (
+      (assertion.kind === "command" || assertion.kind === "status") &&
+      !VERIFICATION_COMMAND.test(assertion.command)
+    ) {
+      return "invalid";
+    }
+    const linkedScenario = scenarios.find(
+      (candidate) =>
+        typeof candidate.id === "string" &&
+        Array.isArray(candidate.acceptanceIds) &&
+        candidate.acceptanceIds.includes(acceptanceId),
+    );
+    if (linkedScenario === undefined) return "unlinked";
     const declaredId = Array.isArray(acceptance.checkIds)
       ? acceptance.checkIds.find(
           (id): id is string =>
@@ -155,7 +217,7 @@ function entries(
       : undefined;
     result.push({
       id: declaredId ?? `server.${assertion.kind}`,
-      acceptanceId,
+      scenarioId: linkedScenario.id as string,
       assertion,
       lines: [],
     });
@@ -200,27 +262,41 @@ function errorText(error: unknown): string {
 }
 
 function scenario(
-  context: VerificationStageContext,
   entry: AssertionEntry,
   state: string,
 ): VerificationStageCheck["subject"] {
-  const scenarios = (context.modSpec.runtime as JsonObject)
-    .scenarios as JsonObject[];
-  const selected =
-    scenarios.find(
-      (candidate) =>
-        Array.isArray(candidate.acceptanceIds) &&
-        candidate.acceptanceIds.includes(entry.acceptanceId),
-    ) ?? scenarios[0];
   return {
     class: "runtime",
     surface: "minecraft_server",
     scenario: {
-      id: typeof selected?.id === "string" ? selected.id : "server_behavior",
+      id: entry.scenarioId,
       state,
       kind: entry.assertion.kind === "multiplayer" ? "multiplayer" : "state",
     },
   };
+}
+
+function protocolArgv(assertion: ServerAssertion): string[] {
+  if (assertion.kind === "command" || assertion.kind === "status") {
+    return ["rcon-client", "send", assertion.command];
+  }
+  if (assertion.kind === "inventory") {
+    return ["mineflayer", "inventory", assertion.item];
+  }
+  if (assertion.kind === "world") {
+    return [
+      "mineflayer",
+      "world",
+      String(assertion.position.x),
+      String(assertion.position.y),
+      String(assertion.position.z),
+      assertion.block,
+    ];
+  }
+  if (assertion.kind === "multiplayer") {
+    return ["mineflayer", "multiplayer", ...assertion.players];
+  }
+  throw new Error("Unsupported assertion.");
 }
 
 function check(
@@ -229,6 +305,7 @@ function check(
   status: EvidenceStatus,
   checked: boolean,
   log: { name: string; path: string } | undefined,
+  operationArgv?: readonly string[],
 ): VerificationStageCheck {
   const argv = [...context.target.verification.checks.server!.argv];
   return {
@@ -237,9 +314,11 @@ function check(
     checked,
     status,
     requestedArgv: argv,
-    executedArgv: checked ? argv : null,
-    exitCode: checked ? (status === "passed" ? 0 : 1) : null,
-    subject: scenario(context, entry, checked ? "completed" : status),
+    executedArgv: checked
+      ? [...(operationArgv ?? protocolArgv(entry.assertion))]
+      : null,
+    exitCode: null,
+    subject: scenario(entry, status === "passed" ? "completed" : status),
     logs: log === undefined ? [] : [log],
   };
 }
@@ -257,7 +336,11 @@ function fallbackCheck(
     requestedArgv: argv,
     executedArgv: null,
     exitCode: null,
-    subject: { class: "runtime", surface: "minecraft_server" },
+    subject: {
+      class: "source",
+      sourceSha256: "0".repeat(64),
+      exportSha256: "0".repeat(64),
+    },
     logs: [],
   };
 }
@@ -273,7 +356,7 @@ async function waitForSpawn(
     cleanup();
     ready.resolve();
   };
-  const failure = (...args: never[]) => {
+  const failure = (...args: unknown[]) => {
     cleanup();
     ready.reject(
       new Error(args.map(String).join(" ") || "Mineflayer bot disconnected."),
@@ -335,14 +418,42 @@ async function runAssertion(
   }
   if (assertion.kind !== "multiplayer")
     throw new Error("Unsupported assertion.");
-  const missing = assertion.players.filter(
+  const participants = assertion.players.filter(
+    (player) => player !== bot.username,
+  );
+  const missing = participants.filter(
     (player) => bot.players[player] === undefined,
   );
   entry.lines.push(
-    `multiplayer expected=${assertion.players.join(",")} online=${Object.keys(bot.players).join(",")}`,
+    `multiplayer expected=${participants.join(",")} online=${Object.keys(bot.players).join(",")}`,
   );
-  if (missing.length > 0)
-    throw new Error(`Players missing: ${missing.join(",")}`);
+  if (participants.length === 0 || missing.length > 0)
+    throw new Error(`Independent players missing: ${missing.join(",")}`);
+  if (bot.synchronizedState === undefined)
+    throw new Error("No synchronized-state oracle is available.");
+  const synchronized = await bot.synchronizedState(
+    participants,
+    assertion.oracle,
+  );
+  entry.lines.push(`synchronized=${synchronized}`);
+  if (!synchronized) throw new Error("Multiplayer state did not match.");
+}
+
+function defaultRcon(config: RconConfig, timeoutMs: number): RconClient {
+  const client = new Rcon({ ...config, timeout: timeoutMs, maxPending: 1 });
+  return {
+    connect: () => client.connect(),
+    send: (command) => client.send(command),
+    end: () => {
+      const socket = client.socket;
+      if (socket === null) return Promise.resolve();
+      const closed = Promise.withResolvers<void>();
+      socket.once("close", closed.resolve);
+      socket.destroy();
+      return closed.promise;
+    },
+    destroy: () => client.socket?.destroy(),
+  };
 }
 
 export function createServerBehaviorExecutor(
@@ -352,22 +463,18 @@ export function createServerBehaviorExecutor(
   return async (context) => {
     const assertions = entries(context);
     if (context.stage !== "server") {
-      return { checks: [fallbackCheck(context, "failed")] };
+      return { checks: [fallbackCheck(context, "unavailable")] };
     }
-    if (assertions === undefined || assertions.length === 0) {
+    if (
+      assertions === "invalid" ||
+      assertions === "unlinked" ||
+      assertions.length === 0
+    ) {
       return {
-        checks: [
-          fallbackCheck(
-            context,
-            assertions === undefined ? "failed" : "unavailable",
-          ),
-        ],
+        checks: [fallbackCheck(context, "unavailable")],
       };
     }
 
-    const requiresBot = assertions.some((entry) =>
-      ["inventory", "world", "multiplayer"].includes(entry.assertion.kind),
-    );
     const invalidConfiguration =
       !Number.isFinite(timeoutMs) ||
       timeoutMs <= 0 ||
@@ -376,26 +483,34 @@ export function createServerBehaviorExecutor(
       options.rcon.port < 1 ||
       options.rcon.port > 65_535 ||
       options.rcon.password.length === 0 ||
-      (requiresBot &&
-        options.bot !== undefined &&
+      (options.bot !== undefined &&
         (!["127.0.0.1", "::1"].includes(options.bot.host) ||
           !Number.isInteger(options.bot.port) ||
           options.bot.port < 1 ||
           options.bot.port > 65_535 ||
-          options.bot.username.length === 0));
-    const unsupportedBot =
-      requiresBot &&
-      options.bot !== undefined &&
-      (options.bot.version !== context.target.minecraft.version ||
-        !testedVersions.includes(context.target.minecraft.version));
+          options.bot.username.length === 0)) ||
+      (options.bot !== undefined &&
+        assertions.some(
+          (entry) =>
+            entry.assertion.kind === "multiplayer" &&
+            entry.assertion.players.every(
+              (player) => player === options.bot!.username,
+            ),
+        ));
     if (invalidConfiguration) {
       return {
         checks: assertions.map((entry) =>
-          check(context, entry, "failed", false, undefined),
+          check(context, entry, "unavailable", false, undefined),
         ),
       };
     }
-    if (unsupportedBot || (requiresBot && options.bot === undefined)) {
+    if (
+      !UUID_PATTERN.test(options.serverInstance?.id ?? "") ||
+      options.serverInstance.version !== context.target.minecraft.version ||
+      options.bot === undefined ||
+      options.bot.version !== context.target.minecraft.version ||
+      !testedVersions.includes(context.target.minecraft.version)
+    ) {
       return {
         checks: assertions.map((entry) =>
           check(context, entry, "unavailable", false, undefined),
@@ -410,10 +525,9 @@ export function createServerBehaviorExecutor(
       };
     }
 
-    const connect =
-      options.connectRcon ??
-      ((config: RconConfig) =>
-        Rcon.connect({ ...config, timeout: timeoutMs, maxPending: 1 }));
+    const createRcon =
+      options.createRcon ??
+      ((config: RconConfig) => defaultRcon(config, timeoutMs));
     const createBot =
       options.createBot ??
       ((config: BotConfig) =>
@@ -422,30 +536,126 @@ export function createServerBehaviorExecutor(
       entry: AssertionEntry;
       status: EvidenceStatus;
       checked: boolean;
+      operationArgv?: readonly string[];
     }> = [];
     let rcon: RconClient | undefined;
+    let rconConnected = false;
     let bot: ProbeBot | undefined;
+    let setupOperation: readonly string[] | undefined;
     let terminal: EvidenceStatus | undefined;
     const cleanupErrors: string[] = [];
 
     try {
-      rcon = await bounded(
-        () => connect(options.rcon),
-        timeoutMs,
-        context.signal,
-      );
-      if (requiresBot) {
-        bot = createBot(options.bot!);
-        await waitForSpawn(bot, timeoutMs, context.signal);
+      rcon = createRcon(options.rcon);
+      setupOperation = ["rcon-client", "connect"];
+      await bounded(() => rcon!.connect(), timeoutMs, context.signal);
+      rconConnected = true;
+      setupOperation = ["mineflayer", "connect"];
+      bot = createBot(options.bot);
+      await waitForSpawn(bot, timeoutMs, context.signal);
+      setupOperation = undefined;
+      if (bot.username !== options.bot.username) {
+        throw new IdentityUnavailable(
+          "Mineflayer handshake username did not match the trusted configuration.",
+        );
+      }
+      const identityCommand = `voxellume test identity ${options.serverInstance.id}`;
+      for (const entry of assertions) {
+        entry.lines.push(`identity command: ${identityCommand}`);
+      }
+      let actualServerVersion: string;
+      setupOperation = ["rcon-client", "send", identityCommand];
+      try {
+        actualServerVersion = await bounded(
+          () => rcon!.send(identityCommand),
+          timeoutMs,
+          context.signal,
+        );
+      } catch (error) {
+        if (error instanceof Interruption) throw error;
+        throw new IdentityUnavailable(
+          `Verification-mod identity handshake failed: ${errorText(error)}`,
+        );
+      }
+      for (const entry of assertions) {
+        entry.lines.push(`server release: ${actualServerVersion}`);
+      }
+      if (actualServerVersion !== context.target.minecraft.version) {
+        throw new IdentityUnavailable(
+          `Server release ${actualServerVersion} did not match target ${context.target.minecraft.version}.`,
+        );
+      }
+      setupOperation = undefined;
+      if (bot.confirmServerInstance === undefined) {
+        throw new IdentityUnavailable(
+          "Mineflayer verification-mod instance confirmation is unavailable.",
+        );
+      }
+      setupOperation = [
+        "mineflayer",
+        "confirmServerInstance",
+        options.serverInstance.id,
+      ];
+      let botIdentity: { instanceId: string; version: string };
+      try {
+        botIdentity = await bounded(
+          () =>
+            Promise.resolve(
+              bot!.confirmServerInstance!(options.serverInstance.id),
+            ),
+          timeoutMs,
+          context.signal,
+        );
+      } catch (error) {
+        if (error instanceof Interruption) throw error;
+        throw new IdentityUnavailable(
+          `Mineflayer instance confirmation failed: ${errorText(error)}`,
+        );
+      }
+      if (!isObject(botIdentity)) {
+        throw new IdentityUnavailable(
+          "Malformed Mineflayer instance identity.",
+        );
+      }
+      for (const entry of assertions) {
+        entry.lines.push(
+          `bot instance: ${String(botIdentity.instanceId)}`,
+          `bot release: ${String(botIdentity.version)}`,
+        );
+      }
+      if (
+        botIdentity.instanceId !== options.serverInstance.id ||
+        botIdentity.version !== context.target.minecraft.version
+      ) {
+        throw new IdentityUnavailable(
+          "Mineflayer endpoint identity did not match the trusted server instance.",
+        );
+      }
+      setupOperation = undefined;
+      if (
+        assertions.some((entry) => entry.assertion.kind === "multiplayer") &&
+        bot.synchronizedState === undefined
+      ) {
+        throw new IdentityUnavailable(
+          "No synchronized-state oracle is available.",
+        );
       }
       for (const entry of assertions) {
         if (terminal !== undefined) {
-          results.push({ entry, status: terminal, checked: false });
+          results.push({
+            entry,
+            status: terminal === "cancelled" ? "cancelled" : "unavailable",
+            checked: false,
+          });
           continue;
         }
+        let started = false;
         try {
           await bounded(
-            () => runAssertion(entry, rcon!, bot),
+            () => {
+              started = true;
+              return runAssertion(entry, rcon!, bot);
+            },
             timeoutMs,
             context.signal,
           );
@@ -454,17 +664,31 @@ export function createServerBehaviorExecutor(
           const status =
             error instanceof Interruption ? error.status : "failed";
           entry.lines.push(`error: ${errorText(error)}`);
-          results.push({ entry, status, checked: status === "failed" });
+          results.push({ entry, status, checked: started });
           terminal = status;
         }
       }
     } catch (error) {
-      const status = error instanceof Interruption ? error.status : "failed";
+      const status =
+        error instanceof Interruption
+          ? error.status
+          : error instanceof IdentityUnavailable
+            ? "unavailable"
+            : "failed";
+      const setupAttempted =
+        setupOperation !== undefined && status !== "unavailable";
+      const resultStatus =
+        status === "failed" && !setupAttempted ? "unavailable" : status;
       for (const entry of assertions.slice(results.length)) {
         entry.lines.push(`error: ${errorText(error)}`);
-        results.push({ entry, status, checked: false });
+        results.push({
+          entry,
+          status: resultStatus,
+          checked: setupAttempted,
+          ...(setupAttempted ? { operationArgv: setupOperation! } : {}),
+        });
       }
-      terminal = status;
+      terminal = resultStatus;
     } finally {
       if (bot !== undefined) {
         try {
@@ -478,9 +702,18 @@ export function createServerBehaviorExecutor(
       }
       if (rcon !== undefined) {
         try {
-          await bounded(() => rcon!.end(), timeoutMs);
+          if (rconConnected) {
+            await bounded(() => rcon!.end(), timeoutMs);
+          } else {
+            rcon.destroy();
+          }
         } catch (error) {
           cleanupErrors.push(`RCON cleanup: ${errorText(error)}`);
+          try {
+            rcon.destroy();
+          } catch (destroyError) {
+            cleanupErrors.push(`RCON destroy: ${errorText(destroyError)}`);
+          }
         }
       }
     }
@@ -493,11 +726,23 @@ export function createServerBehaviorExecutor(
           result.checked = true;
         }
       }
-      if (!results.some((result) => result.status === "failed")) {
+      if (
+        !results.some(
+          (result) =>
+            result.status === "failed" || result.status === "unavailable",
+        )
+      ) {
         const first = results[0];
         if (first !== undefined) {
           first.status = "failed";
-          first.checked = false;
+          if (!first.checked) {
+            first.checked = true;
+            first.operationArgv = cleanupErrors.some((error) =>
+              error.startsWith("RCON"),
+            )
+              ? ["rcon-client", "end"]
+              : ["mineflayer", "quit"];
+          }
         }
       }
     }
@@ -531,7 +776,14 @@ export function createServerBehaviorExecutor(
         }
       }
       checks.push(
-        check(context, result.entry, result.status, result.checked, log),
+        check(
+          context,
+          result.entry,
+          result.status,
+          result.checked,
+          log,
+          result.operationArgv,
+        ),
       );
     }
     return { checks };

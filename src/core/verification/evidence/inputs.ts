@@ -196,6 +196,10 @@ function validateCheck(check: EvidenceCheckInput): void {
   }
 
   const { requestedArgv, executedArgv } = check;
+  const protocolOperation =
+    check.subject?.class === "runtime" &&
+    executedArgv !== null &&
+    ["rcon-client", "mineflayer"].includes(executedArgv[0] ?? "");
   if (
     (!check.requested && check.executed) ||
     (check.requested && requestedArgv.length === 0) ||
@@ -206,11 +210,13 @@ function validateCheck(check: EvidenceCheckInput): void {
     (check.exitCode === 0 && check.status !== "passed") ||
     (check.status === "passed" &&
       (!check.executed ||
-        check.exitCode !== 0 ||
         executedArgv === null ||
-        executedArgv.length === 0)) ||
-    (check.status === "failed" && !check.executed) ||
-    (check.status === "timed_out" && !check.executed) ||
+        executedArgv.length === 0 ||
+        (protocolOperation
+          ? check.exitCode !== null
+          : check.exitCode !== 0))) ||
+    ((check.status === "failed" || check.status === "timed_out") &&
+      !check.executed) ||
     ((check.status === "unsupported" || check.status === "unavailable") &&
       check.executed)
   ) {

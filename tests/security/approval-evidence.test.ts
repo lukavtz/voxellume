@@ -291,6 +291,118 @@ test("an unexecuted runtime check can never be recorded as passed", async (t) =>
   });
 });
 
+test("runtime protocol checks pass without an operating-system exit code", async (t) => {
+  for (const executable of ["rcon-client", "mineflayer"] as const) {
+    await t.test(executable, async (t) => {
+      const options = await evidenceOptions(t);
+      options.checks[0] = {
+        ...options.checks[0]!,
+        requestedArgv: [executable, "assert-state"],
+        executedArgv: [executable, "assert-state"],
+        exitCode: null,
+        subject: {
+          class: "runtime",
+          surface: "minecraft_server",
+          scenario: {
+            id: "protocol-state",
+            state: "initialized",
+            kind: "state",
+          },
+        },
+      };
+
+      const manifest = await finalizeEvidence(options);
+      assert.equal(manifest.checks[0]!.status, "passed");
+      assert.equal(manifest.checks[0]!.exitCode, null);
+      assert.deepEqual(manifest.checks[0]!.executedArgv, [
+        executable,
+        "assert-state",
+      ]);
+      assert.deepEqual(
+        (await readEvidence(options)).checks[0]!.executedArgv,
+        [executable, "assert-state"],
+      );
+    });
+  }
+});
+
+test("only actual runtime protocol operations can pass with a null exit code", async (t) => {
+  const runtimeSubject: EvidenceCheckSubject = {
+    class: "runtime",
+    surface: "minecraft_server",
+    scenario: { id: "protocol-state", state: "initialized", kind: "state" },
+  };
+  const invalidChecks: {
+    name: string;
+    mutate: (options: Parameters<typeof finalizeEvidence>[0]) => void;
+  }[] = [
+    {
+      name: "runtime Gradle process without exit zero",
+      mutate: (options) => {
+        options.checks[0]!.exitCode = null;
+        options.checks[0]!.subject = runtimeSubject;
+      },
+    },
+    {
+      name: "source protocol operation",
+      mutate: (options) => {
+        options.checks[0]!.requestedArgv = ["rcon-client", "assert-state"];
+        options.checks[0]!.executedArgv = ["rcon-client", "assert-state"];
+        options.checks[0]!.exitCode = null;
+      },
+    },
+    {
+      name: "protocol operation with fake process exit",
+      mutate: (options) => {
+        options.checks[0]!.requestedArgv = ["rcon-client", "assert-state"];
+        options.checks[0]!.executedArgv = ["rcon-client", "assert-state"];
+        options.checks[0]!.exitCode = 0;
+        options.checks[0]!.subject = runtimeSubject;
+      },
+    },
+    {
+      name: "unexecuted protocol operation",
+      mutate: (options) => {
+        options.checks[0]!.executed = false;
+        options.checks[0]!.requestedArgv = ["mineflayer", "assert-state"];
+        options.checks[0]!.executedArgv = null;
+        options.checks[0]!.exitCode = null;
+        options.checks[0]!.subject = runtimeSubject;
+        options.checks[0]!.logs = [];
+      },
+    },
+    {
+      name: "empty protocol operation",
+      mutate: (options) => {
+        options.checks[0]!.requestedArgv = ["mineflayer", "assert-state"];
+        options.checks[0]!.executedArgv = [];
+        options.checks[0]!.exitCode = null;
+        options.checks[0]!.subject = runtimeSubject;
+      },
+    },
+    {
+      name: "protocol operation with zero exit and failed status",
+      mutate: (options) => {
+        options.checks[0]!.status = "failed";
+        options.checks[0]!.requestedArgv = ["mineflayer", "assert-state"];
+        options.checks[0]!.executedArgv = ["mineflayer", "assert-state"];
+        options.checks[0]!.exitCode = 0;
+        options.checks[0]!.subject = runtimeSubject;
+      },
+    },
+  ];
+
+  for (const { name, mutate } of invalidChecks) {
+    await t.test(name, async (t) => {
+      const options = await evidenceOptions(t);
+      mutate(options);
+      await assert.rejects(finalizeEvidence(options), {
+        code: "invalid_evidence_status",
+      });
+    });
+  }
+});
+
 test("timed-out and cancelled checks remain non-passing evidence", async (t) => {
   const options = await evidenceOptions(t);
   options.checks = (["timed_out", "cancelled"] as const).map((status) => ({
@@ -317,6 +429,53 @@ test("timed-out and cancelled checks remain non-passing evidence", async (t) => 
     ],
   );
   assert.ok(manifest.checks.every((check) => check.status !== "passed"));
+});
+
+test("pre-execution failures and timeouts cannot be published", async (t) => {
+  for (const status of ["failed", "timed_out"] as const) {
+    await t.test(status, async (t) => {
+      const options = await evidenceOptions(t);
+      options.checks[0] = {
+        ...options.checks[0]!,
+        requestedArgv: ["./gradlew", "runServer"],
+        executed: false,
+        status,
+        executedArgv: null,
+        exitCode: null,
+        logs: [],
+      };
+
+      await assert.rejects(finalizeEvidence(options), {
+        code: "invalid_evidence_status",
+      });
+    });
+  }
+});
+
+test("pre-execution failures cannot invent argv or an exit code", async (t) => {
+  for (const status of ["failed", "timed_out"] as const) {
+    for (const field of ["executedArgv", "exitCode"] as const) {
+      await t.test(`${status}:${field}`, async (t) => {
+        const options = await evidenceOptions(t);
+        options.checks[0] = {
+          ...options.checks[0]!,
+          executed: false,
+          status,
+          executedArgv: null,
+          exitCode: null,
+          logs: [],
+        };
+        if (field === "executedArgv") {
+          options.checks[0]!.executedArgv = ["./gradlew", "runServer"];
+        } else {
+          options.checks[0]!.exitCode = 1;
+        }
+        await assert.rejects(finalizeEvidence(options), {
+          code: "invalid_evidence_status",
+        });
+      });
+    }
+  }
 });
 
 test("finalized evidence is outside agent roots and recursively read-only", async (t) => {
