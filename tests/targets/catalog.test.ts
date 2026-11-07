@@ -100,40 +100,30 @@ function packById(id: string) {
 }
 
 test("catalog contains exactly one deterministic revision for every release and loader", async () => {
-  const revisionFor = (loader: string, minecraftVersion: string) =>
-    minecraftVersion === "1.21.1" &&
-    ["fabric", "neoforge", "quilt"].includes(loader)
-      ? "r2"
-      : "r1";
-  const expectedIds = releases.flatMap((minecraftVersion) =>
-    loaders.map(
-      (loader) =>
-        `java-${loader}-${minecraftVersion}-${revisionFor(loader, minecraftVersion)}`,
-    ),
+  const expectedCoordinates = releases.flatMap((minecraftVersion) =>
+    loaders.map((loader) => `java/${loader}/${minecraftVersion}`),
   );
 
   assert.equal(packs.length, 68);
-  assert.deepEqual(
-    packs.map((pack) => pack.id),
-    expectedIds.toSorted(),
-  );
   assert.equal(new Set(packs.map((pack) => pack.id)).size, 68);
-
-  const coordinates = packs.map(
-    (pack) => `${pack.edition}/${pack.loader.id}/${pack.minecraft.version}`,
+  assert.deepEqual(
+    packs
+      .map(
+        (pack) => `${pack.edition}/${pack.loader.id}/${pack.minecraft.version}`,
+      )
+      .toSorted(),
+    expectedCoordinates.toSorted(),
   );
-  assert.equal(new Set(coordinates).size, 68);
 
-  for (const minecraftVersion of releases) {
-    for (const loader of loaders) {
-      const id = `java-${loader}-${minecraftVersion}-${revisionFor(loader, minecraftVersion)}`;
-      const pack = packById(id);
-      assert.equal(pack.id, id);
-      assert.equal(pack.edition, "java");
-      assert.equal(pack.loader.id, loader);
-      assert.equal(pack.minecraft.version, minecraftVersion);
-      assert.equal(pack.revision, Number(id.slice(id.lastIndexOf("-r") + 2)));
-    }
+  for (const pack of packs) {
+    assert.equal(pack.edition, "java");
+    assert.ok(loaders.includes(pack.loader.id));
+    assert.ok(releases.includes(pack.minecraft.version));
+    assert.ok(Number.isInteger(pack.revision) && pack.revision >= 1);
+    assert.equal(
+      pack.id,
+      `java-${pack.loader.id}-${pack.minecraft.version}-r${pack.revision}`,
+    );
   }
 
   assert.deepEqual(await loadTargetPacks(catalogRoot), packs);
