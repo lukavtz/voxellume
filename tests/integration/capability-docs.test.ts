@@ -1,17 +1,7 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import test from "node:test";
-
-const skillNames = [
-  "minecraft-design",
-  "minecraft-targets",
-  "minecraft-implementation",
-  "minecraft-assets",
-  "minecraft-verification",
-  "minecraft-porting",
-  "minecraft-release",
-] as const;
 
 function headingSlug(value: string): string {
   return value
@@ -23,6 +13,11 @@ function headingSlug(value: string): string {
 }
 
 test("capability documentation links resolve to files and headings", async () => {
+  const skillNames = (await readdir("skills", { withFileTypes: true }))
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort();
+  assert.ok(skillNames.length >= 14);
   const documents = [
     ...skillNames.map((name) => `skills/${name}/SKILL.md`),
     "agents/mod-orchestrator.md",

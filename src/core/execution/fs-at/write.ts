@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { fsyncSync, writeSync } from "node:fs";
+import { fchmodSync, fsyncSync, writeSync } from "node:fs";
 import { join } from "node:path";
 
 import {
@@ -170,6 +170,7 @@ export async function writePosixRootFileAtomic(
       true,
     )!;
     assertTemporary(temporaryFd, temporaryPath);
+    if (request.mode !== undefined) fchmodSync(temporaryFd, request.mode);
     writeAll(temporaryFd, request.contents);
     fsyncSync(temporaryFd);
     const beforeHook = assertTemporary(temporaryFd, temporaryPath);

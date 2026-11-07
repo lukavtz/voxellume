@@ -1,13 +1,13 @@
 import {
-  chmod,
   lstat,
   mkdir,
   readFile,
   readdir,
   realpath,
+  rmdir,
   unlink,
 } from "node:fs/promises";
-import { dirname, join, relative } from "node:path";
+import { dirname, join } from "node:path";
 
 import {
   grantAuthorizedRoot,
@@ -39,12 +39,32 @@ export interface ScaffoldModMetadata {
   readonly license: string;
 }
 
+export interface ScaffoldMutation {
+  readonly phase: "apply" | "rollback";
+  readonly kind: "delete" | "directory" | "write" | "chmod";
+  readonly path: string;
+}
+
+export class ScaffoldRollbackError extends Error {
+  constructor(cause: unknown) {
+    const detail = cause instanceof Error ? cause.message : String(cause);
+    super(`Scaffold rollback failed: ${detail}`, { cause });
+    this.name = "ScaffoldRollbackError";
+  }
+}
+
 export interface ScaffoldProjectRequest {
   readonly destination: string;
   readonly target: TargetPack;
   readonly targetPackRoot: string;
   readonly mod: ScaffoldModMetadata;
   readonly loaders?: readonly TargetLoader[];
+  readonly signal?: AbortSignal;
+  readonly hooks?: {
+    readonly beforeMutation?: (
+      mutation: ScaffoldMutation,
+    ) => void | Promise<void>;
+  };
 }
 
 export type ScaffoldProjectResult =
@@ -68,6 +88,11 @@ export type ScaffoldProjectResult =
 interface TemplateFile {
   readonly sourcePath: string;
   readonly outputPath: string;
+  readonly contents: Buffer;
+  readonly mode: number;
+}
+
+interface OwnedFileSnapshot {
   readonly contents: Buffer;
   readonly mode: number;
 }
@@ -586,10 +611,18 @@ async function existingPath(
   }
 }
 
-async function ensureDirectory(root: string, relative: string): Promise<void> {
+async function ensureDirectory(
+  root: string,
+  relative: string,
+  createDirectory: (absolute: string, path: string) => Promise<void> = async (
+    absolute,
+  ) => {
+    await mkdir(absolute);
+  },
+): Promise<void> {
   const parts = safePath(relative).split("/");
   let current = root;
-  for (const part of parts) {
+  for (const [index, part] of parts.entries()) {
     current = join(current, part);
     try {
       const info = await lstat(current);
@@ -598,17 +631,13 @@ async function ensureDirectory(root: string, relative: string): Promise<void> {
       }
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
-      await mkdir(current);
+      await createDirectory(current, parts.slice(0, index + 1).join("/"));
     }
   }
 }
 
 async function removeOwnedFile(root: string, path: string): Promise<void> {
   const absolute = join(root, ...safePath(path).split("/"));
-  const relativeParent = relative(root, dirname(absolute))
-    .split("\\")
-    .join("/");
-  if (relativeParent) await ensureDirectory(root, relativeParent);
   try {
     const info = await lstat(absolute);
     if (!info.isFile() || info.isSymbolicLink()) {
@@ -697,17 +726,10 @@ export async function scaffoldProject(
   const stale = [...previouslyOwned].filter(
     (path) => path !== MANIFEST_PATH && !generated.has(path),
   );
-  for (const path of stale.sort(comparePaths)) {
-    await removeOwnedFile(destinationRoot, path);
-  }
-
   const directories = new Set<string>();
   for (const path of [...generated.keys(), MANIFEST_PATH]) {
     const parent = dirname(path);
     if (parent !== ".") directories.add(parent.split("\\").join("/"));
-  }
-  for (const directory of [...directories].sort(comparePaths)) {
-    await ensureDirectory(destinationRoot, directory);
   }
 
   const fileModes = new Map(files.map((file) => [file.outputPath, file.mode]));
@@ -731,18 +753,173 @@ export async function scaffoldProject(
     transactionId: `scaffold-${target.id}`,
   });
   try {
-    for (const [path, contents] of [...generated].sort(([left], [right]) =>
-      comparePaths(left, right),
-    )) {
-      let expectedRevision: string | null = null;
-      if (existingOwned.has(path)) {
-        expectedRevision = (await readAuthorizedFile(root, path)).revision;
+    const snapshots = new Map<string, OwnedFileSnapshot>();
+    for (const path of [...previouslyOwned].sort(comparePaths)) {
+      if ((await existingPath(destinationRoot, path)) !== "file") continue;
+      const { contents } = await readAuthorizedFile(root, path);
+      const info = await lstat(join(destinationRoot, ...path.split("/")));
+      snapshots.set(path, { contents, mode: info.mode & 0o777 });
+    }
+
+    const createdFiles = new Set<string>();
+    const createdDirectories = new Set<string>();
+    const touchedExisting = new Set<string>();
+    const mutate = async (
+      kind: ScaffoldMutation["kind"],
+      path: string,
+      operation: () => void | Promise<void>,
+      phase: ScaffoldMutation["phase"] = "apply",
+    ): Promise<void> => {
+      await request.hooks?.beforeMutation?.({ phase, kind, path });
+      if (phase === "apply") request.signal?.throwIfAborted();
+      await operation();
+      if (phase === "apply") request.signal?.throwIfAborted();
+    };
+
+    const rollback = async (): Promise<void> => {
+      let rollbackFailed = false;
+      let firstError: unknown;
+      const attempt = async (operation: () => Promise<void>): Promise<void> => {
+        try {
+          await operation();
+        } catch (error) {
+          if (!rollbackFailed) firstError = error;
+          rollbackFailed = true;
+        }
+      };
+
+      for (const path of [...createdFiles].sort(comparePaths).reverse()) {
+        await attempt(() =>
+          mutate(
+            "delete",
+            path,
+            () => removeOwnedFile(destinationRoot, path),
+            "rollback",
+          ),
+        );
       }
-      await writeAuthorizedFile(root, { path, contents, expectedRevision });
-      await chmod(
-        join(destinationRoot, ...path.split("/")),
-        fileModes.get(path) ?? 0o644,
-      );
+      for (const path of [...touchedExisting].sort(comparePaths)) {
+        const snapshot = snapshots.get(path);
+        if (snapshot === undefined) continue;
+        await attempt(async () => {
+          const existing = await existingPath(destinationRoot, path);
+          if (existing === "other") {
+            throw new Error(`Rollback path is not a regular file: ${path}`);
+          }
+          const expectedRevision =
+            existing === "file"
+              ? (await readAuthorizedFile(root, path)).revision
+              : null;
+          await mutate(
+            "write",
+            path,
+            async () => {
+              await writeAuthorizedFile(root, {
+                path,
+                contents: snapshot.contents,
+                expectedRevision,
+                mode: snapshot.mode,
+                hooks: {
+                  beforeRename: async () => {
+                    await request.hooks?.beforeMutation?.({
+                      phase: "rollback",
+                      kind: "chmod",
+                      path,
+                    });
+                  },
+                },
+              });
+            },
+            "rollback",
+          );
+        });
+      }
+      for (const directory of [...createdDirectories]
+        .sort(comparePaths)
+        .reverse()) {
+        await attempt(() =>
+          mutate(
+            "directory",
+            directory,
+            async () => {
+              try {
+                await rmdir(join(destinationRoot, ...directory.split("/")));
+              } catch (error) {
+                const code = (error as NodeJS.ErrnoException).code;
+                if (
+                  code !== "ENOENT" &&
+                  code !== "ENOTEMPTY" &&
+                  code !== "EEXIST"
+                ) {
+                  throw error;
+                }
+              }
+            },
+            "rollback",
+          ),
+        );
+      }
+      if (rollbackFailed) throw firstError;
+    };
+
+    try {
+      request.signal?.throwIfAborted();
+      for (const path of stale.sort(comparePaths)) {
+        await mutate("delete", path, async () => {
+          await removeOwnedFile(destinationRoot, path);
+          touchedExisting.add(path);
+        });
+      }
+      request.signal?.throwIfAborted();
+
+      for (const directory of [...directories].sort(comparePaths)) {
+        await ensureDirectory(
+          destinationRoot,
+          directory,
+          (absolute, createdPath) =>
+            mutate("directory", createdPath, async () => {
+              await mkdir(absolute);
+              createdDirectories.add(createdPath);
+            }),
+        );
+      }
+      request.signal?.throwIfAborted();
+
+      for (const [path, contents] of [...generated].sort(([left], [right]) =>
+        comparePaths(left, right),
+      )) {
+        let expectedRevision: string | null = null;
+        if (existingOwned.has(path)) {
+          expectedRevision = (await readAuthorizedFile(root, path)).revision;
+        }
+        await mutate("write", path, async () => {
+          if (existingOwned.has(path)) touchedExisting.add(path);
+          await writeAuthorizedFile(root, {
+            path,
+            contents,
+            expectedRevision,
+            mode: fileModes.get(path) ?? 0o644,
+            hooks: {
+              beforeRename: async () => {
+                await request.hooks?.beforeMutation?.({
+                  phase: "apply",
+                  kind: "chmod",
+                  path,
+                });
+              },
+            },
+          });
+          if (!existingOwned.has(path)) createdFiles.add(path);
+        });
+      }
+      request.signal?.throwIfAborted();
+    } catch (error) {
+      try {
+        await rollback();
+      } catch (rollbackError) {
+        throw new ScaffoldRollbackError(rollbackError);
+      }
+      throw error;
     }
   } finally {
     await releaseAuthorizedRoot(root);

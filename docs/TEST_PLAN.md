@@ -129,6 +129,10 @@ If MCP ships:
 - no non-loopback listener by default;
 - safe behavior when the client disappears.
 
+### 2.7 Shared-core host equivalence and serialization
+
+Use one real `CoreOperations` fixture through direct calls, OMP, DSH, and MCP. Compare resolved and unsupported targets, genuine catalog errors, text/structured `DomainResult` projections, and successful scaffolds with initially missing staging roots and golden output. Preposition staging-parent and destination symlinks and require `unauthorized_root` with zero outside mutations. Hold one canonical per-project lock across scaffolding, every verification stage, nested process execution, transactions, and evidence finalization. Cover same-project verify/verify, scaffold/verify, real-path/symlink aliases, cancellation while queued, and forged, wrong-root, or released lock capabilities without deadlock or false success.
+
 ## 3. Real Minecraft integration matrix
 
 Each supported target pack must pass in a clean environment with its declared Java and Gradle toolchain:
@@ -269,6 +273,7 @@ Store raw results with target, host, model, revision, and environment metadata.
 Test the exact distributed artifact, not the source checkout:
 
 - clean private GitHub installation using the supported authentication path;
+- exact-tarball OMP link/import and DSH fresh-profile add/`--dump-config`/activation/removal without enabling dependency install scripts; missing optional Koffi host peer returns native-unavailable rather than triggering a build;
 - pinned revision installation;
 - local tarball/package installation where supported;
 - first-run dependency/setup guidance;

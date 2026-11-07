@@ -3,11 +3,69 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "main": "./dist/adapters/dsh/index.js",
+  "bin": {
+    "voxellume-mcp": "./dist/adapters/mcp/server.js"
+  },
+  "exports": {
+    "./omp": {
+      "types": "./dist/adapters/omp/index.d.ts",
+      "import": "./dist/adapters/omp/index.js"
+    },
+    "./dsh": {
+      "types": "./dist/adapters/dsh/index.d.ts",
+      "import": "./dist/adapters/dsh/index.js"
+    },
+    "./mcp": {
+      "types": "./dist/adapters/mcp/server.d.ts",
+      "import": "./dist/adapters/mcp/server.js"
+    },
+    "./core/results": {
+      "types": "./dist/core/results.d.ts",
+      "import": "./dist/core/results.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "cordis.patch.yml",
+    "skills",
+    "agents",
+    "commands",
+    "schemas",
+    "target-packs",
+    "docs/SPEC.md",
+    "docs/ARCHITECTURE.md",
+    "docs/TEST_PLAN.md",
+    "THIRD_PARTY",
+    "support-manifest.json"
+  ],
+  "omp": {
+    "extensions": [
+      "./dist/adapters/omp/index.js"
+    ]
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "peerDependencies": {
+    "koffi": "3.3.7"
+  },
+  "peerDependenciesMeta": {
+    "koffi": {
+      "optional": true
+    }
+  },
   "packageManager": "pnpm@12.18.0",
   "engines": {
-    "node": ">=24.9.0"
+    "node": ">=24.9.0",
+    "dsh": ">=0.2.2-rc.1 <0.3.0"
   },
   "scripts": {
+    "build": "node --input-type=module --eval \"import { rmSync } from 'node:fs'; rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.build.json",
+    "prepack": "pnpm build",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "oxlint .",
@@ -20,26 +78,34 @@
     "test:e2e": "node --test --experimental-strip-types \"tests/e2e/**/*.test.ts\"",
     "test:targets": "node --test --experimental-strip-types \"tests/targets/**/*.test.ts\"",
     "pack:check": "pnpm pack --dry-run",
-    "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test:unit && pnpm test:security && pnpm test:targets && pnpm pack:check"
+    "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test:unit && pnpm test:security && pnpm test:targets && pnpm test:host && pnpm pack:check"
   },
   "devDependencies": {
+    "@deepseek-ai/dsh": "0.2.2-rc.1",
+    "@oh-my-pi/pi-coding-agent": "18.17.0",
     "@types/node": "26.6.6",
     "@types/pngjs": "6.0.5",
+    "koffi": "3.3.7",
     "oxlint": "1.91.0",
     "prettier": "3.9.10",
     "typescript": "7.0.2"
   },
   "dependencies": {
     "@adhisang/minecraft-modding-mcp": "8.1.0",
+    "@deepseek-ai/cordis": "4.1.0",
+    "@deepseek-ai/dsh-llm": "0.2.2-rc.1",
+    "@deepseek-ai/dsh-scope": "0.2.2-rc.1",
+    "@deepseek-ai/dsh-tools": "0.2.2-rc.1",
     "@fal-ai/client": "1.10.1",
+    "@modelcontextprotocol/server": "2.4.0",
     "ajv": "8.20.0",
     "fflate": "0.8.3",
-    "koffi": "3.3.7",
     "mc-asset": "0.5.0",
     "mineflayer": "4.39.0",
     "pixelmatch": "8.0.0",
     "pngjs": "7.0.0",
     "rcon-client": "4.2.5",
-    "smol-toml": "1.9.1"
+    "smol-toml": "1.9.1",
+    "zod": "4.6.6"
   }
 }

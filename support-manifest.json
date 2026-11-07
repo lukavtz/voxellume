@@ -1,0 +1,350 @@
+{
+  "schemaVersion": "voxellume-support-manifest-1.0.0",
+  "package": {
+    "name": "voxellume",
+    "version": "0.1.0",
+    "revision": "0.1.0"
+  },
+  "targetPacks": [
+    {
+      "id": "java-fabric-1.21-r1",
+      "packSha256": "dd7c6ae779d7af392282755d6e97118149de492186fc768248176c09b1eb8605",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-fabric-1.21.1-r1",
+      "packSha256": "c4ac153d2581381df83bf05d2b2973f61556eca6a620a15449b3e13da890727f",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-fabric-1.21.10-r1",
+      "packSha256": "54aea45433f25e2ec36805bba8af8418bb9502edd7b970358f640283011accb4",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-fabric-1.21.11-r1",
+      "packSha256": "6077e44e130ed17c4d06bacad305019f2fee6be05095cfde81cb12d9f09e7f4d",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-fabric-1.21.2-r1",
+      "packSha256": "b4224deee89dd96fc0fa2c3b31ac165849dcd070af72e06209962a45d50fef02",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-fabric-1.21.3-r1",
+      "packSha256": "46cf4d6939ee935e72868173a49f8ffad315a13e6908b1dda05e9f8c1c8794a5",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-fabric-1.21.4-r1",
+      "packSha256": "a6ff85e2af37a2e8f7cd699823fca8e24bd443552c9990b23b794cdd30745c4c",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-fabric-1.21.5-r1",
+      "packSha256": "8ad802a54fedf209040b316eb74ad1d68b3c7b46f45bfa2203c6b166b41f714b",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-fabric-1.21.6-r1",
+      "packSha256": "fdd8ae734154bccdb7dd1de81cef3cf6de0418646e771f297d647f143c45eb0b",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-fabric-1.21.7-r1",
+      "packSha256": "76fd7bfe3cd558fd99fea934f4daf2729d905820735bd23a4cba079d0976acf4",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-fabric-1.21.8-r1",
+      "packSha256": "3b566468eb7a1f52936d773acf3f32fb52babd11eabaae7b9d5b9ab74f3e1c68",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-fabric-1.21.9-r1",
+      "packSha256": "d5f148f5485cd0e2faff7bfa54b7d8537625f0e3f64f6f0802b22ce12b6cfe29",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-fabric-26.1-r1",
+      "packSha256": "ffe7ee13a87ea61efab8437ad0dc9c26b8cf33a22bf08a47f328c3db5db17e92",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-fabric-26.1.1-r1",
+      "packSha256": "fe755a6b8118ff68ebab954ecb5514ee80655f0790cd8a0a19e605144f558452",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-fabric-26.1.2-r1",
+      "packSha256": "71a088f214cc9f36817d66517ed5219b1ede681133b35ba5655f30388ff5a065",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-fabric-26.2-r1",
+      "packSha256": "01fda32c28cf265d9b2b7ba72e264921b339a164a94cf20041d049469cba1a0b",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-fabric-26.3-r1",
+      "packSha256": "f275c047068eed1302a067182179efeeb19f72e824b6b9ebe0254a1dc94c8c02",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-forge-1.21-r1",
+      "packSha256": "f74155194d03eee924374fd1ffa0707321cb42356b758051494e62463438a296",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-forge-1.21.1-r1",
+      "packSha256": "61592becbec90c5db7e5be9baf325c32a66de651f30771636b4ef39632f9a4b1",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-forge-1.21.10-r1",
+      "packSha256": "d7977a7632766a078fc820861e5753646d42c494a0a56ab5657baf5fa743e420",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-forge-1.21.11-r1",
+      "packSha256": "fe1b20cee1110a017d5440b73d221398db0027794cfebba5264763318d94e08d",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-forge-1.21.2-r1",
+      "packSha256": "28d127b410663e04b585328abba7bc0eceb78af79a128c1bc0e1f2580b2142ee",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-forge-1.21.3-r1",
+      "packSha256": "8ae3d04180779af3d875419987e60b918f6ef8901f8bbb585d365abce4dd3233",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-forge-1.21.4-r1",
+      "packSha256": "4e78d6ae83e1646f154034ec4556f4a283bb27c8969f2f563cb653e7aae74f72",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-forge-1.21.5-r1",
+      "packSha256": "1753599b2c991dc42a297d00d14f3ca3a96df3463ce0e785b47467a7c09d54c8",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-forge-1.21.6-r1",
+      "packSha256": "cf393273ebe34f95a337d91804262038a924f530436ad68e6c0f7ba46122ffb9",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-forge-1.21.7-r1",
+      "packSha256": "93c4b5776eff59339d08ee6a7b435f2b1131b4b8da446fdd4df9d79b18528314",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-forge-1.21.8-r1",
+      "packSha256": "c6c5d7f63fd99a407e4897ddd77bafc81fb67ba4f6e8f7b47caf431bf6200392",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-forge-1.21.9-r1",
+      "packSha256": "4fd34589d69605bb168684d9255855df5a887f179e58dcd4a2ddf39aa84adb47",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-forge-26.1-r1",
+      "packSha256": "7f053ee96425c2b9cb1e855a74924c85035e0d5ce3df88141b290d3ace4d435e",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-forge-26.1.1-r1",
+      "packSha256": "769e5aa4d3ed1c75d418d17b9c02428b636d827ef0bdb438d86a0a1b84c52d45",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-forge-26.1.2-r1",
+      "packSha256": "2b6853e86bc8016f2f3dc740489cd72bc50e73dcbdf8f603103de019db414870",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-forge-26.2-r1",
+      "packSha256": "cd69e2e3630c467d4446fecc3307e4546430910ba391d55e4b7e46db1fad876d",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-forge-26.3-r1",
+      "packSha256": "1ae94a2348785424427110205c077ef44d8846b737cba783e0888fb73e92e5e7",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-neoforge-1.21-r1",
+      "packSha256": "9d80f997c4b6a509f49cb7298f970751319072f32e199b8ee08b203fc264f792",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-neoforge-1.21.1-r1",
+      "packSha256": "0b51340489fbf459f19e9c48af1a6e6f0892bf104fbcededab6bf7bd8947691c",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-neoforge-1.21.10-r1",
+      "packSha256": "90fc89b3558ef38ad2958ad514f1ca42bc9542369a07a84590358b1872ce83e2",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-neoforge-1.21.11-r1",
+      "packSha256": "737469147377354a293690f573b489df4f5af6d9d5e6e8cbb41f29ba75cf05d1",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-neoforge-1.21.2-r1",
+      "packSha256": "6601ce251db42e01fdacfbab667cdfb2c6f4ee134cbc6cbc03b05d7bffd0915a",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-neoforge-1.21.3-r1",
+      "packSha256": "9122fd5e50384138460e42cd7bf9859d1bee23bfec230a89eedc5ed3e1fe3c1d",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-neoforge-1.21.4-r1",
+      "packSha256": "b51722643cea474a4d4341ea1338695b8a3ccdae4c233fb85551fd5d53f4816b",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-neoforge-1.21.5-r1",
+      "packSha256": "87189c6a89291ba272cfb15ce89be07355d99f1a0368a1407e3e972ec24d2ddf",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-neoforge-1.21.6-r1",
+      "packSha256": "2d10d911cc2f875eab586b20c9116a5337d1fc9c14de9bc6dda1674fed838554",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-neoforge-1.21.7-r1",
+      "packSha256": "972667ac3dbd5311107f27a2cd8fb83de7420f169529ec34caf212a991cae6d8",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-neoforge-1.21.8-r1",
+      "packSha256": "66598aeb4e0f996b4efd7d11195bf6798c8d8dd1b5811ad55e0fd8564d78d163",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-neoforge-1.21.9-r1",
+      "packSha256": "6e50d727f6a06efaf0b8b74670e9f3530ea278ccc78daf3d1080a9fcbe45bb16",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-neoforge-26.1-r1",
+      "packSha256": "592ef5d72ff9af5528b64eb2d206bd250351e3601105e3c4c69cefe1a26694ba",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-neoforge-26.1.1-r1",
+      "packSha256": "221063aafb363f5bc2371830a0a7d8c58c184be2bb4167ba36676ffc52c5353f",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-neoforge-26.1.2-r1",
+      "packSha256": "7963ccc41d23933283d33cb609e6702a827dff6b61a4eab3b1de9dc914b4cc6e",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-neoforge-26.2-r1",
+      "packSha256": "6b92c3248ddad38d088065d955f9da37c0fe00c20d7fdb77295d3ba753b0d120",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-neoforge-26.3-r1",
+      "packSha256": "e70ea89b5c41365f5e77ead18a37c82079e5bd694b82c2e8054a6559589f669e",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-quilt-1.21-r1",
+      "packSha256": "a84547cafe8ff3ff657e3768a33e8cc4859338e305c07b9b2de959131156121f",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-quilt-1.21.1-r1",
+      "packSha256": "ae43815a6e24c6a01d146d3df9e3f7730d179ec81f56ba4cbe2b832e1190dc9d",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-quilt-1.21.10-r1",
+      "packSha256": "7cc368d7c9ab66dc52fce1be07c54f4b1fa3aafc4e8b39de0aecbbc26e94461e",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-quilt-1.21.11-r1",
+      "packSha256": "deaec46e9efdb6069d00eff4df190b48416001fdc3b7a98f0227682174b24ff4",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-quilt-1.21.2-r1",
+      "packSha256": "9a2c96643ab2a5025e880edd570d46e40df3d5307fbce69622210556de2ec9d4",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-quilt-1.21.3-r1",
+      "packSha256": "c99640cb2cb64f62ffd58d7a317f6e5c30e84279904e1e2c69cd141d9b4742a7",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-quilt-1.21.4-r1",
+      "packSha256": "cc6f9553ba6a72d50493bca486f4137cb70cfa6f3b1a42217ebc1104076d3bda",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-quilt-1.21.5-r1",
+      "packSha256": "ca41fcc260076720d17cb417bfa77a9c5b49f059d53fb7ab85c6c5c638748859",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-quilt-1.21.6-r1",
+      "packSha256": "eda216b5b2b990ee664a6e43f85b51956cdea6ab318362b728d43f2e204b88bc",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-quilt-1.21.7-r1",
+      "packSha256": "af9b4598782dd0bf21703218cb56946cedf4b8c7082fe6ff1070f9b8ccafd532",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-quilt-1.21.8-r1",
+      "packSha256": "260379dbc9e5006caed8da63bff62da0a2eb5a36f044a8f1f450defa3d67e453",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-quilt-1.21.9-r1",
+      "packSha256": "5b665a235668af087fde84339b4ec2b52059eebcfd979084ac4ff6998c366905",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-quilt-26.1-r1",
+      "packSha256": "5cfb1a03c68245b3a23001f1f9aa7150414ab486172271e2a59b3d33a51ed468",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-quilt-26.1.1-r1",
+      "packSha256": "718847667fd5c9e8d6430d9df2552d685524a358132084352b3ea00b3a47f6ac",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-quilt-26.1.2-r1",
+      "packSha256": "76e6829bf840bc69b964700d252fb8a60790b6ff8fdc0733869968184393bd70",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-quilt-26.2-r1",
+      "packSha256": "e5a8eb21ae75a250d1f327d2cb211189db4570856395bfcdd5c41d57ac0f2cb1",
+      "qualificationEvidence": null
+    },
+    {
+      "id": "java-quilt-26.3-r1",
+      "packSha256": "895cf7ff1617aae649c2f11bc07beb4b468824f33d4c979984ba643e0b8e8a63",
+      "qualificationEvidence": null
+    }
+  ]
+}

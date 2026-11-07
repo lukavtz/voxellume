@@ -11,7 +11,7 @@ Date: 2026-11-07. Sources were evaluated from primary repositories, not install 
 | `Jahrome907/minecraft-agent-skills` | `22d61ce6b7a0c5f215008824aa6b94ecc73f2a43` | Loader test taxonomy, GameTest layouts, resource-pack cross-reference rules, release-version and single-primary-JAR checks. MIT.                      |
 | `adhi-jp/agent-skills` workbench    | `16613367d14423aa5eca4bb83a42a5a4176df0c6` | Evidence levels, project profiles, build-is-not-runtime-proof, GameTest wiring, mappings-before-lifecycle porting. MIT.                               |
 
-These sources remain behind the seven `skills/minecraft-*` workflows. They do not replace exact target packs, source/asset manifests, evidence schemas, or production-JAR gates. No source supplies Quilt coverage, the complete Forge 1.21+ matrix, editable Blockbench/provenance coverage, or the full release evidence bundle.
+These sources remain behind the phase and specialist `skills/minecraft-*` workflows. They do not replace exact target packs, source/asset manifests, evidence schemas, or production-JAR gates. No source supplies Quilt coverage, the complete Forge 1.21+ matrix, editable Blockbench/provenance coverage, or the full release evidence bundle.
 
 ## Rejected or narrowly scoped sources
 

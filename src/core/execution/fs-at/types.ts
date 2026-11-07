@@ -42,6 +42,7 @@ export interface WriteRootFileRequest {
   readonly path: string;
   readonly contents: Buffer;
   readonly expectedRevision: string | null;
+  readonly mode?: number;
   readonly beforeRename?: (paths: RootRenamePaths) => void | Promise<void>;
 }
 

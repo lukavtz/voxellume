@@ -24,9 +24,8 @@ An existing mod or subsystem must move across Minecraft versions, loaders, or bo
    - Resolve the destination with `minecraft_target_resolve`; keep the returned pack ID and revision unchanged throughout the port.
    - **Done:** source and destination are exact, authorized, and free of floating branches or substitute targets.
 2. **Choose the migration path.**
-   - For a Fabric/NeoForge port from 1.21.x to 26.1, or a 26.1 patch, complete the vendored [26.1 migration procedure](../../THIRD_PARTY/siredvin-minecraft-modding-skills/skills/minecraft-26-1-migration/SKILL.md) before bootstrap or subsystem edits: decision gate, repository reconnaissance, migration brief, then port strategy.
-   - Review its cumulative change map in order; create its durable brief only when requested.
-   - This guidance establishes no other loader or destination support.
+   - For a Fabric/NeoForge port from 1.21.x to 26.1, or between 26.1 patches, complete `minecraft-26-1-migration` before bootstrap or subsystem edits.
+   - Other destinations use their exact pack documentation and this porting inventory; the specialist establishes no additional coverage.
    - **Done:** applicable migration decisions and ordered subsystem boundaries are recorded.
 3. **Inventory and map every source unit.**
    - Enumerate code, build configuration, dependencies, resources, data, editable assets, and tests.

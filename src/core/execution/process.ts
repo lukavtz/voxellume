@@ -3,7 +3,13 @@ import { join, resolve } from "node:path";
 
 import { runDockerVerification } from "./docker.ts";
 import { executePosixProcess } from "./process/posix.ts";
-import { acquireProjectLock } from "./process/project-lock.ts";
+import {
+  acquireHeldProjectLock,
+  assertHeldProjectLock,
+  canonicalProjectKey,
+  type ProjectLockCapability,
+  type ProjectLockRelease,
+} from "./process/project-lock.ts";
 import { executeWindowsProcess } from "./process-win32.ts";
 import {
   ALLOWED_GRADLE_TASKS,
@@ -56,6 +62,7 @@ export interface RunVerificationProcessOptions {
   readonly allowHostExecution?: boolean;
   readonly javaHome?: string;
   readonly lockRoot?: string;
+  readonly projectLock?: ProjectLockCapability;
 }
 
 const allowedTasks = new Set<string>(ALLOWED_GRADLE_TASKS);
@@ -138,12 +145,22 @@ export async function runVerificationProcess(
 
   let projectRoot: string;
   let lockRoot: string;
+  let releaseLock: ProjectLockRelease | undefined;
   try {
     projectRoot = await realpath(resolve(options.projectRoot));
-    lockRoot =
-      options.lockRoot === undefined
-        ? projectRoot
-        : await realpath(resolve(options.lockRoot));
+    if (options.projectLock === undefined) {
+      const held = await acquireHeldProjectLock(
+        resolve(options.lockRoot ?? projectRoot),
+        options.signal,
+      );
+      if (held === null) return { ...base, status: "cancelled" };
+      lockRoot = held.key;
+      releaseLock = held.release;
+    } else {
+      lockRoot = await canonicalProjectKey(
+        resolve(options.lockRoot ?? options.projectRoot),
+      );
+    }
   } catch (error: unknown) {
     return {
       ...base,
@@ -155,8 +172,20 @@ export async function runVerificationProcess(
     };
   }
 
-  const releaseLock = await acquireProjectLock(lockRoot, options.signal);
-  if (releaseLock === null) return { ...base, status: "cancelled" };
+  if (
+    options.projectLock !== undefined &&
+    !assertHeldProjectLock(options.projectLock, lockRoot)
+  ) {
+    return {
+      ...base,
+      status: "unavailable",
+      error: {
+        code: "project_lock_mismatch",
+        detail:
+          "The project lock capability does not hold the canonical lock root.",
+      },
+    };
+  }
 
   try {
     await Promise.all([
@@ -171,7 +200,7 @@ export async function runVerificationProcess(
     if (backend === "docker") return await runDockerVerification(options);
     return await executeHost(options, projectRoot, requested);
   } finally {
-    releaseLock();
+    releaseLock?.();
   }
 }
 

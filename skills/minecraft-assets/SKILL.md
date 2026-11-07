@@ -30,7 +30,7 @@ A feature needs new or changed runtime art, editable masters, export provenance,
    | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
    | Existing-art cleanup          | `mod-game-worker` runs pinned `runMcAsset` under the approved execution policy; record input/output hashes and transformation.                                                                                                                                                                   |
    | Concept or texture generation | The orchestrator invokes core `requestAsset` through an available trusted-host provider operation: native host image tool, explicitly approved fal, or reviewed local ComfyUI workflow. Record request, model/seed when applicable, references, and output hash; record fal cost when available. |
-   | Model or bone animation       | `mod-game-worker` runs the host-approved tool behind `createBlockbenchExporter`: pinned, root-restricted Blockbench with `risky_eval` disabled and loopback-only access. Record application version, project format, and export settings.                                                        |
+   | Model or bone animation       | Use `minecraft-blockbench`; `mod-game-worker` runs only its host-approved exporter under the approved execution policy. Record application version, project format, and export settings.                                                                                                         |
    - Keep secrets outside the repository and evidence.
    - If the named host operation or approved provider callback is not exposed, return `unavailable`; use no remote-workflow, direct-shell, or invented-art fallback.
    - **Done:** the selected route, authorization, immutable references, and generation record are stored.
@@ -45,7 +45,7 @@ A feature needs new or changed runtime art, editable masters, export provenance,
    - Call `minecraft_assets_validate` on the staged project.
    - Check schemas, identifiers, dimensions, alpha, tiling, UV/orientation/scale, animation timing/states, model round trips, cross-file references, and stale exports.
    - Regenerate exports and compare hashes.
-   - For resource-pack references, consult the [Jahrome procedure](../../THIRD_PARTY/jahrome-minecraft-agent-skills/.agents/skills/minecraft-resource-pack/SKILL.md) and [conditional-asset rules](../../THIRD_PARTY/jahrome-minecraft-agent-skills/.agents/skills/minecraft-resource-pack/references/conditional-assets.md); exact pack `docs.json` and resource formats outrank examples.
+   - Use `minecraft-resource-pack` for pack metadata, model/texture references, item definitions, sounds, fonts, namespaces, and conditional client assets.
    - **Done:** validation passes and repeated generation produces identical exports.
 5. **Separate previews from game evidence.**
    - Label Blockbench/Blender captures as previews.

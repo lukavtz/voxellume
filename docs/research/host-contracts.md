@@ -2,7 +2,7 @@
 
 Дата проверки: 2026-11-06.
 
-Наблюдаемые версии: OMP `18.17.0`, DeepSeek Harness `0.2.2-rc.1`.
+Целевая OMP baseline: `18.17.0`; установленный smoke host: `18.18.0`. DeepSeek Harness: `0.2.2-rc.1` с `@deepseek-ai/dsh-tools@0.2.2-rc.1` и Cordis `4.1.0`. MCP adapter: официальный `@modelcontextprotocol/server@2.4.0` и `zod@4.6.6`; старый `@modelcontextprotocol/sdk@1.x` не используется для нового server.
 
 ## OMP
 
@@ -84,7 +84,19 @@ Cordis plugin регистрирует typed tools через `ctx.tools.registe
 
 ### Compatibility risk
 
-README обозначает developer preview и предупреждает о compatibility-breaking changes. Поэтому адаптер и contract tests фиксируются на конкретный supported Harness range; `master` documentation не смешивается с другой installed version без проверки.
+README обозначает developer preview и предупреждает о compatibility-breaking changes. Поэтому адаптер и contract tests фиксируются на конкретный supported Harness range; `master` documentation не смешивается с другой installed version без проверки. `engines.dsh` — `>=0.2.2-rc.1 <0.3.0`; installed `0.2.2-rc.1` принимает prerelease через `includePrerelease: true`.
+
+Fresh-profile plugin manager использует pnpm `autoInstallPeers: false`. Поэтому runtime imports `@deepseek-ai/cordis`, `@deepseek-ai/dsh-scope` и `@deepseek-ai/dsh-llm` поставляются как exact dependencies; иначе `--dump-config` проходит, но активация падает с `ERR_MODULE_NOT_FOUND`. Koffi остаётся optional peer: чистый tarball install не требует `allowBuilds`, а отсутствующий native backend возвращает `unavailable`.
+
+## MCP TypeScript SDK v2
+
+Первичные источники: https://github.com/modelcontextprotocol/typescript-sdk/tree/v2.4.0 и published declarations.
+
+- Imports: `@modelcontextprotocol/server`, `@modelcontextprotocol/server/stdio`, `zod/v4`.
+- `McpServer.registerTool` использует strict Zod object schemas; handler получает `ctx.mcpReq.signal`.
+- `serveStdio` owns transport lifecycle; disconnect aborts in-flight handlers, но domain cleanup остаётся обязанностью core.
+- Результат содержит одинаковые `structuredContent` и serialized text; output ограничен 256 KiB. Stdout reserved for JSON-RPC, logs only stderr.
+- No HTTP listener or second domain implementation.
 
 ## Общий core и различия адаптеров
 

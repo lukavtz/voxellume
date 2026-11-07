@@ -15,7 +15,7 @@ import {
   nativeCall,
 } from "./probe.ts";
 import { informationBytes, statHandle } from "./read.ts";
-import { setDisposition, utf16Units } from "./root.ts";
+import { queryInformation, setDisposition, utf16Units } from "./root.ts";
 import {
   openParent,
   openRelative,
@@ -32,6 +32,7 @@ import {
   FILE_RENAME_POSIX_SEMANTICS,
   FILE_RENAME_REPLACE_IF_EXISTS,
   FILE_WRITE_DATA,
+  FileBasicInformation,
   FileRenameInformationEx,
   GENERIC_READ,
   IO_CHUNK_SIZE,
@@ -208,6 +209,44 @@ function writeAll(
   }
 }
 
+const FILE_ATTRIBUTE_READONLY = 0x01;
+const FILE_WRITE_ATTRIBUTES = 0x0100;
+
+function setFileMode(
+  owner: Win32Native,
+  handle: Handle,
+  path: string,
+  mode: number,
+): void {
+  const information = queryInformation(
+    owner,
+    handle,
+    FileBasicInformation,
+    40,
+    path,
+  );
+  const current = information.readUInt32LE(32);
+  const attributes =
+    (mode & 0o200) === 0
+      ? current | FILE_ATTRIBUTE_READONLY
+      : current & ~FILE_ATTRIBUTE_READONLY;
+  information.writeUInt32LE(attributes, 32);
+  const ioStatus: IoStatus = { Status: 0, Information: 0 };
+  const status = nativeCall(
+    "NtSetInformationFile(FileBasicInformation)",
+    path,
+    () =>
+      owner.NtSetInformationFile(
+        handle,
+        ioStatus,
+        information,
+        40,
+        FileBasicInformation,
+      ),
+  );
+  checkStatus("NtSetInformationFile(FileBasicInformation)", path, status);
+}
+
 function flushFile(owner: Win32Native, handle: Handle, path: string): void {
   const ioStatus: IoStatus = { Status: 0, Information: 0 };
   const status = nativeCall("NtFlushBuffersFileEx", path, () =>
@@ -277,11 +316,19 @@ export async function writeWin32RootFileAtomic(
     const original = targetStat(owner, parent, base);
     assertRevision(original, request.expectedRevision, request.path);
     temporaryHandle = openRequiredRelative(owner, parent, temporaryName, {
-      access: DELETE | FILE_WRITE_DATA | FILE_READ_ATTRIBUTES | SYNCHRONIZE,
+      access:
+        DELETE |
+        FILE_WRITE_DATA |
+        FILE_READ_ATTRIBUTES |
+        FILE_WRITE_ATTRIBUTES |
+        SYNCHRONIZE,
       disposition: FILE_CREATE,
       directory: false,
     });
     assertTemporary(owner, temporaryHandle, temporaryPath);
+    if (request.mode !== undefined) {
+      setFileMode(owner, temporaryHandle, temporaryPath, request.mode);
+    }
     writeAll(owner, temporaryHandle, request.contents, temporaryPath);
     flushFile(owner, temporaryHandle, temporaryPath);
     const beforeHook = assertTemporary(owner, temporaryHandle, temporaryPath);

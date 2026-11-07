@@ -25,10 +25,9 @@ A staged mod candidate needs acceptance verification, bounded repair, delivery e
    - Use the [Adhi evidence levels](../../THIRD_PARTY/adhi-agent-skills.txt) to distinguish specification, generated files, build, runtime behavior, production JAR, and real-client visuals.
    - **Done:** every acceptance has behavior evidence where required, every required check is executable or explicitly `unsupported`/`unavailable`, and no screenshot substitutes for a behavior assertion.
 2. **Prepare loader-native test wiring.**
-   - For pack-qualified Fabric/NeoForge native GameTests, consult [Jahrome testing](../../THIRD_PARTY/jahrome-minecraft-agent-skills/.agents/skills/minecraft-testing/SKILL.md) and [test layouts](../../THIRD_PARTY/jahrome-minecraft-agent-skills/.agents/skills/minecraft-testing/references/test-layouts.md) for source sets, registration, metadata, structures, and test instances.
-   - Only when Testiarium is already configured on a qualified 1.21.1 Fabric/NeoForge project, follow its [vendored procedure](../../THIRD_PARTY/siredvin-minecraft-modding-skills/skills/testiarium-gametest/SKILL.md).
-   - Keep Testiarium test-only; do not add it or extend it to other loaders/releases.
-   - **Done:** applicable test layout matches the exact pack and all integrations remain outside production output.
+   - Use `minecraft-gametest` to classify acceptance checks, inspect exact source layouts, register fixtures, prove the negative control, and account for every required test.
+   - Keep all test integrations outside production output.
+   - **Done:** the specialist test matrix matches the exact pack and every required test is discoverable or explicitly unavailable.
 3. **Run stages in exact order.**
    - Call `minecraft_project_verify` through `mod-game-worker`.
    - Execute core stages `static → build → server → gameTest → client → productionJar → visual → package`. Static includes unit, resource, dependency/license, and security checks; package includes final package/evidence validation.

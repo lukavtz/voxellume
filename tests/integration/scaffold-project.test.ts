@@ -1,11 +1,14 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import {
+  chmod,
   mkdir,
   mkdtemp,
   readFile,
   readdir,
   rm,
+  stat,
+  symlink,
   unlink,
   writeFile,
 } from "node:fs/promises";
@@ -179,6 +182,16 @@ async function snapshot(root: string): Promise<Record<string, string>> {
   await visit(root);
   return Object.fromEntries(
     Object.entries(files).sort(([left], [right]) => left.localeCompare(right)),
+  );
+}
+
+async function snapshotModes(root: string): Promise<Record<string, number>> {
+  const modes: Record<string, number> = {};
+  for (const name of Object.keys(await snapshot(root))) {
+    modes[name] = (await stat(join(root, name))).mode & 0o777;
+  }
+  return Object.fromEntries(
+    Object.entries(modes).sort(([left], [right]) => left.localeCompare(right)),
   );
 }
 
@@ -365,6 +378,222 @@ test("regenerates deterministically, prunes stale owned files, and preserves use
     await readFile(join(destination, "notes.md"), "utf8"),
     "user-owned notes\n",
   );
+});
+
+async function rollbackFixture(t: TestContext) {
+  const { destination, targetPackRoot, target } = await fixture(t);
+  const options = { destination, target, targetPackRoot, mod };
+  const first = await scaffoldProject(options);
+  assert.equal(first.status, "scaffolded");
+
+  await writeFile(join(destination, "notes.md"), "user-owned notes\n");
+  await writeFile(join(destination, "build.gradle"), "edited owned bytes\n");
+  await chmod(join(destination, "build.gradle"), 0o640);
+  await unlink(
+    join(
+      targetPackRoot,
+      "templates/src/datagen/java/com/example/ExampleModDataGenerator.java",
+    ),
+  );
+  await writeTree(join(targetPackRoot, "templates"), {
+    "new/generated.txt": "new generated output\n",
+  });
+  return {
+    options,
+    beforeFiles: await snapshot(destination),
+    beforeModes: await snapshotModes(destination),
+  };
+}
+
+interface RollbackFixtureState {
+  readonly options: {
+    readonly destination: string;
+    readonly targetPackRoot: string;
+    readonly target: TargetPack;
+    readonly mod: typeof mod;
+  };
+  readonly beforeFiles: Record<string, string>;
+  readonly beforeModes: Record<string, number>;
+}
+
+async function assertRestored(
+  fixtureState: RollbackFixtureState,
+): Promise<void> {
+  assert.deepEqual(
+    await snapshot(fixtureState.options.destination),
+    fixtureState.beforeFiles,
+  );
+  assert.deepEqual(
+    await snapshotModes(fixtureState.options.destination),
+    fixtureState.beforeModes,
+  );
+}
+
+test("aborts before stale deletion and restores the complete prior tree", async (t) => {
+  const state = await rollbackFixture(t);
+  const controller = new AbortController();
+  await assert.rejects(
+    scaffoldProject({
+      ...state.options,
+      signal: controller.signal,
+      hooks: {
+        beforeMutation(mutation) {
+          if (mutation.kind === "delete") controller.abort();
+        },
+      },
+    }),
+    { name: "AbortError" },
+  );
+  await assertRestored(state);
+});
+
+test("aborts during writes and removes all newly generated output", async (t) => {
+  const state = await rollbackFixture(t);
+  const controller = new AbortController();
+  await assert.rejects(
+    scaffoldProject({
+      ...state.options,
+      signal: controller.signal,
+      hooks: {
+        beforeMutation(mutation) {
+          if (
+            mutation.kind === "write" &&
+            mutation.path === "src/main/resources/fabric.mod.json"
+          ) {
+            controller.abort();
+          }
+        },
+      },
+    }),
+    { name: "AbortError" },
+  );
+  await assertRestored(state);
+});
+
+test("aborts during chmod and restores owned bytes and modes", async (t) => {
+  const state = await rollbackFixture(t);
+  const controller = new AbortController();
+  await assert.rejects(
+    scaffoldProject({
+      ...state.options,
+      signal: controller.signal,
+      hooks: {
+        beforeMutation(mutation) {
+          if (mutation.kind === "chmod" && mutation.path === "build.gradle") {
+            controller.abort();
+          }
+        },
+      },
+    }),
+    { name: "AbortError" },
+  );
+  await assertRestored(state);
+});
+
+test("an injected write failure restores stale, existing, and new paths", async (t) => {
+  const state = await rollbackFixture(t);
+  await assert.rejects(
+    scaffoldProject({
+      ...state.options,
+      hooks: {
+        beforeMutation(mutation) {
+          if (
+            mutation.kind === "write" &&
+            mutation.path === "src/main/resources/fabric.mod.json"
+          ) {
+            throw new Error("injected write failure");
+          }
+        },
+      },
+    }),
+    /injected write failure/,
+  );
+  await assertRestored(state);
+});
+
+test("rollback failure is surfaced instead of reporting cancellation", async (t) => {
+  const state = await rollbackFixture(t);
+  const controller = new AbortController();
+  await assert.rejects(
+    scaffoldProject({
+      ...state.options,
+      signal: controller.signal,
+      hooks: {
+        beforeMutation(mutation) {
+          if (
+            mutation.phase === "apply" &&
+            mutation.kind === "chmod" &&
+            mutation.path === "build.gradle"
+          ) {
+            controller.abort();
+          }
+          if (mutation.phase === "rollback" && mutation.kind === "write") {
+            throw new Error("injected rollback failure");
+          }
+        },
+      },
+    }),
+    /injected rollback failure/,
+  );
+});
+
+test("apply mode changes cannot follow a swapped symlink outside staging", async (t) => {
+  const state = await rollbackFixture(t);
+  const outside = join(state.options.destination, "..", "outside.txt");
+  await writeFile(outside, "outside bytes\n");
+  await chmod(outside, 0o600);
+  const targetPath = join(state.options.destination, "build.gradle");
+
+  await assert.rejects(
+    scaffoldProject({
+      ...state.options,
+      hooks: {
+        beforeMutation: async (mutation) => {
+          if (mutation.kind === "chmod" && mutation.path === "build.gradle") {
+            await unlink(targetPath);
+            await symlink(outside, targetPath);
+          }
+        },
+      },
+    }),
+  );
+  assert.equal((await stat(outside)).mode & 0o777, 0o600);
+});
+
+test("rollback mode restoration cannot follow a swapped symlink outside staging", async (t) => {
+  const state = await rollbackFixture(t);
+  const outside = join(state.options.destination, "..", "outside.txt");
+  await writeFile(outside, "outside bytes\n");
+  await chmod(outside, 0o600);
+  const targetPath = join(state.options.destination, "build.gradle");
+  const controller = new AbortController();
+
+  await assert.rejects(
+    scaffoldProject({
+      ...state.options,
+      signal: controller.signal,
+      hooks: {
+        beforeMutation: async (mutation) => {
+          if (
+            mutation.phase === "apply" &&
+            mutation.kind === "chmod" &&
+            mutation.path === "build.gradle"
+          ) {
+            controller.abort();
+          }
+          if (
+            mutation.phase === "rollback" &&
+            mutation.kind === "chmod" &&
+            mutation.path === "build.gradle"
+          ) {
+            await unlink(targetPath);
+            await symlink(outside, targetPath);
+          }
+        },
+      },
+    }),
+  );
+  assert.equal((await stat(outside)).mode & 0o777, 0o600);
 });
 
 test("uses Architectury common and loader modules only for explicit multi-loader selection", async (t) => {

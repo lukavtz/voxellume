@@ -29,6 +29,7 @@ export interface WriteAuthorizedFileRequest {
   readonly path: string;
   readonly contents: string | Uint8Array;
   readonly expectedRevision: string | null;
+  readonly mode?: number;
   readonly hooks?: {
     readonly beforeRename?: (paths: RootRenamePaths) => void | Promise<void>;
   };
@@ -139,6 +140,7 @@ export async function writeAuthorizedFile(
       path: request.path,
       contents: Buffer.from(request.contents),
       expectedRevision: request.expectedRevision,
+      ...(request.mode === undefined ? {} : { mode: request.mode }),
       ...(request.hooks?.beforeRename === undefined
         ? {}
         : { beforeRename: request.hooks.beforeRename }),

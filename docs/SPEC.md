@@ -137,7 +137,7 @@ Separate skills own distinct triggers:
 - visual quality review;
 - release and GitHub delivery.
 
-Skills contain procedures and pointers to versioned references. They do not duplicate executable logic owned by tools. Ready-made sources and adoption limits are recorded in `docs/research/skill-sources.md`; Universal Modder, SirEdvin, Jahrome, and Adhi methods remain subordinate to exact packs and executable evidence.
+Skills contain procedures and pointers to versioned references. They do not duplicate executable logic owned by tools. Seven phase skills orchestrate design through release; specialist skills cover Fabric, NeoForge, loader-native GameTests, Blockbench, resource packs, 26.1 migration, and read-only Modrinth dependency resolution. Specialists are invoked only for their exact topic and remain subordinate to the phase workflow and target pack. Ready-made sources and adoption limits are recorded in `docs/research/skill-sources.md`; Universal Modder, SirEdvin, Jahrome, and Adhi methods remain subordinate to exact packs and executable evidence.
 
 ### 5.2 Deterministic tools
 
@@ -163,13 +163,10 @@ Exact public interfaces and test seams are architecture decisions and must be co
 ### 5.4 Host adapters
 
 - **OMP:** package manifest, extension module, conventional skills, agents, commands, tools, and optional MCP configuration.
-- **DeepSeek Harness:** external Cordis bundle, typed model-facing tools, bundle patch, lifecycle handling, and host-native execution policy.
+- **DeepSeek Harness:** external Cordis bundle, typed model-facing tools, bundle patch, lifecycle handling, managed verification jobs, and host-native execution policy.
+- **MCP:** official TypeScript server v2 with stdio-only transport, strict Zod inputs, structured results, bounded output, and disconnect/cancellation propagation.
 
-Adapters translate host contracts only. Domain behavior stays in the shared core.
-
-### 5.4 MCP
-
-MCP is optional packaging for deterministic services that are useful outside native OMP and Harness tools. It must not become a second implementation of domain behavior. Native adapters and MCP call the same core interfaces.
+Adapters translate host contracts only. Domain behavior stays in the shared `CoreOperations` facade, which lazily loads target packs, revalidates model input, and requires host-granted path authority. All hosts project the same versioned `DomainResult<T>` with stable error codes, details, retryability, and evidence references.
 
 ### 5.5 Agents
 

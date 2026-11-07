@@ -23,8 +23,7 @@ A verified candidate needs an exact distributable package, clean-install evidenc
    - Reconcile every required acceptance and target-matrix row with finalized evidence, including the trusted human's approved visual-rubric record where required.
    - Failed, unrun, cancelled, timed-out, or unavailable required rows block release.
    - An `unsupported` target is admissible only when the declared matrix and primary-source reason already classify that cell as unsupported.
-   - For declared Modrinth dependencies only, use the [read-only Modrinth procedure](../../THIRD_PARTY/siredvin-minecraft-modding-skills/skills/modrinth-api/SKILL.md) and [API workflow](../../THIRD_PARTY/siredvin-minecraft-modding-skills/skills/modrinth-api/references/api-v2-workflows.md) to recheck exact version IDs, loader/game compatibility, dependencies, filenames, sizes, and SHA-512 hashes.
-   - Download only when requested; perform no Modrinth writes or publication.
+   - For declared Modrinth dependencies only, use `minecraft-modrinth` to recheck exact project/version IDs, loader/game compatibility, dependencies, filenames, sizes, and SHA-512 hashes. Download only when separately approved; perform no Modrinth writes or publication.
    - **Done:** every supported target's required evidence passes, each declared unsupported cell has reason evidence, and declared Modrinth artifacts have exact identity/hash records.
 2. **Assemble only the matching allowlist.**
 

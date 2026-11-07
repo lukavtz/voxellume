@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { createReadStream } from "node:fs";
 import { isAbsolute, relative, resolve, sep } from "node:path";
 
+import type { ProjectLockCapability } from "../execution/process/project-lock.ts";
 import type { TargetCapability, TargetPack } from "../targets/target-pack.ts";
 import { assertTargetCapability } from "../targets/resolve-target.ts";
 import type { ModSpec } from "../spec/mod-spec.ts";
@@ -79,6 +80,7 @@ export interface VerificationStageContext {
   readonly modSpec: ModSpec;
   readonly identity: VerificationIdentity;
   readonly policy: VerificationPolicy;
+  readonly projectLock?: ProjectLockCapability;
   readonly signal?: AbortSignal;
 }
 
@@ -93,6 +95,7 @@ export interface VerifyProjectOptions {
   readonly profile: VerificationProfile;
   readonly identity: VerificationIdentity;
   readonly policy: VerificationPolicy;
+  readonly projectLock?: ProjectLockCapability;
   readonly signal?: AbortSignal;
   readonly stageExecutor?: VerificationStageExecutor;
 }
@@ -446,6 +449,9 @@ export async function verifyProject(
       modSpec: options.modSpec,
       identity: options.identity,
       policy: options.policy,
+      ...(options.projectLock === undefined
+        ? {}
+        : { projectLock: options.projectLock }),
       ...(options.signal === undefined ? {} : { signal: options.signal }),
     });
     for (const artifact of execution.artifacts ?? []) {
