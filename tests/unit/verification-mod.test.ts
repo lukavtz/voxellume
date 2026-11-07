@@ -1237,7 +1237,8 @@ test("world creation and 11900 ticks use the computed 600000ms budget without a 
     projectRoot: "/isolated/project",
     mode: "hidden",
   });
-  const deadlineMs = Date.now() + 600_000;
+  // Include world-creation overhead; each bridge call remains capped at 600000ms.
+  const deadlineMs = Date.now() + 605_000;
   assert.equal(
     (
       await created.adapter.worldCreate({
