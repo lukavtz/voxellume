@@ -459,10 +459,11 @@ test("generation never injects behavior, fixture, or arbitrary expectation code"
 
 test("Quilt is unavailable without explicit pack GameTest proof", async () => {
   const spec = await specFixture();
-  assert.deepEqual(generateFor(spec, await targetFixture("quilt")), {
+  const target = await targetFixture("quilt");
+  assert.deepEqual(generateFor(spec, target), {
     status: "unavailable",
     code: "game_test_unavailable",
-    targetPackId: "java-quilt-1.21.1-r1",
+    targetPackId: target.id,
   });
 });
 
@@ -473,10 +474,11 @@ test("a loader cannot borrow another loader's task", async () => {
     ["neoforge", "runGametest"],
     ["forge", "runClientGameTest"],
   ] as const) {
-    assert.deepEqual(generateFor(spec, await targetFixture(loader, task)), {
+    const target = await targetFixture(loader, task);
+    assert.deepEqual(generateFor(spec, target), {
       status: "unavailable",
       code: "game_test_task_mismatch",
-      targetPackId: `java-${loader}-1.21.1-r1`,
+      targetPackId: target.id,
     });
   }
 });
@@ -506,7 +508,7 @@ test("extra Gradle tasks in the pack argv are rejected", async () => {
   assert.deepEqual(generateFor(await specFixture(), contaminated), {
     status: "unavailable",
     code: "game_test_task_mismatch",
-    targetPackId: "java-fabric-1.21.1-r1",
+    targetPackId: target.id,
   });
 });
 
