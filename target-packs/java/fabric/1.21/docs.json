@@ -23,13 +23,25 @@
   "gradlePlugins": [
     {
       "id": "net.fabricmc.fabric-loom-remap",
-      "version": "1.20.0-alpha.19",
+      "version": "1.17.21",
       "url": "https://docs.fabricmc.net/develop/loom/",
-      "revision": "1.20.0-alpha.19",
+      "revision": "1.17.21",
       "responseSha256": "296ba8190907388981fd4e111fb81204d8397f81f90aa830cfda98f17067d126"
     }
   ],
   "catalogs": [
+    {
+      "url": "https://maven.fabricmc.net/net/fabricmc/fabric-loom-remap/net.fabricmc.fabric-loom-remap.gradle.plugin/1.17.21/net.fabricmc.fabric-loom-remap.gradle.plugin-1.17.21.pom",
+      "responseSha256": "234e78cc7f7ab4b458f043a5694464cd7ef543194029a482c82b1c629ee12ea2"
+    },
+    {
+      "url": "https://maven.fabricmc.net/net/fabricmc/fabric-loom/1.17.21/fabric-loom-1.17.21.jar",
+      "responseSha256": "89c08938d865621172e3fb31036081399b2731a4971f599b42724b2509ff5b64"
+    },
+    {
+      "url": "https://maven.fabricmc.net/net/fabricmc/fabric-loom/1.17.21/fabric-loom-1.17.21.module",
+      "responseSha256": "b4b57c34129fe2b113c9db754d7deca89c527eeffbb08612af3c64760e9006b3"
+    },
     {
       "url": "https://maven.fabricmc.net/net/fabricmc/fabric-api/fabric-api/maven-metadata.xml",
       "responseSha256": "329422f5ae847e329b14d2ae8e9091adf946a40b0f7b63266362e52e534bbaf4"

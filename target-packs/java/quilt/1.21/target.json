@@ -1,10 +1,10 @@
 {
   "schemaVersion": "target-pack-1.0.0",
-  "id": "java-quilt-1.21-r1",
+  "id": "java-quilt-1.21-r2",
   "edition": "java",
-  "status": "candidate",
-  "revision": 1,
-  "packSha256": "a84547cafe8ff3ff657e3768a33e8cc4859338e305c07b9b2de959131156121f",
+  "status": "rejected",
+  "revision": 2,
+  "packSha256": "5121200f4eda92f12dc1ad46346fbcf4e62cb6c924ac859adc956135b06cd2b4",
   "minecraft": {
     "version": "1.21",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -51,12 +51,13 @@
     "architecture": "64-bit"
   },
   "gradle": {
-    "version": "8.9",
-    "distributionUrl": "https://services.gradle.org/distributions/gradle-8.9-bin.zip",
-    "distributionSha256": "d725d707bfabd4dfdc958c624003b3c80accc03f7037b5122c4b1d0ef15cecab",
+    "version": "9.2.0",
+    "distributionUrl": "https://services.gradle.org/distributions/gradle-9.2.0-bin.zip",
+    "distributionSha256": "df67a32e86e3276d011735facb1535f64d0d88df84fa87521e90becc2d735444",
+    "wrapperJarSha256": "cb0da6751c2b753a16ac168bb354870ebb1e162e9083f116729cec9c781156b8",
     "plugins": [
       {
-        "id": "org.quiltmc.loom",
+        "id": "org.quiltmc.loom.remap",
         "version": "1.15.1"
       }
     ]
@@ -72,12 +73,22 @@
     }
   },
   "knownLimitations": [
-    "Only generic official template is available; its content declares Minecraft 1.20.6, so every target coordinate is an override. No target-local build/runtime compatibility claim.",
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "R1 paired Quilt Loom 1.15.1 requiring Gradle plugin API 9.2.0 with Gradle 8.9; task discovery and clean build failed during plugin variant resolution.",
+    "R2 pinned Gradle 9.2.0 and org.quiltmc.loom.remap 1.15.1. Task discovery then failed on a Quilt Maven HTTP 500 for the exact QFAPI crash-report module, and clean build exceeded the 300-second outer runner window without a production JAR.",
+    "No server, GameTest, client, production-JAR runtime, or visual capability was observed."
   ],
-  "template": {
-    "repository": "https://github.com/QuiltMC/quilt-template-mod",
-    "revision": "9a6f89cd481e3f58f128596b5b043353bee6b3f2",
-    "contentSha256": "a2afaa5ab8037021c4538fc8f1bbcca6e30b713c57359245c7eec315e0aaf849"
+  "reason": {
+    "code": "verification_failed",
+    "detail": "Both exact-pin revisions failed before a production JAR: r1 had an incompatible Gradle plugin API, while r2 encountered an upstream Maven HTTP 500 during task discovery and a supervised clean-build timeout. No runtime or visual qualification completed.",
+    "evidence": [
+      {
+        "url": "https://maven.quiltmc.org/repository/release/org/quiltmc/loom/1.15.1/loom-1.15.1.jar",
+        "sha256": "0237bf0a894f2be15bbf11d578263b292bdf21a4ea098ef77aa2a2ea722b8029"
+      },
+      {
+        "url": "https://maven.quiltmc.org/repository/release/org/quiltmc/quilted-fabric-api/quilted-fabric-api/11.0.0-alpha.3+0.102.0-1.21/quilted-fabric-api-11.0.0-alpha.3+0.102.0-1.21.jar",
+        "sha256": "d433ef5f5199b446827b642a5c7d504b6164a325d76e77c78b8c950d4e85b944"
+      }
+    ]
   }
 }
