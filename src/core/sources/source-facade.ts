@@ -25,13 +25,20 @@ const OPERATIONS: Readonly<Record<SourceOperation, true>> = {
 };
 
 export type SourceMappingKind =
-  "mojang" | "yarn" | "intermediary" | "parchment" | "quilt" | "none";
+  | "mojang"
+  | "yarn"
+  | "intermediary"
+  | "parchment"
+  | "parchment-layer"
+  | "quilt"
+  | "none";
 
 const MAPPING_KINDS: Readonly<Record<SourceMappingKind, true>> = {
   mojang: true,
   yarn: true,
   intermediary: true,
   parchment: true,
+  "parchment-layer": true,
   quilt: true,
   none: true,
 };
@@ -63,12 +70,16 @@ export interface SourceRequest {
   readonly target?: SourceTarget | undefined;
   readonly artifact?: SourceArtifactIdentity | undefined;
   readonly artifactId?: string | undefined;
+  readonly workspaceId?: string | undefined;
   readonly className?: string | undefined;
   readonly symbol?: string | undefined;
   readonly query?: string | undefined;
   readonly mapping?: SourceMappingKind | undefined;
-  readonly left?: string | undefined;
-  readonly right?: string | undefined;
+  readonly rightArtifactId?: string | undefined;
+  readonly rightArtifact?: SourceArtifactIdentity | undefined;
+  readonly rightTarget?: SourceTarget | undefined;
+  readonly runtimeArtifactId?: string | undefined;
+  readonly runtimeArtifact?: SourceArtifactIdentity | undefined;
 }
 
 /** Only these fields ever reach a candidate; everything else is host-only. */
@@ -77,12 +88,16 @@ export interface SourceCandidateRequest {
   readonly target: SourceTarget;
   readonly artifact?: SourceArtifactIdentity | undefined;
   readonly artifactId?: string | undefined;
+  readonly workspaceId?: string | undefined;
   readonly className?: string | undefined;
   readonly symbol?: string | undefined;
   readonly query?: string | undefined;
   readonly mapping?: SourceMappingKind | undefined;
-  readonly left?: string | undefined;
-  readonly right?: string | undefined;
+  readonly rightArtifactId?: string | undefined;
+  readonly rightArtifact?: SourceArtifactIdentity | undefined;
+  readonly rightTarget?: SourceTarget | undefined;
+  readonly runtimeArtifactId?: string | undefined;
+  readonly runtimeArtifact?: SourceArtifactIdentity | undefined;
 }
 
 export interface SourceCandidateContext {
@@ -332,18 +347,6 @@ function archiveEntryError(name: string): string | undefined {
   return undefined;
 }
 
-function looksLikeZip(bytes: Uint8Array): boolean {
-  if (bytes.byteLength < 4) return false;
-  if (bytes[0] !== 0x50 || bytes[1] !== 0x4b) return false;
-  const third = bytes[2];
-  const fourth = bytes[3];
-  return (
-    (third === 0x03 && fourth === 0x04) ||
-    (third === 0x05 && fourth === 0x06) ||
-    (third === 0x07 && fourth === 0x08)
-  );
-}
-
 interface ArchiveScan {
   readonly error: string | undefined;
   readonly nested: readonly string[];
@@ -410,7 +413,6 @@ function validateArchive(
   bytes: Uint8Array,
   limits: SourceLimits,
 ): string | undefined {
-  if (!looksLikeZip(bytes)) return undefined;
   const outer = scanArchive(
     bytes,
     limits.archiveEntryBytes,
@@ -430,7 +432,11 @@ function validateArchive(
       limits.nestedEntryBytes,
       false,
     );
-    if (inner.error !== undefined) return inner.error;
+    if (inner.error !== undefined) {
+      return inner.error === "archive_entry_too_large"
+        ? "nested_entry_too_large"
+        : inner.error;
+    }
   }
   return undefined;
 }
@@ -568,18 +574,26 @@ function createFacade(config: SourceFacadeConfig): SourceFacade {
   async function artifactFailure(
     request: SourceRequest,
   ): Promise<string | undefined> {
-    const artifactId = request.artifactId;
-    if (artifactId === undefined || selected === undefined) return undefined;
-    const record = artifacts.find(
-      (entry) =>
-        entry.id === artifactId &&
-        (request.artifact === undefined ||
-          (entry.coordinates === request.artifact.coordinates &&
-            entry.version === request.artifact.version &&
-            entry.sha256 === request.artifact.sha256)),
-    );
-    if (record === undefined) return "artifact_not_found";
-    return verifyArtifact(record, limits, verified);
+    if (selected === undefined) return undefined;
+    for (const [artifactId, artifact] of [
+      [request.artifactId, request.artifact],
+      [request.rightArtifactId, request.rightArtifact],
+      [request.runtimeArtifactId, request.runtimeArtifact],
+    ] as const) {
+      if (artifactId === undefined) continue;
+      const record = artifacts.find(
+        (entry) =>
+          entry.id === artifactId &&
+          (artifact === undefined ||
+            (entry.coordinates === artifact.coordinates &&
+              entry.version === artifact.version &&
+              entry.sha256 === artifact.sha256)),
+      );
+      if (record === undefined) return "artifact_not_found";
+      const error = await verifyArtifact(record, limits, verified);
+      if (error !== undefined) return error;
+    }
+    return undefined;
   }
 
   async function invoke(
@@ -617,6 +631,24 @@ function createFacade(config: SourceFacadeConfig): SourceFacade {
     if (request.artifact !== undefined && artifact === undefined) {
       return failure("failed", operation, "artifact_invalid");
     }
+    const rightArtifact = normalizeArtifact(request.rightArtifact);
+    if (request.rightArtifact !== undefined && rightArtifact === undefined) {
+      return failure("failed", operation, "artifact_invalid");
+    }
+    const runtimeArtifact = normalizeArtifact(request.runtimeArtifact);
+    if (
+      request.runtimeArtifact !== undefined &&
+      runtimeArtifact === undefined
+    ) {
+      return failure("failed", operation, "artifact_invalid");
+    }
+    const rightTarget =
+      request.rightTarget === undefined
+        ? undefined
+        : normalizeTarget(request.rightTarget);
+    if (request.rightTarget !== undefined && rightTarget === undefined) {
+      return failure("failed", operation, "exact_target_required");
+    }
 
     const controller = new AbortController();
     let detach = (): void => {};
@@ -634,7 +666,11 @@ function createFacade(config: SourceFacadeConfig): SourceFacade {
     try {
       // No await before the candidate call when no artifact is named: an
       // immediate abort must still reach the candidate's own abort listener.
-      if (request.artifactId !== undefined) {
+      if (
+        request.artifactId !== undefined ||
+        request.rightArtifactId !== undefined ||
+        request.runtimeArtifactId !== undefined
+      ) {
         const artifactError = await artifactFailure(request);
         if (artifactError !== undefined) {
           return failure(
@@ -654,11 +690,15 @@ function createFacade(config: SourceFacadeConfig): SourceFacade {
         mapping,
         artifact,
         artifactId: request.artifactId,
+        workspaceId: request.workspaceId,
         className: request.className,
         symbol: request.symbol,
         query: request.query,
-        left: request.left,
-        right: request.right,
+        rightArtifactId: request.rightArtifactId,
+        rightArtifact,
+        rightTarget,
+        runtimeArtifactId: request.runtimeArtifactId,
+        runtimeArtifact,
       };
 
       let candidatePromise: Promise<unknown>;

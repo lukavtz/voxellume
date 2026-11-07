@@ -111,6 +111,19 @@ async function setup(t: TestContext): Promise<Fixture> {
     "1",
     zipSync({ "../outside.class": strToU8("escape") }),
   );
+  const prefixed = await addArtifact(
+    artifactRoot,
+    "prefixed",
+    "fixture:prefixed",
+    "1",
+    new Uint8Array([
+      1,
+      2,
+      3,
+      4,
+      ...zipSync({ "../outside.class": strToU8("escape") }),
+    ]),
+  );
   const absolute = await addArtifact(
     artifactRoot,
     "absolute",
@@ -194,6 +207,7 @@ async function setup(t: TestContext): Promise<Fixture> {
       vanilla,
       loader,
       traversal,
+      prefixed,
       absolute,
       nested,
       oversize,
@@ -358,6 +372,32 @@ test("a catalog hash that differs from local bytes fails closed", async (t) => {
   assert.equal(candidate.calls.length, 0);
 });
 
+test("a mismatched right diff artifact never reaches the candidate", async (t) => {
+  const fixture = await setup(t);
+  const candidate = new LocalFakeCandidate();
+  const facade = facadeFor(fixture, candidate);
+  t.after(() => facade.dispose());
+
+  assert.deepEqual(
+    await facade.invoke(
+      operationRequest("diff_classes", fixture.vanilla, {
+        rightArtifactId: fixture.loader.id,
+        rightArtifact: {
+          coordinates: fixture.loader.coordinates,
+          version: fixture.loader.version,
+          sha256: "0".repeat(64),
+        },
+      }),
+    ),
+    {
+      status: "not_found",
+      operation: "diff_classes",
+      code: "artifact_not_found",
+    },
+  );
+  assert.equal(candidate.calls.length, 0);
+});
+
 test("patched loader source is distinct from vanilla for the same class", async (t) => {
   const fixture = await setup(t);
   const facade = facadeFor(fixture);
@@ -423,6 +463,7 @@ test("malicious archive paths, nested entries, and oversized classes are rejecte
   t.after(() => facade.dispose());
   const cases = [
     ["traversal", "archive_traversal"],
+    ["prefixed", "archive_traversal"],
     ["absolute", "archive_absolute_path"],
     ["nested", "nested_entry_too_large"],
     ["oversize", "archive_entry_too_large"],

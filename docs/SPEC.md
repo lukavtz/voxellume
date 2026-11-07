@@ -262,7 +262,7 @@ Permanent tests cover behavior, malformed input, path containment, cancellation,
 - Repository: private [`lukavtz/voxellume`](https://github.com/lukavtz/voxellume).
 
 - Required coverage is every official Minecraft release from 1.21 through 26.3, using JDK 21 and 25 as appropriate. Each loader/release combination still requires its own qualification evidence and an explicit unsupported result when no compatible loader/API exists.
-- ModLens and adhi minecraft-modding-mcp are compared on the same fixtures before one source/mapping integration is selected.
+- ModLens and adhi minecraft-modding-mcp were compared on exact fixtures and qualification gates. Neither qualified; the source/MCP facade remains disabled until a replacement passes the complete matrix. Evidence is in `docs/research/source-mcp-benchmark.md`.
 - Real-client verification combines a minimal target-specific verification mod with suitable OSS adapters.
 - Asset generation supports host image tools, fal, and local ComfyUI. Pinned `mc-asset` is an external-process implementation dependency behind the Voxellume facade; jasonjgardner is the only external Blockbench engine; sosadly is method adaptation only; Blender is optional QA/review tooling; Mosaicary remains conditional and unqualified.
 - The completed mc-asset and sosadly pilots establish only their recorded process/method behavior. Neither pilot establishes real-Minecraft correctness or human aesthetic approval.

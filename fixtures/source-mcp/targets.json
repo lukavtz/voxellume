@@ -1,0 +1,817 @@
+{
+  "schemaVersion": "source-mcp-targets-1.0.0",
+  "caseCount": 68,
+  "operations": [
+    "resolve_artifact",
+    "find_class",
+    "get_members",
+    "map_symbol",
+    "read_source",
+    "search_source",
+    "diff_classes"
+  ],
+  "workspaces": [
+    {
+      "id": "fabric-1.21.1",
+      "kind": "loader",
+      "minecraftVersion": "1.21.1",
+      "loader": "fabric",
+      "targetPackId": "java-fabric-1.21.1-r1",
+      "mappings": { "kind": "mojang", "version": "1.21.1" },
+      "artifactId": "fabric-loader",
+      "oracleId": "fabric-loader-1.21.1",
+      "features": ["loom-remap"],
+      "files": {
+        "settings.gradle": "rootProject.name = 'fabric-1-21-1'\n",
+        "build.gradle": "plugins { id 'net.fabricmc.fabric-loom-remap' version '1.20.0-alpha.19' }\n",
+        "gradle.properties": "minecraft_version=1.21.1\nloader_version=0.20.1\nfabric_version=0.116.17+1.21.1\n",
+        "src/main/java/example/Fixture.java": "package example; public final class Fixture {}\n"
+      }
+    },
+    {
+      "id": "fabric-26.3",
+      "kind": "loader",
+      "minecraftVersion": "26.3",
+      "loader": "fabric",
+      "targetPackId": "java-fabric-26.3-r1",
+      "mappings": { "kind": "none" },
+      "artifactId": "fabric-loader",
+      "oracleId": "fabric-loader-26.3",
+      "features": ["loom", "unobfuscated"],
+      "files": {
+        "settings.gradle": "rootProject.name = 'fabric-26-3'\n",
+        "build.gradle": "plugins { id 'net.fabricmc.fabric-loom' version '1.20.0-alpha.19' }\n",
+        "gradle.properties": "minecraft_version=26.3\nloader_version=0.20.1\nfabric_version=0.165.0+26.3\n",
+        "src/main/java/example/Fixture.java": "package example; public final class Fixture {}\n"
+      }
+    },
+    {
+      "id": "neoforge-1.21.1",
+      "kind": "loader",
+      "minecraftVersion": "1.21.1",
+      "loader": "neoforge",
+      "targetPackId": "java-neoforge-1.21.1-r1",
+      "mappings": { "kind": "parchment-layer", "version": "2024.11.17" },
+      "artifactId": "neoforge-1.21.1",
+      "oracleId": "neoforge-item-1.21.1",
+      "features": ["moddevgradle", "patched-source"],
+      "files": {
+        "settings.gradle": "rootProject.name = 'neoforge-1-21-1'\n",
+        "build.gradle": "plugins { id 'net.neoforged.moddev' version '2.0.148' }\n",
+        "gradle.properties": "minecraft_version=1.21.1\nneo_version=21.1.265\nparchment_minecraft=1.21.1\nparchment_mappings=2024.11.17\n",
+        "src/main/java/example/Fixture.java": "package example; public final class Fixture {}\n"
+      }
+    },
+    {
+      "id": "neoforge-26.3",
+      "kind": "loader",
+      "minecraftVersion": "26.3",
+      "loader": "neoforge",
+      "targetPackId": "java-neoforge-26.3-r1",
+      "mappings": { "kind": "none" },
+      "artifactId": "neoforge-26.3",
+      "oracleId": "neoforge-item-26.3",
+      "features": ["moddevgradle", "patched-source", "unobfuscated"],
+      "files": {
+        "settings.gradle": "rootProject.name = 'neoforge-26-3'\n",
+        "build.gradle": "plugins { id 'net.neoforged.moddev' version '2.0.148' }\n",
+        "gradle.properties": "minecraft_version=26.3\nneo_version=26.3.0.101\n",
+        "src/main/java/example/Fixture.java": "package example; public final class Fixture {}\n"
+      }
+    },
+    {
+      "id": "forge-1.21.1",
+      "kind": "loader",
+      "minecraftVersion": "1.21.1",
+      "loader": "forge",
+      "targetPackId": "java-forge-1.21.1-r1",
+      "mappings": { "kind": "mojang", "version": "1.21.1" },
+      "artifactId": "forge-1.21.1",
+      "oracleId": "forge-item-1.21.1",
+      "features": ["forgegradle", "patched-source"],
+      "files": {
+        "settings.gradle": "rootProject.name = 'forge-1-21-1'\n",
+        "build.gradle": "plugins { id 'net.minecraftforge.gradle' version '7.0.40' }\n",
+        "gradle.properties": "minecraft_version=1.21.1\nforge_version=52.1.20\n",
+        "src/main/java/example/Fixture.java": "package example; public final class Fixture {}\n"
+      }
+    },
+    {
+      "id": "forge-26.3",
+      "kind": "loader",
+      "minecraftVersion": "26.3",
+      "loader": "forge",
+      "targetPackId": "java-forge-26.3-r1",
+      "mappings": { "kind": "none" },
+      "artifactId": "forge-26.3",
+      "oracleId": "forge-item-26.3",
+      "features": ["forgegradle", "patched-source", "unobfuscated"],
+      "files": {
+        "settings.gradle": "rootProject.name = 'forge-26-3'\n",
+        "build.gradle": "plugins { id 'net.minecraftforge.gradle' version '7.0.40' }\n",
+        "gradle.properties": "minecraft_version=26.3\nforge_version=66.1.0\n",
+        "src/main/java/example/Fixture.java": "package example; public final class Fixture {}\n"
+      }
+    },
+    {
+      "id": "quilt-1.21.1",
+      "kind": "loader",
+      "minecraftVersion": "1.21.1",
+      "loader": "quilt",
+      "targetPackId": "java-quilt-1.21.1-r1",
+      "mappings": { "kind": "quilt", "version": "1.21.1+build.9" },
+      "artifactId": "quilt-loader",
+      "oracleId": "quilt-loader-1.21.1",
+      "features": ["quilt-loom"],
+      "files": {
+        "settings.gradle": "rootProject.name = 'quilt-1-21-1'\n",
+        "build.gradle": "plugins { id 'org.quiltmc.loom' version '1.15.1' }\n",
+        "gradle.properties": "minecraft_version=1.21.1\nquilt_loader=0.20.0-beta.9\nquilt_mappings=1.21.1+build.9\nqsl_version=10.0.0-alpha.5+1.21.1\n",
+        "src/main/java/example/Fixture.java": "package example; public final class Fixture {}\n"
+      }
+    },
+    {
+      "id": "quilt-26.3",
+      "kind": "loader",
+      "minecraftVersion": "26.3",
+      "loader": "quilt",
+      "targetPackId": "java-quilt-26.3-r1",
+      "mappings": { "kind": "none" },
+      "artifactId": "quilt-loader",
+      "oracleId": "quilt-loader-26.3",
+      "features": ["quilt-loom", "unobfuscated"],
+      "files": {
+        "settings.gradle": "rootProject.name = 'quilt-26-3'\n",
+        "build.gradle": "plugins { id 'org.quiltmc.loom' version '1.15.1' }\n",
+        "gradle.properties": "minecraft_version=26.3\nquilt_loader=0.20.0-beta.9\n",
+        "src/main/java/example/Fixture.java": "package example; public final class Fixture {}\n"
+      }
+    },
+    {
+      "id": "vanilla-1.21.1",
+      "kind": "vanilla",
+      "minecraftVersion": "1.21.1",
+      "loader": "vanilla",
+      "mappings": { "kind": "mojang", "version": "1.21.1" },
+      "artifactId": "vanilla-1.21.1",
+      "oracleId": "vanilla-item-1.21.1",
+      "features": ["obfuscated"],
+      "files": { "settings.gradle": "rootProject.name = 'vanilla-1-21-1'\n" }
+    },
+    {
+      "id": "vanilla-1.21.11",
+      "kind": "vanilla",
+      "minecraftVersion": "1.21.11",
+      "loader": "vanilla",
+      "mappings": { "kind": "mojang", "version": "1.21.11" },
+      "artifactId": "vanilla-1.21.11",
+      "oracleId": "vanilla-item-1.21.11",
+      "features": ["obfuscated"],
+      "files": { "settings.gradle": "rootProject.name = 'vanilla-1-21-11'\n" }
+    },
+    {
+      "id": "vanilla-26.1",
+      "kind": "vanilla",
+      "minecraftVersion": "26.1",
+      "loader": "vanilla",
+      "mappings": { "kind": "none" },
+      "artifactId": "vanilla-26.1",
+      "oracleId": "vanilla-item-26.1",
+      "features": ["unobfuscated"],
+      "files": { "settings.gradle": "rootProject.name = 'vanilla-26-1'\n" }
+    },
+    {
+      "id": "vanilla-26.3",
+      "kind": "vanilla",
+      "minecraftVersion": "26.3",
+      "loader": "vanilla",
+      "mappings": { "kind": "none" },
+      "artifactId": "vanilla-26.3",
+      "oracleId": "vanilla-item-26.3",
+      "features": ["unobfuscated"],
+      "files": { "settings.gradle": "rootProject.name = 'vanilla-26-3'\n" }
+    },
+    {
+      "id": "special-settings-catalog",
+      "kind": "special",
+      "extendsWorkspaceId": "fabric-1.21.1",
+      "minecraftVersion": "1.21.1",
+      "loader": "fabric",
+      "mappings": { "kind": "mojang", "version": "1.21.1" },
+      "artifactId": "fabric-loader",
+      "oracleId": "fabric-loader-1.21.1",
+      "features": ["settings.gradle", "version-catalog"],
+      "files": {
+        "settings.gradle": "pluginManagement { repositories { maven { url = uri('https://maven.fabricmc.net') } } }\nrootProject.name = 'settings-catalog'\n",
+        "gradle/libs.versions.toml": "[versions]\nminecraft = \"1.21.1\"\nfabric-loader = \"0.20.1\"\n[libraries]\nfabric-loader = { module = \"net.fabricmc:fabric-loader\", version.ref = \"fabric-loader\" }\n"
+      }
+    },
+    {
+      "id": "special-split-sources",
+      "kind": "special",
+      "extendsWorkspaceId": "fabric-1.21.1",
+      "minecraftVersion": "1.21.1",
+      "loader": "fabric",
+      "mappings": { "kind": "mojang", "version": "1.21.1" },
+      "artifactId": "fabric-loader",
+      "oracleId": "fabric-loader-1.21.1",
+      "features": ["split-sources"],
+      "files": {
+        "src/client/java/example/client/FixtureClient.java": "package example.client; public final class FixtureClient {}\n",
+        "src/client/resources/fabric.mod.json": "{}\n"
+      }
+    },
+    {
+      "id": "special-nested-fabric-api",
+      "kind": "special",
+      "extendsWorkspaceId": "fabric-1.21.1",
+      "minecraftVersion": "1.21.1",
+      "loader": "fabric",
+      "mappings": { "kind": "mojang", "version": "1.21.1" },
+      "artifactId": "fabric-api-1.21.1",
+      "oracleId": "nested-fabric-1.21.1",
+      "features": ["nested-fabric-api"],
+      "files": {}
+    },
+    {
+      "id": "special-neoforge-mdg-at",
+      "kind": "special",
+      "extendsWorkspaceId": "neoforge-1.21.1",
+      "minecraftVersion": "1.21.1",
+      "loader": "neoforge",
+      "mappings": { "kind": "parchment-layer", "version": "2024.11.17" },
+      "artifactId": "neoforge-1.21.1",
+      "oracleId": "neoforge-item-1.21.1",
+      "features": ["moddevgradle", "access-transformer"],
+      "files": {
+        "src/main/resources/META-INF/accesstransformer.cfg": "public net.minecraft.world.item.Item m_41410_()V\n"
+      }
+    },
+    {
+      "id": "special-forge-forgegradle-at",
+      "kind": "special",
+      "extendsWorkspaceId": "forge-1.21.1",
+      "minecraftVersion": "1.21.1",
+      "loader": "forge",
+      "mappings": { "kind": "mojang", "version": "1.21.1" },
+      "artifactId": "forge-1.21.1",
+      "oracleId": "forge-item-1.21.1",
+      "features": ["forgegradle", "access-transformer"],
+      "files": {
+        "src/main/resources/META-INF/accesstransformer.cfg": "public net.minecraft.world.item.Item m_41410_()V\n"
+      }
+    },
+    {
+      "id": "special-quilt-loom-aw",
+      "kind": "special",
+      "extendsWorkspaceId": "quilt-1.21.1",
+      "minecraftVersion": "1.21.1",
+      "loader": "quilt",
+      "mappings": { "kind": "quilt", "version": "1.21.1+build.9" },
+      "artifactId": "quilt-loader",
+      "oracleId": "quilt-aw-1.21.1",
+      "features": ["quilt-loom", "access-widener"],
+      "files": {
+        "src/main/resources/example.accesswidener": "accessWidener v1 named\n"
+      }
+    },
+    {
+      "id": "special-client-only",
+      "kind": "special",
+      "extendsWorkspaceId": "vanilla-26.3",
+      "minecraftVersion": "26.3",
+      "loader": "vanilla",
+      "mappings": { "kind": "none" },
+      "artifactId": "vanilla-26.3",
+      "oracleId": "client-only-26.3",
+      "features": ["client-only"],
+      "files": {
+        "src/client/java/example/client/OnlyClient.java": "package example.client; public final class OnlyClient {}\n"
+      }
+    },
+    {
+      "id": "special-namespace-mismatch",
+      "kind": "special",
+      "extendsWorkspaceId": "fabric-26.3",
+      "minecraftVersion": "26.3",
+      "loader": "fabric",
+      "mappings": { "kind": "none" },
+      "artifactId": "fabric-api-26.3",
+      "features": ["namespace-mismatch"],
+      "className": "voxellume.fixture.NamespaceMismatch",
+      "files": {
+        "src/main/java/example/WrongNamespace.java": "package example; public final class WrongNamespace {}\n"
+      }
+    }
+  ],
+  "cases": [
+    {
+      "id": "fabric-1.21.1-routing",
+      "category": "routing",
+      "workspaceId": "fabric-1.21.1",
+      "operation": "resolve_artifact",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "fabric-1.21.1-symbol",
+      "category": "symbol",
+      "workspaceId": "fabric-1.21.1",
+      "operation": "find_class",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "fabric-1.21.1-members",
+      "category": "members",
+      "workspaceId": "fabric-1.21.1",
+      "operation": "get_members",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "fabric-1.21.1-mapping",
+      "category": "mapping",
+      "workspaceId": "fabric-1.21.1",
+      "operation": "map_symbol",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "fabric-1.21.1-source",
+      "category": "source",
+      "workspaceId": "fabric-1.21.1",
+      "operation": "read_source",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "fabric-1.21.1-search",
+      "category": "search",
+      "workspaceId": "fabric-1.21.1",
+      "operation": "search_source",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "fabric-1.21.1-diff",
+      "category": "diff",
+      "workspaceId": "fabric-1.21.1",
+      "operation": "diff_classes",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "fabric-26.3-routing",
+      "category": "routing",
+      "workspaceId": "fabric-26.3",
+      "operation": "resolve_artifact",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "fabric-26.3-symbol",
+      "category": "symbol",
+      "workspaceId": "fabric-26.3",
+      "operation": "find_class",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "fabric-26.3-members",
+      "category": "members",
+      "workspaceId": "fabric-26.3",
+      "operation": "get_members",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "fabric-26.3-mapping",
+      "category": "mapping",
+      "workspaceId": "fabric-26.3",
+      "operation": "map_symbol",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "fabric-26.3-source",
+      "category": "source",
+      "workspaceId": "fabric-26.3",
+      "operation": "read_source",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "fabric-26.3-search",
+      "category": "search",
+      "workspaceId": "fabric-26.3",
+      "operation": "search_source",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "fabric-26.3-diff",
+      "category": "diff",
+      "workspaceId": "fabric-26.3",
+      "operation": "diff_classes",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "neoforge-1.21.1-routing",
+      "category": "routing",
+      "workspaceId": "neoforge-1.21.1",
+      "operation": "resolve_artifact",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "neoforge-1.21.1-symbol",
+      "category": "symbol",
+      "workspaceId": "neoforge-1.21.1",
+      "operation": "find_class",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "neoforge-1.21.1-members",
+      "category": "members",
+      "workspaceId": "neoforge-1.21.1",
+      "operation": "get_members",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "neoforge-1.21.1-mapping",
+      "category": "mapping",
+      "workspaceId": "neoforge-1.21.1",
+      "operation": "map_symbol",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "neoforge-1.21.1-source",
+      "category": "source",
+      "workspaceId": "neoforge-1.21.1",
+      "operation": "read_source",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "neoforge-1.21.1-search",
+      "category": "search",
+      "workspaceId": "neoforge-1.21.1",
+      "operation": "search_source",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "neoforge-1.21.1-diff",
+      "category": "diff",
+      "workspaceId": "neoforge-1.21.1",
+      "operation": "diff_classes",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "neoforge-26.3-routing",
+      "category": "routing",
+      "workspaceId": "neoforge-26.3",
+      "operation": "resolve_artifact",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "neoforge-26.3-symbol",
+      "category": "symbol",
+      "workspaceId": "neoforge-26.3",
+      "operation": "find_class",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "neoforge-26.3-members",
+      "category": "members",
+      "workspaceId": "neoforge-26.3",
+      "operation": "get_members",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "neoforge-26.3-mapping",
+      "category": "mapping",
+      "workspaceId": "neoforge-26.3",
+      "operation": "map_symbol",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "neoforge-26.3-source",
+      "category": "source",
+      "workspaceId": "neoforge-26.3",
+      "operation": "read_source",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "neoforge-26.3-search",
+      "category": "search",
+      "workspaceId": "neoforge-26.3",
+      "operation": "search_source",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "neoforge-26.3-diff",
+      "category": "diff",
+      "workspaceId": "neoforge-26.3",
+      "operation": "diff_classes",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "forge-1.21.1-routing",
+      "category": "routing",
+      "workspaceId": "forge-1.21.1",
+      "operation": "resolve_artifact",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "forge-1.21.1-symbol",
+      "category": "symbol",
+      "workspaceId": "forge-1.21.1",
+      "operation": "find_class",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "forge-1.21.1-members",
+      "category": "members",
+      "workspaceId": "forge-1.21.1",
+      "operation": "get_members",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "forge-1.21.1-mapping",
+      "category": "mapping",
+      "workspaceId": "forge-1.21.1",
+      "operation": "map_symbol",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "forge-1.21.1-source",
+      "category": "source",
+      "workspaceId": "forge-1.21.1",
+      "operation": "read_source",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "forge-1.21.1-search",
+      "category": "search",
+      "workspaceId": "forge-1.21.1",
+      "operation": "search_source",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "forge-1.21.1-diff",
+      "category": "diff",
+      "workspaceId": "forge-1.21.1",
+      "operation": "diff_classes",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "forge-26.3-routing",
+      "category": "routing",
+      "workspaceId": "forge-26.3",
+      "operation": "resolve_artifact",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "forge-26.3-symbol",
+      "category": "symbol",
+      "workspaceId": "forge-26.3",
+      "operation": "find_class",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "forge-26.3-members",
+      "category": "members",
+      "workspaceId": "forge-26.3",
+      "operation": "get_members",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "forge-26.3-mapping",
+      "category": "mapping",
+      "workspaceId": "forge-26.3",
+      "operation": "map_symbol",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "forge-26.3-source",
+      "category": "source",
+      "workspaceId": "forge-26.3",
+      "operation": "read_source",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "forge-26.3-search",
+      "category": "search",
+      "workspaceId": "forge-26.3",
+      "operation": "search_source",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "forge-26.3-diff",
+      "category": "diff",
+      "workspaceId": "forge-26.3",
+      "operation": "diff_classes",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "quilt-1.21.1-routing",
+      "category": "routing",
+      "workspaceId": "quilt-1.21.1",
+      "operation": "resolve_artifact",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "quilt-1.21.1-symbol",
+      "category": "symbol",
+      "workspaceId": "quilt-1.21.1",
+      "operation": "find_class",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "quilt-1.21.1-members",
+      "category": "members",
+      "workspaceId": "quilt-1.21.1",
+      "operation": "get_members",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "quilt-1.21.1-mapping",
+      "category": "mapping",
+      "workspaceId": "quilt-1.21.1",
+      "operation": "map_symbol",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "quilt-1.21.1-source",
+      "category": "source",
+      "workspaceId": "quilt-1.21.1",
+      "operation": "read_source",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "quilt-1.21.1-search",
+      "category": "search",
+      "workspaceId": "quilt-1.21.1",
+      "operation": "search_source",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "quilt-1.21.1-diff",
+      "category": "diff",
+      "workspaceId": "quilt-1.21.1",
+      "operation": "diff_classes",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "quilt-26.3-routing",
+      "category": "routing",
+      "workspaceId": "quilt-26.3",
+      "operation": "resolve_artifact",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "quilt-26.3-symbol",
+      "category": "symbol",
+      "workspaceId": "quilt-26.3",
+      "operation": "find_class",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "quilt-26.3-members",
+      "category": "members",
+      "workspaceId": "quilt-26.3",
+      "operation": "get_members",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "quilt-26.3-mapping",
+      "category": "mapping",
+      "workspaceId": "quilt-26.3",
+      "operation": "map_symbol",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "quilt-26.3-source",
+      "category": "source",
+      "workspaceId": "quilt-26.3",
+      "operation": "read_source",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "quilt-26.3-search",
+      "category": "search",
+      "workspaceId": "quilt-26.3",
+      "operation": "search_source",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "quilt-26.3-diff",
+      "category": "diff",
+      "workspaceId": "quilt-26.3",
+      "operation": "diff_classes",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "vanilla-1.21.1",
+      "category": "vanilla",
+      "workspaceId": "vanilla-1.21.1",
+      "operations": [
+        "resolve_artifact",
+        "find_class",
+        "get_members",
+        "map_symbol",
+        "read_source",
+        "search_source",
+        "diff_classes"
+      ],
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "vanilla-1.21.11",
+      "category": "vanilla",
+      "workspaceId": "vanilla-1.21.11",
+      "operations": [
+        "resolve_artifact",
+        "find_class",
+        "get_members",
+        "map_symbol",
+        "read_source",
+        "search_source",
+        "diff_classes"
+      ],
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "vanilla-26.1",
+      "category": "vanilla",
+      "workspaceId": "vanilla-26.1",
+      "operations": [
+        "resolve_artifact",
+        "find_class",
+        "get_members",
+        "map_symbol",
+        "read_source",
+        "search_source",
+        "diff_classes"
+      ],
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "vanilla-26.3",
+      "category": "vanilla",
+      "workspaceId": "vanilla-26.3",
+      "operations": [
+        "resolve_artifact",
+        "find_class",
+        "get_members",
+        "map_symbol",
+        "read_source",
+        "search_source",
+        "diff_classes"
+      ],
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "special-settings-version-catalog",
+      "category": "special",
+      "workspaceId": "special-settings-catalog",
+      "operation": "resolve_artifact",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "special-split-sources",
+      "category": "special",
+      "workspaceId": "special-split-sources",
+      "operation": "find_class",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "special-nested-fabric-api",
+      "category": "special",
+      "workspaceId": "special-nested-fabric-api",
+      "operation": "get_members",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "special-neoforge-mdg-at",
+      "category": "special",
+      "workspaceId": "special-neoforge-mdg-at",
+      "operation": "find_class",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "special-forge-forgegradle-at",
+      "category": "special",
+      "workspaceId": "special-forge-forgegradle-at",
+      "operation": "find_class",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "special-quilt-loom-aw",
+      "category": "special",
+      "workspaceId": "special-quilt-loom-aw",
+      "operation": "get_members",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "special-client-only",
+      "category": "special",
+      "workspaceId": "special-client-only",
+      "operation": "get_members",
+      "expected": { "status": "ok" }
+    },
+    {
+      "id": "special-namespace-mismatch",
+      "category": "special",
+      "workspaceId": "special-namespace-mismatch",
+      "operation": "find_class",
+      "expected": { "status": "not_found", "code": "not_found" }
+    }
+  ]
+}

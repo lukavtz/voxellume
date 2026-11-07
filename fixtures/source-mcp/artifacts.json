@@ -1,0 +1,704 @@
+{
+  "schemaVersion": "source-mcp-artifacts-1.0.0",
+  "cache": {
+    "rootEnv": "VOXELLUME_SOURCE_MCP_CACHE",
+    "defaultRoot": ".artifacts/source-mcp/artifacts",
+    "maximumDownloadBytes": 536870912
+  },
+  "oracleTools": {
+    "javap": {
+      "executable": "javap",
+      "arguments": ["-p", "-s"]
+    },
+    "vineflower": {
+      "artifactId": "vineflower-1.11.1",
+      "version": "1.11.1",
+      "arguments": ["--silent"]
+    }
+  },
+  "artifacts": [
+    {
+      "id": "vanilla-1.21.1",
+      "path": "vanilla-1.21.1.jar",
+      "coordinates": "net.minecraft:client",
+      "version": "1.21.1",
+      "sha256": "499f6897d1837516680f3114072d8106e11c9adcd933fe5cf051b551089b0c99",
+      "url": "https://piston-data.mojang.com/v1/objects/30c73b1c5da787909b2f73340419fdf13b9def88/client.jar"
+    },
+    {
+      "id": "vanilla-1.21.11",
+      "path": "vanilla-1.21.11.jar",
+      "coordinates": "net.minecraft:client",
+      "version": "1.21.11",
+      "sha256": "1473c9489ac50fda3c435049a76a70d61a10b8610db27f5ba9d8756b686cd3bd",
+      "url": "https://piston-data.mojang.com/v1/objects/ba2df812c2d12e0219c489c4cd9a5e1f0760f5bd/client.jar"
+    },
+    {
+      "id": "vanilla-26.1",
+      "path": "vanilla-26.1.jar",
+      "coordinates": "net.minecraft:client",
+      "version": "26.1",
+      "sha256": "bc6194c61566b587f196090d730698f2191170f7580adb143e4ff839939d3840",
+      "url": "https://piston-data.mojang.com/v1/objects/191771837687b766537a8c4607cb6fad79c533a1/client.jar"
+    },
+    {
+      "id": "vanilla-26.3",
+      "path": "vanilla-26.3.jar",
+      "coordinates": "net.minecraft:client",
+      "version": "26.3",
+      "sha256": "4508d006323f24fa02876310c192d739af56516eb259000ac50f0909a68c9a2d",
+      "url": "https://piston-data.mojang.com/v1/objects/e877b6a07acd633fb3bb475002175cec036e7b87/client.jar"
+    },
+    {
+      "id": "fabric-loader",
+      "path": "fabric-loader-0.20.1.jar",
+      "coordinates": "net.fabricmc:fabric-loader",
+      "version": "0.20.1",
+      "sha256": "d0c5a082e07410aaff9de7ab196aa6b4236002870f9ba3ad5c1260fcce5110ad",
+      "url": "https://maven.fabricmc.net/net/fabricmc/fabric-loader/0.20.1/fabric-loader-0.20.1.jar"
+    },
+    {
+      "id": "fabric-api-1.21.1",
+      "path": "fabric-api-0.116.17+1.21.1.jar",
+      "coordinates": "net.fabricmc.fabric-api:fabric-api",
+      "version": "0.116.17+1.21.1",
+      "sha256": "79ac44b40780acbd884b34c50be1e39af682847e5f5cb3b1fddeeaa768dce800",
+      "url": "https://maven.fabricmc.net/net/fabricmc/fabric-api/fabric-api/0.116.17%2B1.21.1/fabric-api-0.116.17%2B1.21.1.jar"
+    },
+    {
+      "id": "fabric-api-26.3",
+      "path": "fabric-api-0.165.0+26.3.jar",
+      "coordinates": "net.fabricmc.fabric-api:fabric-api",
+      "version": "0.165.0+26.3",
+      "sha256": "18442e2ad466d6ef41c37dbb4cb68495e6ca6658b1f1ee9be76143d155ef2c88",
+      "url": "https://maven.fabricmc.net/net/fabricmc/fabric-api/fabric-api/0.165.0%2B26.3/fabric-api-0.165.0%2B26.3.jar"
+    },
+    {
+      "id": "neoforge-1.21.1",
+      "path": "neoforge-21.1.265-universal.jar",
+      "coordinates": "net.neoforged:neoforge:universal",
+      "version": "21.1.265",
+      "sha256": "c12cf1a6cb0aa7792b13174b06088a4f54d8bcc92f6a32fcb03310b456936847",
+      "url": "https://maven.neoforged.net/releases/net/neoforged/neoforge/21.1.265/neoforge-21.1.265-universal.jar"
+    },
+    {
+      "id": "neoforge-26.3",
+      "path": "neoforge-26.3.0.101-universal.jar",
+      "coordinates": "net.neoforged:neoforge:universal",
+      "version": "26.3.0.101",
+      "sha256": "bc8904db92ad31f721a5cb7a20cd2565deccb66809fd04e8169a7d5a43bbcbf8",
+      "url": "https://maven.neoforged.net/releases/net/neoforged/neoforge/26.3.0.101/neoforge-26.3.0.101-universal.jar"
+    },
+    {
+      "id": "forge-1.21.1",
+      "path": "forge-1.21.1-52.1.20-installer.jar",
+      "coordinates": "net.minecraftforge:forge:installer",
+      "version": "1.21.1-52.1.20",
+      "sha256": "6b83521a70aaf5371af8c4c9f97d930d51ec4266ac6ec3bc975182fba2ef9f62",
+      "url": "https://maven.minecraftforge.net/net/minecraftforge/forge/1.21.1-52.1.20/forge-1.21.1-52.1.20-installer.jar"
+    },
+    {
+      "id": "forge-26.3",
+      "path": "forge-26.3-66.1.0-installer.jar",
+      "coordinates": "net.minecraftforge:forge:installer",
+      "version": "26.3-66.1.0",
+      "sha256": "31b5d7272b97771b586f3bcad3b0ceab40b03117ef437f23ccc8afe11c462b4e",
+      "url": "https://maven.minecraftforge.net/net/minecraftforge/forge/26.3-66.1.0/forge-26.3-66.1.0-installer.jar"
+    },
+    {
+      "id": "quilt-loader",
+      "path": "quilt-loader-0.20.0-beta.9.jar",
+      "coordinates": "org.quiltmc:quilt-loader",
+      "version": "0.20.0-beta.9",
+      "sha256": "a475689ac9a5b9718c045972bb0f41381ce22315a87273a99f30ec1fa3aacb8a",
+      "url": "https://maven.quiltmc.org/repository/release/org/quiltmc/quilt-loader/0.20.0-beta.9/quilt-loader-0.20.0-beta.9.jar"
+    },
+    {
+      "id": "mojang-1.21.1",
+      "path": "mojang-client-1.21.1.txt",
+      "coordinates": "net.minecraft:client:mappings@txt",
+      "version": "1.21.1",
+      "sha256": "140c47931cccc8fc9e4c22d7603e2d714d1a953a146f51ea7397d95c955536ec",
+      "url": "https://piston-data.mojang.com/v1/objects/2244b6f072256667bcd9a73df124d6c58de77992/client.txt"
+    },
+    {
+      "id": "mojang-1.21.11",
+      "path": "mojang-client-1.21.11.txt",
+      "coordinates": "net.minecraft:client:mappings@txt",
+      "version": "1.21.11",
+      "sha256": "517799a8485e107e932dc1bd27c002b2d0b9207eb2396b685bcfe6c3321a9fbd",
+      "url": "https://piston-data.mojang.com/v1/objects/031a68bebf55d824f66d6573d8c752f0e1bf232a/client.txt"
+    },
+    {
+      "id": "parchment-1.21.1",
+      "path": "parchment-1.21.1-2024.11.17.zip",
+      "coordinates": "org.parchmentmc.data:parchment-1.21.1@zip",
+      "version": "2024.11.17",
+      "sha256": "7c240a37ab432213033b1113d75cb80dc22bffa631d979818b2da1585fa24a08",
+      "url": "https://ldtteam.jfrog.io/artifactory/parchmentmc-public/org/parchmentmc/data/parchment-1.21.1/2024.11.17/parchment-1.21.1-2024.11.17.zip"
+    },
+    {
+      "id": "quilt-mappings-1.21.1",
+      "path": "quilt-mappings-1.21.1+build.9-intermediary-v2.jar",
+      "coordinates": "org.quiltmc:quilt-mappings:intermediary-v2",
+      "version": "1.21.1+build.9",
+      "sha256": "e445b1d48d016ac7302a294bf88ee158644bac941958ec7dac4aadf0db7b9c3a",
+      "url": "https://maven.quiltmc.org/repository/release/org/quiltmc/quilt-mappings/1.21.1+build.9/quilt-mappings-1.21.1+build.9-intermediary-v2.jar"
+    },
+    {
+      "id": "qsl-1.21.1",
+      "path": "qsl-10.0.0-alpha.5+1.21.1.pom",
+      "coordinates": "org.quiltmc:qsl@pom",
+      "version": "10.0.0-alpha.5+1.21.1",
+      "sha256": "2836796932b4c3e01e063fa5fc5a6509395df06a2949bb63212e7c502dc8bb8e",
+      "url": "https://maven.quiltmc.org/repository/release/org/quiltmc/qsl/10.0.0-alpha.5+1.21.1/qsl-10.0.0-alpha.5+1.21.1.pom"
+    },
+    {
+      "id": "vineflower-1.11.1",
+      "path": "vineflower-1.11.1.jar",
+      "coordinates": "org.vineflower:vineflower",
+      "version": "1.11.1",
+      "sha256": "a615d07ddbbcd489369674f40e42df639c32be95410890b38f173d5c1e2ea39c",
+      "url": "https://repo1.maven.org/maven2/org/vineflower/vineflower/1.11.1/vineflower-1.11.1.jar"
+    },
+    {
+      "id": "tiny-remapper-0.10.3",
+      "path": "tiny-remapper-0.10.3-fat.jar",
+      "coordinates": "net.fabricmc:tiny-remapper",
+      "version": "0.10.3",
+      "sha256": "95cd1d91d13535d9a8fddfe81d07f19246ab7589fd39e55227441f8475a6713c",
+      "url": "https://maven.fabricmc.net/net/fabricmc/tiny-remapper/0.10.3/tiny-remapper-0.10.3-fat.jar"
+    }
+  ],
+  "oracles": {
+    "fabric-loader-1.21.1": {
+      "className": "net.fabricmc.loader.impl.FabricLoaderImpl",
+      "binaryName": "net.fabricmc.loader.impl.FabricLoaderImpl",
+      "oracleArtifactId": "fabric-loader",
+      "member": {
+        "name": "freeze",
+        "descriptor": "()V",
+        "binaryName": "freeze",
+        "binaryDescriptor": "()V"
+      },
+      "sourceSnippet": "public final class FabricLoaderImpl extends FabricLoader {",
+      "search": {
+        "query": "Already frozen!",
+        "line": 86,
+        "text": "throw new IllegalStateException(\"Already frozen!\");"
+      },
+      "mapping": {
+        "from": "net.minecraft.world.item.Item",
+        "to": "cul",
+        "kind": "mojang",
+        "artifactId": "mojang-1.21.1"
+      },
+      "diff": {
+        "leftArtifactId": "fabric-loader",
+        "rightArtifactId": "fabric-loader",
+        "className": "net.fabricmc.loader.impl.FabricLoaderImpl",
+        "leftBinaryName": "net.fabricmc.loader.impl.FabricLoaderImpl",
+        "rightBinaryName": "net.fabricmc.loader.impl.FabricLoaderImpl",
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    },
+    "fabric-loader-26.3": {
+      "className": "net.fabricmc.loader.impl.FabricLoaderImpl",
+      "binaryName": "net.fabricmc.loader.impl.FabricLoaderImpl",
+      "oracleArtifactId": "fabric-loader",
+      "member": {
+        "name": "freeze",
+        "descriptor": "()V",
+        "binaryName": "freeze",
+        "binaryDescriptor": "()V"
+      },
+      "sourceSnippet": "public final class FabricLoaderImpl extends FabricLoader {",
+      "search": {
+        "query": "Already frozen!",
+        "line": 86,
+        "text": "throw new IllegalStateException(\"Already frozen!\");"
+      },
+      "mapping": {
+        "from": "net.minecraft.world.item.Item",
+        "to": "net.minecraft.world.item.Item",
+        "kind": "none"
+      },
+      "diff": {
+        "leftArtifactId": "fabric-loader",
+        "rightArtifactId": "fabric-loader",
+        "className": "net.fabricmc.loader.impl.FabricLoaderImpl",
+        "leftBinaryName": "net.fabricmc.loader.impl.FabricLoaderImpl",
+        "rightBinaryName": "net.fabricmc.loader.impl.FabricLoaderImpl",
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    },
+    "quilt-loader-1.21.1": {
+      "className": "org.quiltmc.loader.impl.QuiltLoaderImpl",
+      "binaryName": "org.quiltmc.loader.impl.QuiltLoaderImpl",
+      "oracleArtifactId": "quilt-loader",
+      "member": {
+        "name": "freeze",
+        "descriptor": "()V",
+        "binaryName": "freeze",
+        "binaryDescriptor": "()V"
+      },
+      "sourceSnippet": "public final class QuiltLoaderImpl {",
+      "search": {
+        "query": "Already frozen!",
+        "line": 152,
+        "text": "throw new IllegalStateException(\"Already frozen!\");"
+      },
+      "mapping": {
+        "from": "net.minecraft.world.item.Item",
+        "to": "net.minecraft.world.item.Item",
+        "kind": "quilt",
+        "artifactId": "quilt-mappings-1.21.1"
+      },
+      "diff": {
+        "leftArtifactId": "quilt-loader",
+        "rightArtifactId": "quilt-loader",
+        "className": "org.quiltmc.loader.impl.QuiltLoaderImpl",
+        "leftBinaryName": "org.quiltmc.loader.impl.QuiltLoaderImpl",
+        "rightBinaryName": "org.quiltmc.loader.impl.QuiltLoaderImpl",
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    },
+    "quilt-loader-26.3": {
+      "className": "org.quiltmc.loader.impl.QuiltLoaderImpl",
+      "binaryName": "org.quiltmc.loader.impl.QuiltLoaderImpl",
+      "oracleArtifactId": "quilt-loader",
+      "member": {
+        "name": "freeze",
+        "descriptor": "()V",
+        "binaryName": "freeze",
+        "binaryDescriptor": "()V"
+      },
+      "sourceSnippet": "public final class QuiltLoaderImpl {",
+      "search": {
+        "query": "Already frozen!",
+        "line": 152,
+        "text": "throw new IllegalStateException(\"Already frozen!\");"
+      },
+      "mapping": {
+        "from": "net.minecraft.world.item.Item",
+        "to": "net.minecraft.world.item.Item",
+        "kind": "none"
+      },
+      "diff": {
+        "leftArtifactId": "quilt-loader",
+        "rightArtifactId": "quilt-loader",
+        "className": "org.quiltmc.loader.impl.QuiltLoaderImpl",
+        "leftBinaryName": "org.quiltmc.loader.impl.QuiltLoaderImpl",
+        "rightBinaryName": "org.quiltmc.loader.impl.QuiltLoaderImpl",
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    },
+    "neoforge-item-1.21.1": {
+      "className": "net.minecraft.world.item.Item",
+      "binaryName": "cul",
+      "oracleArtifactId": "vanilla-1.21.1",
+      "patchedFromVanilla": true,
+      "member": {
+        "name": "getDefaultInstance",
+        "descriptor": "()Lnet/minecraft/world/item/ItemStack;",
+        "binaryName": "w",
+        "binaryDescriptor": "()Lcuq;"
+      },
+      "binarySourceSnippet": "public cuq w() {\n      return new cuq(this);\n   }",
+      "sourceSnippet": "public ItemStack getDefaultInstance() {\n      return new ItemStack(this);\n   }",
+      "search": {
+        "query": "return new ItemStack(this);",
+        "line": 270,
+        "text": "return new cuq(this);",
+        "mappedText": "return new ItemStack(this);"
+      },
+      "mapping": {
+        "from": "net.minecraft.world.item.Item",
+        "to": "net.minecraft.world.item.Item",
+        "kind": "parchment-layer",
+        "artifactId": "parchment-1.21.1"
+      },
+      "diff": {
+        "leftArtifactId": "neoforge-1.21.1",
+        "rightArtifactId": "neoforge-26.3",
+        "className": "net.neoforged.neoforge.common.NeoForge",
+        "leftBinaryName": "net.neoforged.neoforge.common.NeoForge",
+        "rightBinaryName": "net.neoforged.neoforge.common.NeoForge",
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    },
+    "neoforge-item-26.3": {
+      "className": "net.minecraft.world.item.Item",
+      "binaryName": "net.minecraft.world.item.Item",
+      "oracleArtifactId": "vanilla-26.3",
+      "patchedFromVanilla": true,
+      "member": {
+        "name": "getDefaultInstance",
+        "descriptor": "()Lnet/minecraft/world/item/ItemStack;",
+        "binaryName": "getDefaultInstance",
+        "binaryDescriptor": "()Lnet/minecraft/world/item/ItemStack;"
+      },
+      "sourceSnippet": "public ItemStack getDefaultInstance() {\n      return new ItemStack(this);\n   }",
+      "search": {
+        "query": "return new ItemStack(this);",
+        "line": 322,
+        "text": "return new ItemStack(this);"
+      },
+      "mapping": {
+        "from": "net.minecraft.world.item.Item",
+        "to": "net.minecraft.world.item.Item",
+        "kind": "none"
+      },
+      "diff": {
+        "leftArtifactId": "neoforge-1.21.1",
+        "rightArtifactId": "neoforge-26.3",
+        "className": "net.neoforged.neoforge.common.NeoForge",
+        "leftBinaryName": "net.neoforged.neoforge.common.NeoForge",
+        "rightBinaryName": "net.neoforged.neoforge.common.NeoForge",
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    },
+    "forge-item-1.21.1": {
+      "className": "net.minecraft.world.item.Item",
+      "binaryName": "cul",
+      "oracleArtifactId": "vanilla-1.21.1",
+      "patchedFromVanilla": true,
+      "member": {
+        "name": "getDefaultInstance",
+        "descriptor": "()Lnet/minecraft/world/item/ItemStack;",
+        "binaryName": "w",
+        "binaryDescriptor": "()Lcuq;"
+      },
+      "binarySourceSnippet": "public cuq w() {\n      return new cuq(this);\n   }",
+      "sourceSnippet": "public ItemStack getDefaultInstance() {\n      return new ItemStack(this);\n   }",
+      "search": {
+        "query": "return new ItemStack(this);",
+        "line": 270,
+        "text": "return new cuq(this);",
+        "mappedText": "return new ItemStack(this);"
+      },
+      "mapping": {
+        "from": "net.minecraft.world.item.Item",
+        "to": "cul",
+        "kind": "mojang",
+        "artifactId": "mojang-1.21.1"
+      },
+      "diff": {
+        "leftArtifactId": "forge-1.21.1",
+        "rightArtifactId": "forge-26.3",
+        "className": "net.minecraftforge.installer.SimpleInstaller",
+        "leftBinaryName": "net.minecraftforge.installer.SimpleInstaller",
+        "rightBinaryName": "net.minecraftforge.installer.SimpleInstaller",
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    },
+    "forge-item-26.3": {
+      "className": "net.minecraft.world.item.Item",
+      "binaryName": "net.minecraft.world.item.Item",
+      "oracleArtifactId": "vanilla-26.3",
+      "patchedFromVanilla": true,
+      "member": {
+        "name": "getDefaultInstance",
+        "descriptor": "()Lnet/minecraft/world/item/ItemStack;",
+        "binaryName": "getDefaultInstance",
+        "binaryDescriptor": "()Lnet/minecraft/world/item/ItemStack;"
+      },
+      "sourceSnippet": "public ItemStack getDefaultInstance() {\n      return new ItemStack(this);\n   }",
+      "search": {
+        "query": "return new ItemStack(this);",
+        "line": 322,
+        "text": "return new ItemStack(this);"
+      },
+      "mapping": {
+        "from": "net.minecraft.world.item.Item",
+        "to": "net.minecraft.world.item.Item",
+        "kind": "none"
+      },
+      "diff": {
+        "leftArtifactId": "forge-1.21.1",
+        "rightArtifactId": "forge-26.3",
+        "className": "net.minecraftforge.installer.SimpleInstaller",
+        "leftBinaryName": "net.minecraftforge.installer.SimpleInstaller",
+        "rightBinaryName": "net.minecraftforge.installer.SimpleInstaller",
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    },
+    "vanilla-item-1.21.1": {
+      "className": "net.minecraft.world.item.Item",
+      "binaryName": "cul",
+      "oracleArtifactId": "vanilla-1.21.1",
+      "member": {
+        "name": "getDefaultInstance",
+        "descriptor": "()Lnet/minecraft/world/item/ItemStack;",
+        "binaryName": "w",
+        "binaryDescriptor": "()Lcuq;"
+      },
+      "binarySourceSnippet": "public cuq w() {\n      return new cuq(this);\n   }",
+      "sourceSnippet": "public ItemStack getDefaultInstance() {\n      return new ItemStack(this);\n   }",
+      "search": {
+        "query": "return new ItemStack(this);",
+        "line": 270,
+        "text": "return new cuq(this);",
+        "mappedText": "return new ItemStack(this);"
+      },
+      "mapping": {
+        "from": "net.minecraft.world.item.Item",
+        "to": "cul",
+        "kind": "mojang",
+        "artifactId": "mojang-1.21.1"
+      },
+      "diff": {
+        "leftArtifactId": "vanilla-1.21.1",
+        "rightArtifactId": "vanilla-1.21.1",
+        "className": "net.minecraft.world.item.Item",
+        "leftBinaryName": "cul",
+        "rightBinaryName": "cul",
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    },
+    "vanilla-item-1.21.11": {
+      "className": "net.minecraft.world.item.Item",
+      "binaryName": "dlp",
+      "oracleArtifactId": "vanilla-1.21.11",
+      "member": {
+        "name": "getDefaultInstance",
+        "descriptor": "()Lnet/minecraft/world/item/ItemStack;",
+        "binaryName": "m",
+        "binaryDescriptor": "()Ldlt;"
+      },
+      "binarySourceSnippet": "public dlt m() {\n      return new dlt(this);\n   }",
+      "sourceSnippet": "public ItemStack getDefaultInstance() {\n      return new ItemStack(this);\n   }",
+      "search": {
+        "query": "return new ItemStack(this);",
+        "line": 267,
+        "text": "return new dlt(this);",
+        "mappedText": "return new ItemStack(this);"
+      },
+      "mapping": {
+        "from": "net.minecraft.world.item.Item",
+        "to": "dlp",
+        "kind": "mojang",
+        "artifactId": "mojang-1.21.11"
+      },
+      "diff": {
+        "leftArtifactId": "vanilla-1.21.11",
+        "rightArtifactId": "vanilla-1.21.11",
+        "className": "net.minecraft.world.item.Item",
+        "leftBinaryName": "dlp",
+        "rightBinaryName": "dlp",
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    },
+    "vanilla-item-26.1": {
+      "className": "net.minecraft.world.item.Item",
+      "binaryName": "net.minecraft.world.item.Item",
+      "oracleArtifactId": "vanilla-26.1",
+      "member": {
+        "name": "getDefaultInstance",
+        "descriptor": "()Lnet/minecraft/world/item/ItemStack;",
+        "binaryName": "getDefaultInstance",
+        "binaryDescriptor": "()Lnet/minecraft/world/item/ItemStack;"
+      },
+      "sourceSnippet": "public ItemStack getDefaultInstance() {\n      return new ItemStack(this);\n   }",
+      "search": {
+        "query": "return new ItemStack(this);",
+        "line": 319,
+        "text": "return new ItemStack(this);"
+      },
+      "mapping": {
+        "from": "net.minecraft.world.item.Item",
+        "to": "net.minecraft.world.item.Item",
+        "kind": "none"
+      },
+      "diff": {
+        "leftArtifactId": "vanilla-26.1",
+        "rightArtifactId": "vanilla-26.1",
+        "className": "net.minecraft.world.item.Item",
+        "leftBinaryName": "net.minecraft.world.item.Item",
+        "rightBinaryName": "net.minecraft.world.item.Item",
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    },
+    "vanilla-item-26.3": {
+      "className": "net.minecraft.world.item.Item",
+      "binaryName": "net.minecraft.world.item.Item",
+      "oracleArtifactId": "vanilla-26.3",
+      "member": {
+        "name": "getDefaultInstance",
+        "descriptor": "()Lnet/minecraft/world/item/ItemStack;",
+        "binaryName": "getDefaultInstance",
+        "binaryDescriptor": "()Lnet/minecraft/world/item/ItemStack;"
+      },
+      "sourceSnippet": "public ItemStack getDefaultInstance() {\n      return new ItemStack(this);\n   }",
+      "search": {
+        "query": "return new ItemStack(this);",
+        "line": 322,
+        "text": "return new ItemStack(this);"
+      },
+      "mapping": {
+        "from": "net.minecraft.world.item.Item",
+        "to": "net.minecraft.world.item.Item",
+        "kind": "none"
+      },
+      "diff": {
+        "leftArtifactId": "vanilla-26.3",
+        "rightArtifactId": "vanilla-26.3",
+        "className": "net.minecraft.world.item.Item",
+        "leftBinaryName": "net.minecraft.world.item.Item",
+        "rightBinaryName": "net.minecraft.world.item.Item",
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    },
+    "nested-fabric-1.21.1": {
+      "className": "net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents",
+      "binaryName": "net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents",
+      "oracleArtifactId": "fabric-api-1.21.1",
+      "nestedEntry": "META-INF/jars/fabric-lifecycle-events-v1-0.116.17.jar",
+      "nestedSha256": "ddf50877c45fbeb30374b6d63232bcb553de14a962495aef377303f9fa096d58",
+      "member": {
+        "name": "SERVER_STARTING",
+        "descriptor": "Lnet/fabricmc/fabric/api/event/Event;",
+        "binaryName": "SERVER_STARTING",
+        "binaryDescriptor": "Lnet/fabricmc/fabric/api/event/Event;"
+      },
+      "sourceSnippet": "public final class ServerLifecycleEvents {",
+      "search": {
+        "query": "SERVER_STARTING = EventFactory.createArrayBacked",
+        "line": 16,
+        "text": "public static final Event<ServerStarting> SERVER_STARTING = EventFactory.createArrayBacked(ServerStarting.class, callbacks -> server -> {"
+      },
+      "mapping": {
+        "from": "net.minecraft.world.item.Item",
+        "to": "cul",
+        "kind": "mojang",
+        "artifactId": "mojang-1.21.1"
+      },
+      "diff": {
+        "leftArtifactId": "fabric-api-1.21.1",
+        "rightArtifactId": "fabric-api-1.21.1",
+        "className": "net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents",
+        "leftBinaryName": "net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents",
+        "rightBinaryName": "net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents",
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    },
+    "quilt-aw-1.21.1": {
+      "className": "org.quiltmc.loader.impl.QuiltLoaderImpl",
+      "binaryName": "org.quiltmc.loader.impl.QuiltLoaderImpl",
+      "oracleArtifactId": "quilt-loader",
+      "member": {
+        "name": "loadAccessWideners",
+        "descriptor": "()V",
+        "binaryName": "loadAccessWideners",
+        "binaryDescriptor": "()V"
+      },
+      "sourceSnippet": "public final class QuiltLoaderImpl {",
+      "search": {
+        "query": "loadAccessWideners()",
+        "line": 1048,
+        "text": "public void loadAccessWideners() {"
+      },
+      "mapping": {
+        "from": "net.minecraft.world.item.Item",
+        "to": "net.minecraft.world.item.Item",
+        "kind": "quilt",
+        "artifactId": "quilt-mappings-1.21.1"
+      },
+      "diff": {
+        "leftArtifactId": "quilt-loader",
+        "rightArtifactId": "quilt-loader",
+        "className": "org.quiltmc.loader.impl.QuiltLoaderImpl",
+        "leftBinaryName": "org.quiltmc.loader.impl.QuiltLoaderImpl",
+        "rightBinaryName": "org.quiltmc.loader.impl.QuiltLoaderImpl",
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    },
+    "client-only-26.3": {
+      "className": "net.minecraft.client.Minecraft",
+      "binaryName": "net.minecraft.client.Minecraft",
+      "oracleArtifactId": "vanilla-26.3",
+      "member": {
+        "name": "getInstance",
+        "descriptor": "()Lnet/minecraft/client/Minecraft;",
+        "binaryName": "getInstance",
+        "binaryDescriptor": "()Lnet/minecraft/client/Minecraft;"
+      },
+      "sourceSnippet": "public static Minecraft getInstance() {\n      return instance;\n   }",
+      "search": {
+        "query": "return instance;",
+        "line": 2703,
+        "text": "return instance;"
+      },
+      "mapping": {
+        "from": "net.minecraft.world.item.Item",
+        "to": "net.minecraft.world.item.Item",
+        "kind": "none"
+      },
+      "diff": {
+        "leftArtifactId": "vanilla-26.3",
+        "rightArtifactId": "vanilla-26.3",
+        "className": "net.minecraft.client.Minecraft",
+        "leftBinaryName": "net.minecraft.client.Minecraft",
+        "rightBinaryName": "net.minecraft.client.Minecraft",
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    }
+  },
+  "maliciousArtifacts": [
+    {
+      "id": "malicious-traversal",
+      "kind": "traversal",
+      "expectedCode": "archive_traversal"
+    },
+    {
+      "id": "malicious-absolute",
+      "kind": "absolute",
+      "expectedCode": "archive_absolute_path"
+    },
+    {
+      "id": "malicious-nested-oversize",
+      "kind": "nested-oversize",
+      "expectedCode": "nested_entry_too_large"
+    },
+    {
+      "id": "malicious-entry-oversize",
+      "kind": "entry-oversize",
+      "expectedCode": "archive_entry_too_large"
+    },
+    {
+      "id": "malicious-wrong-hash",
+      "kind": "wrong-hash",
+      "expectedCode": "artifact_sha256_mismatch"
+    }
+  ]
+}
