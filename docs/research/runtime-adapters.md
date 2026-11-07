@@ -13,3 +13,9 @@ The facade allows only literal loopback endpoints, per-run secrets held outside 
 License notices are preserved in `THIRD_PARTY/`. The mcp-rogal pin switches `LICENSE` to MIT while its README, `fabric.mod.json`, and Modrinth metadata still say CC0; that contradiction is recorded for legal review and is not copied into generated artifacts. Arclight's short upstream `LICENSE` is preserved verbatim. ModLens additionally documents vendored ASM 9.9.1 under BSD-3-Clause.
 
 Source maps and non-claims were checked against `RUNTIME.md`, runtime hubs/protocols/request dispatch, client tool registries, screenshot implementations, and license files at the exact revisions above. Author-provided validation statements are not Voxellume runtime evidence.
+
+## Live pilot results
+
+### mcp-rogal Fabric 26.2
+
+Evidence: `/tmp/voxellume-runtime-research/rogal-live/evidence/fabric-26.2-java25` (`qualification.json`, `supply-chain.json`, `evidence-hashes.txt`, `live-world.png`). Launch, isolated-world creation/reload, text/Enter input, independent gold-block placement/readback, real 1708×960 OpenGL screenshot, and exact process/world cleanup passed. Request-scoped cancellation returned HTTP 202 but ran to completion; several mouse/button actions and the inventory key failed. The result is **failed qualification**, not `supported`: cancellation and full input coverage remain unproven. Only OpenGL was exercised; no Vulkan, production-JAR, dedicated-server, or modpack claim is made. The MIT/CC0 contradiction and floating Loom `1.17-SNAPSHOT` are preserved as limitations, not silently repaired.
