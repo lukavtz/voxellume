@@ -4,7 +4,7 @@
   "edition": "java",
   "status": "candidate",
   "revision": 1,
-  "packSha256": "6601ce251db42e01fdacfbab667cdfb2c6f4ee134cbc6cbc03b05d7bffd0915a",
+  "packSha256": "7cfdda9f79d88cb7316824f78dcf51be48d0b60adc725c6164aabdf5307f22b2",
   "minecraft": {
     "version": "1.21.2",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -65,7 +65,7 @@
   },
   "knownLimitations": [
     "Official template declares Parchment for 1.21.1, not 1.21.2; discovery does not substitute that layer for target mappings.",
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "Task discovery, clean builds, positive GameTests, negative control, and production JAR passed. Dedicated server, real client, pristine production runtime, and visual checks were not completed; no supported claim."
   ],
   "template": {
     "repository": "https://github.com/NeoForgeMDKs/MDK-1.21.2-ModDevGradle",

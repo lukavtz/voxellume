@@ -926,7 +926,7 @@
         ]
       },
       "minecraft": "1.21.2",
-      "qualificationStatus": "candidate_eligible",
+      "qualificationStatus": "partial",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/5941d98532ff0c7de72bd3f514d226d66977b7f0/1.21.2.json",
         "https://piston-data.mojang.com/v1/objects/7bf95409b0d9b5388bfea3704ec92012d273c14c/server.jar",
@@ -1009,7 +1009,7 @@
         "kind": "mojang"
       },
       "minecraft": "1.21.2",
-      "qualificationStatus": "candidate_eligible",
+      "qualificationStatus": "partial",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/5941d98532ff0c7de72bd3f514d226d66977b7f0/1.21.2.json",
         "https://piston-data.mojang.com/v1/objects/7bf95409b0d9b5388bfea3704ec92012d273c14c/server.jar",
@@ -1145,7 +1145,7 @@
         ]
       },
       "minecraft": "1.21.2",
-      "qualificationStatus": "candidate_eligible",
+      "qualificationStatus": "partial",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/5941d98532ff0c7de72bd3f514d226d66977b7f0/1.21.2.json",
         "https://piston-data.mojang.com/v1/objects/7bf95409b0d9b5388bfea3704ec92012d273c14c/server.jar",
@@ -6724,15 +6724,15 @@
   },
   "summary": {
     "fabric": {
-      "candidate_eligible": 14,
-      "partial": 3,
+      "candidate_eligible": 13,
+      "partial": 4,
       "rejected": 0,
       "supported": 0,
       "unsupported": 0
     },
     "neoforge": {
-      "candidate_eligible": 14,
-      "partial": 3,
+      "candidate_eligible": 13,
+      "partial": 4,
       "rejected": 0,
       "supported": 0,
       "unsupported": 0
@@ -6745,16 +6745,16 @@
       "unsupported": 1
     },
     "quilt": {
-      "candidate_eligible": 15,
-      "partial": 2,
+      "candidate_eligible": 14,
+      "partial": 3,
       "rejected": 0,
       "supported": 0,
       "unsupported": 0
     },
     "total": {
       "cells": 68,
-      "candidate_eligible": 56,
-      "partial": 8,
+      "candidate_eligible": 53,
+      "partial": 11,
       "rejected": 3,
       "supported": 0,
       "unsupported": 1

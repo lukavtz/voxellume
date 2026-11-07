@@ -27,8 +27,8 @@
       "qualificationEvidence": null
     },
     {
-      "id": "java-fabric-1.21.2-r1",
-      "packSha256": "b4224deee89dd96fc0fa2c3b31ac165849dcd070af72e06209962a45d50fef02",
+      "id": "java-fabric-1.21.2-r2",
+      "packSha256": "9e187551f73f4159ddb9b171a38b73993fc4cc6ead28f491394f6f2a850ac004",
       "qualificationEvidence": null
     },
     {
@@ -201,7 +201,7 @@
     },
     {
       "id": "java-neoforge-1.21.2-r1",
-      "packSha256": "6601ce251db42e01fdacfbab667cdfb2c6f4ee134cbc6cbc03b05d7bffd0915a",
+      "packSha256": "7cfdda9f79d88cb7316824f78dcf51be48d0b60adc725c6164aabdf5307f22b2",
       "qualificationEvidence": null
     },
     {
@@ -285,8 +285,8 @@
       "qualificationEvidence": null
     },
     {
-      "id": "java-quilt-1.21.2-r1",
-      "packSha256": "9a2c96643ab2a5025e880edd570d46e40df3d5307fbce69622210556de2ec9d4",
+      "id": "java-quilt-1.21.2-r2",
+      "packSha256": "a64de57531da085be367fff00112bd75ba13c04db1f807c15a8de1dd49277b3f",
       "qualificationEvidence": null
     },
     {
