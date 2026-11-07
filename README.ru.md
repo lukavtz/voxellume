@@ -54,12 +54,12 @@ minecraft_project_verify
 Требования: Node.js `>=24.9.0`, pnpm `12.18.0` и JDK выбранной цели. Проверки сборки и runtime в sandbox используют Docker.
 
 ```sh
-corepack pnpm install
-corepack pnpm build
-corepack pnpm pack
+git clone https://github.com/lukavtz/voxellume.git
+cd voxellume
+./install.sh
 ```
 
-Результат — `voxellume-0.1.0.tgz` с готовыми JavaScript и declarations.
+Установщик соберёт `voxellume-0.1.0.tgz` и установит `voxellume-mcp` глобально через pnpm.
 
 **OMP**
 
@@ -102,3 +102,7 @@ corepack pnpm verify
 - [Контракты хостов](./docs/research/host-contracts.md)
 - [Визуальный runtime в sandbox](./docs/research/visual-qualification-image.md)
 - [Hashes пакетов и ссылки на квалификацию](./support-manifest.json)
+
+## Лицензия
+
+[MIT](./LICENSE). Сторонние компоненты сохраняют свои лицензии и notices.

@@ -54,12 +54,12 @@ Every host returns the same versioned `DomainResult<T>` with stable error codes,
 Requirements: Node.js `>=24.9.0`, pnpm `12.18.0`, and the target's JDK. Sandboxed build/runtime checks use Docker.
 
 ```sh
-corepack pnpm install
-corepack pnpm build
-corepack pnpm pack
+git clone https://github.com/lukavtz/voxellume.git
+cd voxellume
+./install.sh
 ```
 
-The result is `voxellume-0.1.0.tgz` with prebuilt JavaScript and declarations.
+The installer builds `voxellume-0.1.0.tgz` and installs `voxellume-mcp` globally with pnpm.
 
 **OMP**
 
@@ -102,3 +102,7 @@ corepack pnpm verify
 - [Host contracts](./docs/research/host-contracts.md)
 - [Sandboxed visual runtime](./docs/research/visual-qualification-image.md)
 - [Pack hashes and qualification links](./support-manifest.json)
+
+## License
+
+[MIT](./LICENSE). Third-party components retain their own licenses and notices.

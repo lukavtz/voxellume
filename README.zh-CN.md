@@ -54,12 +54,12 @@ minecraft_project_verify
 要求：Node.js `>=24.9.0`、pnpm `12.18.0`，以及目标所需的 JDK。沙箱中的构建和运行时检查使用 Docker。
 
 ```sh
-corepack pnpm install
-corepack pnpm build
-corepack pnpm pack
+git clone https://github.com/lukavtz/voxellume.git
+cd voxellume
+./install.sh
 ```
 
-结果为 `voxellume-0.1.0.tgz`，包含预构建的 JavaScript 和 declarations。
+安装脚本会构建 `voxellume-0.1.0.tgz`，并通过 pnpm 全局安装 `voxellume-mcp`。
 
 **OMP**
 
@@ -102,3 +102,7 @@ corepack pnpm verify
 - [宿主契约](./docs/research/host-contracts.md)
 - [沙箱视觉运行时](./docs/research/visual-qualification-image.md)
 - [目标包哈希与验证链接](./support-manifest.json)
+
+## 许可证
+
+[MIT](./LICENSE)。第三方组件保留其各自的许可证和声明。
