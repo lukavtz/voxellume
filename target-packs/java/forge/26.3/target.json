@@ -2,9 +2,8 @@
   "schemaVersion": "target-pack-1.0.0",
   "id": "java-forge-26.3-r1",
   "edition": "java",
-  "status": "candidate",
+  "status": "rejected",
   "revision": 1,
-  "packSha256": "1ae94a2348785424427110205c077ef44d8846b737cba783e0888fb73e92e5e7",
   "minecraft": {
     "version": "26.3",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -35,6 +34,7 @@
     "version": "9.7.1",
     "distributionUrl": "https://services.gradle.org/distributions/gradle-9.7.1-bin.zip",
     "distributionSha256": "acd53f1edaf02f1a8ff99879f8a34b302661a057d9b063ae9e35b552f804d20a",
+    "wrapperJarSha256": "497c8c2a7e5031f6aa847f88104aa80a93532ec32ee17bdb8d1d2f67a194a9c7",
     "plugins": [
       {
         "id": "net.minecraftforge.gradle",
@@ -53,12 +53,18 @@
     }
   },
   "knownLimitations": [
-    "MDK declares a ForgeGradle range; exact plugin pin is selected from official Forge Maven. No build/runtime compatibility claim.",
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "Task discovery and clean build failed during ForgeGradle/Minecraft Mavenizer decompilation with MCP step exit 137 inside the required 4 GiB Docker limit.",
+    "No tasks were listed and no production JAR was produced. Server, GameTest, client, production-JAR runtime, and visual checks were not run because the build prerequisite failed."
   ],
-  "template": {
-    "repository": "https://maven.minecraftforge.net/net/minecraftforge/forge/26.3-66.1.0/forge-26.3-66.1.0-mdk.zip",
-    "revision": "26.3-66.1.0",
-    "contentSha256": "f665efa0f451f848b9310d4cb230e237ffc371a380bae209a2fcf3aa664bf54a"
-  }
+  "reason": {
+    "code": "verification_failed",
+    "detail": "Official MCP config 26.3-20260918.230105 drove ForgeGradle decompilation to exit 137 during task discovery and clean build in the mandatory 4 GiB container. No executable qualification or support is claimed.",
+    "evidence": [
+      {
+        "url": "https://maven.minecraftforge.net/de/oceanlabs/mcp/mcp_config/26.3-20260918.230105/mcp_config-26.3-20260918.230105.zip",
+        "sha256": "8679f4eaa95f9779cfe9c4a59998ba2b3be9dce84a42d835a05248dc72c83df6"
+      }
+    ]
+  },
+  "packSha256": "599071c19b3c190f8f25a7d30b75c401e05aca5547714e870ce315669a50259b"
 }

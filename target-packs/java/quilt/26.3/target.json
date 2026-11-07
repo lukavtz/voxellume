@@ -4,7 +4,6 @@
   "edition": "java",
   "status": "candidate",
   "revision": 1,
-  "packSha256": "895cf7ff1617aae649c2f11bc07beb4b468824f33d4c979984ba643e0b8e8a63",
   "minecraft": {
     "version": "26.3",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -35,6 +34,7 @@
     "version": "9.8.2",
     "distributionUrl": "https://services.gradle.org/distributions/gradle-9.8.2-bin.zip",
     "distributionSha256": "21bd5da2de49b642904077f38c0efdc7778e92b3ed0889392dca61b97e389607",
+    "wrapperJarSha256": "cb0da6751c2b753a16ac168bb354870ebb1e162e9083f116729cec9c781156b8",
     "plugins": [
       {
         "id": "org.quiltmc.loom",
@@ -53,13 +53,14 @@
     }
   },
   "knownLimitations": [
-    "Only generic official template is available; its content declares Minecraft 1.20.6, so every target coordinate is an override. No target-local build/runtime compatibility claim.",
-    "Quilt Loom 1.15.1 and Gradle 9.8.2 are exact upstream artifacts but their combination is unverified for this target.",
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "Only generic official template is available; its content declares Minecraft 1.20.6, so every target coordinate is an override. Stale Yarn-era mixin sources are removed.",
+    "Task discovery and clean build passed on Linux/arm64; no GameTest workflow is configured by this loader-only pack.",
+    "Development and packaged production servers reject Java 25 class major 69 in Quilt Loader's ASM entrypoint patch. No client or visual support is claimed."
   ],
   "template": {
     "repository": "https://github.com/QuiltMC/quilt-template-mod",
     "revision": "9a6f89cd481e3f58f128596b5b043353bee6b3f2",
     "contentSha256": "a2afaa5ab8037021c4538fc8f1bbcca6e30b713c57359245c7eec315e0aaf849"
-  }
+  },
+  "packSha256": "6f2469932670d61f2ea38d23ec054cca190188e4aa7828b28cb75f5b3abe3cad"
 }

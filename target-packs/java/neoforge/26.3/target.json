@@ -4,7 +4,6 @@
   "edition": "java",
   "status": "candidate",
   "revision": 1,
-  "packSha256": "e70ea89b5c41365f5e77ead18a37c82079e5bd694b82c2e8054a6559589f669e",
   "minecraft": {
     "version": "26.3",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -35,6 +34,7 @@
     "version": "9.2.1",
     "distributionUrl": "https://services.gradle.org/distributions/gradle-9.2.1-bin.zip",
     "distributionSha256": "72f44c9f8ebcb1af43838f45ee5c4aa9c5444898b3468ab3f4af7b6076c5bc3f",
+    "wrapperJarSha256": "7d3a4ac4de1c32b59bc6a4eb8ecb8e612ccd0cf1ae1e99f66902da64df296172",
     "plugins": [
       {
         "id": "net.neoforged.moddev",
@@ -53,11 +53,13 @@
     }
   },
   "knownLimitations": [
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "Clean binary-pipeline builds, development and packaged production servers, two positive GameTests, and a valid negative control passed on Linux/arm64.",
+    "Real-client early display failed with Couldn't find matching GLX visual. The reviewed capture is a failure surface, not client or visual support; full support is not claimed."
   ],
   "template": {
     "repository": "https://github.com/NeoForgeMDKs/MDK-26.3-ModDevGradle",
     "revision": "966d723e9563dd5488e7cb2362373f68c6783119",
     "contentSha256": "f8d73ee439b3d73ba2c80afa5600dde2bc75cec294bb743c60edf5b357ee5266"
-  }
+  },
+  "packSha256": "cb6e8028774f92e09ecc5e6399189fc2a28e5b96209a955caa7a7ffd379b1a41"
 }
