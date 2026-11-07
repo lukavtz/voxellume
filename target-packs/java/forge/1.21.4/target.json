@@ -2,9 +2,9 @@
   "schemaVersion": "target-pack-1.0.0",
   "id": "java-forge-1.21.4-r1",
   "edition": "java",
-  "status": "candidate",
+  "status": "rejected",
   "revision": 1,
-  "packSha256": "4e78d6ae83e1646f154034ec4556f4a283bb27c8969f2f563cb653e7aae74f72",
+  "packSha256": "4ea5ec7358636a8c7d83f1b4b90fe3048425c7a754a331a176078367f7f10c87",
   "minecraft": {
     "version": "1.21.4",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -46,6 +46,7 @@
     "version": "9.3.1",
     "distributionUrl": "https://services.gradle.org/distributions/gradle-9.3.1-bin.zip",
     "distributionSha256": "b266d5ff6b90eada6dc3b20cb090e3731302e553a27c5d3e4df1f0d76beaff06",
+    "wrapperJarSha256": "2db75c40782f5e8ba1fc278a5574bab070adccb2d21ca5a6e5ed840888448046",
     "plugins": [
       {
         "id": "net.minecraftforge.gradle",
@@ -64,12 +65,17 @@
     }
   },
   "knownLimitations": [
-    "MDK declares a ForgeGradle range; exact plugin pin is selected from official Forge Maven. No build/runtime compatibility claim.",
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "Task discovery and clean build failed during ForgeGradle/Minecraft Mavenizer decompilation: Vineflower 1.10.1 requested -Xmx4G and exited 137 inside the required 4 GiB container; no tasks were listed and no production JAR was produced.",
+    "Server, GameTest, client, production-JAR, and visual checks were not run after the required build failure."
   ],
-  "template": {
-    "repository": "https://maven.minecraftforge.net/net/minecraftforge/forge/1.21.4-54.1.22/forge-1.21.4-54.1.22-mdk.zip",
-    "revision": "1.21.4-54.1.22",
-    "contentSha256": "3efcafafdc916ba1e000828f801557218778e27104054aa0fba1dafbab6edbb8"
+  "reason": {
+    "code": "verification_failed",
+    "detail": "The official MDK's ForgeGradle range was pinned exactly to 7.0.40. Under JDK 21 and the mandatory 2 CPU/4 GiB/512 PID sandbox, both task discovery and clean build failed in MCP config 1.21.4-20241203.143248 decompilation with exit 137. The configuration requests -Xmx4G for Vineflower 1.10.1, exceeding the available container budget with the supervising JVM and tooling.",
+    "evidence": [
+      {
+        "url": "https://maven.minecraftforge.net/de/oceanlabs/mcp/mcp_config/1.21.4-20241203.143248/mcp_config-1.21.4-20241203.143248.zip",
+        "sha256": "4ab389a224f2f07549ad3e808e936454f9f2b270fcea5dacfb978d449079d330"
+      }
+    ]
   }
 }
