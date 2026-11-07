@@ -1,10 +1,10 @@
 {
   "schemaVersion": "target-pack-1.0.0",
-  "id": "java-fabric-1.21.8-r1",
+  "id": "java-fabric-1.21.8-r2",
   "edition": "java",
   "status": "candidate",
-  "revision": 1,
-  "packSha256": "3b566468eb7a1f52936d773acf3f32fb52babd11eabaae7b9d5b9ab74f3e1c68",
+  "revision": 2,
+  "packSha256": "14ab602fac7c3b2ecf6f55521795f07a9df533fe3aef987c19863ff732d069fd",
   "minecraft": {
     "version": "1.21.8",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -53,10 +53,11 @@
     "version": "9.8.2",
     "distributionUrl": "https://services.gradle.org/distributions/gradle-9.8.2-bin.zip",
     "distributionSha256": "21bd5da2de49b642904077f38c0efdc7778e92b3ed0889392dca61b97e389607",
+    "wrapperJarSha256": "3b8a25775a69158b5ad2b1d17a80a88dc7b40a352a73eb27d06c612a7ce68e98",
     "plugins": [
       {
         "id": "net.fabricmc.fabric-loom-remap",
-        "version": "1.20.0-alpha.19"
+        "version": "1.17.21"
       }
     ]
   },
@@ -71,8 +72,9 @@
     }
   },
   "knownLimitations": [
-    "Template declares floating Loom 1.19-SNAPSHOT; exact 1.20.0-alpha.19 is a required override. No build/runtime compatibility claim.",
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "Superseded r1 used exact Loom 1.20.0-alpha.19; task discovery failed because that artifact requires JVM 25 while this target requires JDK 21. R2 pins Loom 1.17.21 without changing Minecraft, Loader, API, mappings, or template families.",
+    "R2 task discovery, clean builds, dedicated development and packaged production servers, positive GameTests, and a deliberate negative control passed on Linux/arm64. Production JAR SHA-256 is 09cb8fa80e8676e5bf3c2a38c4cc71687323436e83986c8513ce55208017e484.",
+    "The real client remained at downloadAssets until the bounded timeout. Its reviewed 1280x720 capture was uniformly black and rejected; client and visual are false and status remains candidate."
   ],
   "template": {
     "repository": "https://github.com/FabricMC/fabric-example-mod",

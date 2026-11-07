@@ -1,10 +1,10 @@
 {
   "schemaVersion": "target-pack-1.0.0",
-  "id": "java-quilt-1.21.8-r1",
+  "id": "java-quilt-1.21.8-r2",
   "edition": "java",
   "status": "candidate",
-  "revision": 1,
-  "packSha256": "260379dbc9e5006caed8da63bff62da0a2eb5a36f044a8f1f450defa3d67e453",
+  "revision": 2,
+  "packSha256": "0bafac4a0432fdb4f90b360fd355ee7bedb11e4d028ab6ad9f2eb146941ac8d5",
   "minecraft": {
     "version": "1.21.8",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -38,12 +38,13 @@
     "architecture": "64-bit"
   },
   "gradle": {
-    "version": "8.9",
-    "distributionUrl": "https://services.gradle.org/distributions/gradle-8.9-bin.zip",
-    "distributionSha256": "d725d707bfabd4dfdc958c624003b3c80accc03f7037b5122c4b1d0ef15cecab",
+    "version": "9.2.0",
+    "distributionUrl": "https://services.gradle.org/distributions/gradle-9.2.0-bin.zip",
+    "distributionSha256": "df67a32e86e3276d011735facb1535f64d0d88df84fa87521e90becc2d735444",
+    "wrapperJarSha256": "cb0da6751c2b753a16ac168bb354870ebb1e162e9083f116729cec9c781156b8",
     "plugins": [
       {
-        "id": "org.quiltmc.loom",
+        "id": "org.quiltmc.loom.remap",
         "version": "1.15.1"
       }
     ]
@@ -59,8 +60,10 @@
     }
   },
   "knownLimitations": [
-    "Only generic official template is available; its content declares Minecraft 1.20.6, so every target coordinate is an override. No target-local build/runtime compatibility claim.",
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "The generic official template declares Minecraft 1.20.6; Minecraft, mappings, Loader, metadata, and Loom are exact target overrides. No QSL or QFAPI dependency is declared.",
+    "Superseded r1 paired Gradle 8.9 and org.quiltmc.loom 1.15.1; task discovery failed because the plugin requires Gradle API 9.2.0. R2 pins Gradle 9.2.0 and org.quiltmc.loom.remap 1.15.1 without changing Minecraft, Loader, mappings, or template family.",
+    "R2 task discovery, clean build, and dedicated development and packaged production servers passed. Production JAR SHA-256 is 9a73a04217c0bfe87966c6715b0f53fb3d1bd429763f015a6c85442b355d8fc0. No GameTest workflow is claimed.",
+    "The real client remained at downloadAssets until the bounded timeout. Its reviewed 1280x720 capture was uniformly black and rejected; client and visual are false and status remains candidate."
   ],
   "template": {
     "repository": "https://github.com/QuiltMC/quilt-template-mod",
