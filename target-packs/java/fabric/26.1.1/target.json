@@ -4,7 +4,7 @@
   "edition": "java",
   "status": "candidate",
   "revision": 1,
-  "packSha256": "fe755a6b8118ff68ebab954ecb5514ee80655f0790cd8a0a19e605144f558452",
+  "packSha256": "1db6275d8756fad186b259126a59aa5c662ba717f507481c0c0c94e76b65e704",
   "minecraft": {
     "version": "26.1.1",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -42,6 +42,7 @@
     "version": "9.8.2",
     "distributionUrl": "https://services.gradle.org/distributions/gradle-9.8.2-bin.zip",
     "distributionSha256": "21bd5da2de49b642904077f38c0efdc7778e92b3ed0889392dca61b97e389607",
+    "wrapperJarSha256": "3b8a25775a69158b5ad2b1d17a80a88dc7b40a352a73eb27d06c612a7ce68e98",
     "plugins": [
       {
         "id": "net.fabricmc.fabric-loom",
@@ -60,8 +61,9 @@
     }
   },
   "knownLimitations": [
-    "Template declares floating Loom 1.19-SNAPSHOT; exact 1.20.0-alpha.19 is a required override. No build/runtime compatibility claim.",
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "Template declares floating Loom 1.19-SNAPSHOT; exact 1.20.0-alpha.19 is the required override. The unobfuscated target uses no mappings.",
+    "Task discovery, clean fixture-free builds, development and packaged production servers, positive GameTests, and a failing negative control passed on Linux/arm64. Production JAR SHA-256 is 44f9feea6e08df1279d63263374ae82c2d51c99198133ca78509eae29b6fd4ca.",
+    "runClientGameTest reached its singleplayer assertion and rendered the world but exited 134 in libopenal.so during shutdown. The real runClient was stopped after capturing its modded main menu, fixed-seed world, hand, inventory, movement, and pause GUI; client capability remains false and the pack remains candidate."
   ],
   "template": {
     "repository": "https://github.com/FabricMC/fabric-example-mod",

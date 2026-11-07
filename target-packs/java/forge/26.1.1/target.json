@@ -2,9 +2,9 @@
   "schemaVersion": "target-pack-1.0.0",
   "id": "java-forge-26.1.1-r1",
   "edition": "java",
-  "status": "candidate",
+  "status": "rejected",
   "revision": 1,
-  "packSha256": "769e5aa4d3ed1c75d418d17b9c02428b636d827ef0bdb438d86a0a1b84c52d45",
+  "packSha256": "a61ef4184692c7d3737d7ab2c09dbe34509e3842d185820e5d18a024dce1ff74",
   "minecraft": {
     "version": "26.1.1",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -53,12 +53,17 @@
     }
   },
   "knownLimitations": [
-    "MDK declares a ForgeGradle range; exact plugin pin is selected from official Forge Maven. No build/runtime compatibility claim.",
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "Task discovery and clean build both failed during ForgeGradle/Minecraft Mavenizer decompilation with MCP step exit 137 inside the required 4 GiB Docker limit. No tasks were listed and no production JAR was produced.",
+    "Dedicated server, configured GameTest, negative control, real client, production-JAR runtime, and visual checks were not run because the build prerequisite failed."
   ],
-  "template": {
-    "repository": "https://maven.minecraftforge.net/net/minecraftforge/forge/26.1.1-63.0.2/forge-26.1.1-63.0.2-mdk.zip",
-    "revision": "26.1.1-63.0.2",
-    "contentSha256": "7644d9d3e6c430200d1eabf4b9ee635b95355c142a1fb982fb7c79433bb38cd4"
+  "reason": {
+    "code": "verification_failed",
+    "detail": "Official MCP config 26.1.1-20260401.101545 selects Vineflower 1.11.2. Both ForgeGradle task discovery and clean build failed its decompile step with exit 137 in the mandatory 4 GiB container. No executable qualification or support is claimed.",
+    "evidence": [
+      {
+        "url": "https://maven.minecraftforge.net/de/oceanlabs/mcp/mcp_config/26.1.1-20260401.101545/mcp_config-26.1.1-20260401.101545.zip",
+        "sha256": "b743eea5bfd80420a5a31030005d27424031c9fc0a2b73c0fe90bc87318e3ac1"
+      }
+    ]
   }
 }

@@ -4,7 +4,7 @@
   "edition": "java",
   "status": "candidate",
   "revision": 1,
-  "packSha256": "221063aafb363f5bc2371830a0a7d8c58c184be2bb4167ba36676ffc52c5353f",
+  "packSha256": "b9ff4c90f640af0dc2e2905163b3931f408ddf5b287c952320b081b5fe87c622",
   "minecraft": {
     "version": "26.1.1",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -53,7 +53,9 @@
     }
   },
   "knownLimitations": [
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "The official MDG binary-patch pipeline uses disableRecompilation=true; decompiled Minecraft sources are unavailable.",
+    "Task discovery, clean fixture-free builds, development and packaged production servers, positive GameTests, a failing negative control, and the real development client passed on Linux/arm64. Production JAR SHA-256 is 6ccd30a8b8b611f8b4e0c657c7ea92313d51c1bdb1997b6478b988334fbc7670.",
+    "Reviewed real-client captures cover the modded main menu, fixed-seed world, hand, inventory, movement, and pause GUI. The development client was deliberately stopped after capture; packaged-JAR client, persistence, multiplayer, placed-block, custom animation, clipping, and z-fighting scenarios remain unqualified, so the pack remains candidate."
   ],
   "template": {
     "repository": "https://github.com/NeoForgeMDKs/MDK-26.1.1-ModDevGradle",

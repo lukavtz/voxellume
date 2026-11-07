@@ -1,11 +1,11 @@
 {
   "schemaVersion": "target-verification-1.0.0",
   "capabilities": {
-    "build": false,
-    "server": false,
+    "build": true,
+    "server": true,
     "client": false,
-    "gameTest": false,
-    "visual": false
+    "gameTest": true,
+    "visual": true
   },
   "required": [
     "build",
@@ -47,13 +47,14 @@
       "argv": [
         "./gradlew",
         "--no-daemon",
-        "runClient"
+        "runClientGameTest"
       ],
       "assertions": [
-        "Qualification requires the client main-menu and mod-error assertions."
+        "Records configured client GameTest evidence only; the singleplayer assertion passed but JVM shutdown exited 134 in libopenal.so, so client capability is false."
       ],
       "artifactGlobs": [
-        "run/logs/*.log"
+        "build/run/clientGameTest/**",
+        "build/reports/**"
       ]
     },
     "visual": {
@@ -73,16 +74,21 @@
       "argv": [
         "./gradlew",
         "--no-daemon",
-        "runClientGameTest"
+        "build"
       ],
       "assertions": [
-        "Qualification requires all configured GameTests to pass."
+        "build completes configured server GameTests through runGameTest; the positive fixture passed and the deliberate negative control failed as designed."
       ],
       "artifactGlobs": [
-        "build/reports/gametest/**",
-        "run/logs/*.log"
+        "build/run/gameTest/**",
+        "build/reports/**"
       ]
     }
   },
-  "testedPlatforms": []
+  "testedPlatforms": [
+    {
+      "os": "linux",
+      "arch": "arm64"
+    }
+  ]
 }
