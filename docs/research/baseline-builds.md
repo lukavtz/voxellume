@@ -33,6 +33,8 @@ Both commands failed during root-project configuration. `net.fabricmc:fabric-loo
 
 Next repair: select and pin an exact Loom release compatible with the target's JDK 21, update the target pack, and rerun qualification. Do not promote the target by switching it to JDK 25.
 
+A separate Ruby Blade rerun under `/tmp/voxellume-fabric-1.21.1-r1-ruby-blade-CostlyRabbit/evidence/result.json` reproduced the same result: wrapper JAR and Gradle 9.8.2 distribution hashes passed, but both `clean build` and `runGametest` exited `1` because Loom `1.20.0-alpha.19` requires JVM 25. No tests ran, no JAR was produced, and production-JAR/visual smoke was `unavailable`. The pack remains `candidate` with unchanged versions.
+
 ## NeoForge `java-neoforge-1.21.1-r1`
 
 Evidence root: `~/.local/share/voxellume/evidence/neoforge-baseline.fp2L9v/`. Immutable-input values are cross-referenced from `docs/research/minecraft-targets.md`; wrapper files remained at `/tmp/voxellume-neoforge-baseline.4mytVD/` when inspected.
