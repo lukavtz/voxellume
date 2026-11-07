@@ -1,7 +1,7 @@
 {
   "schemaVersion": "target-verification-1.0.0",
   "capabilities": {
-    "build": false,
+    "build": true,
     "server": false,
     "client": false,
     "gameTest": false,
@@ -49,7 +49,7 @@
         "runClient"
       ],
       "assertions": [
-        "Qualification requires the client main-menu and mod-error assertions."
+        "The real client remained in downloadAssets and was deliberately stopped with exit 137; no client capability is claimed."
       ],
       "artifactGlobs": [
         "run/logs/*.log"
@@ -62,12 +62,17 @@
         "runClient"
       ],
       "assertions": [
-        "Qualification requires reviewed inventory, hand, world, GUI, and animation captures."
+        "The only real-client capture was uniformly black and was rejected; no visual capability is claimed."
       ],
       "artifactGlobs": [
         "verification/screenshots/*.png"
       ]
     }
   },
-  "testedPlatforms": []
+  "testedPlatforms": [
+    {
+      "os": "linux",
+      "arch": "arm64"
+    }
+  ]
 }

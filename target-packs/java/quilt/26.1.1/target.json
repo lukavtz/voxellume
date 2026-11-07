@@ -4,7 +4,7 @@
   "edition": "java",
   "status": "candidate",
   "revision": 1,
-  "packSha256": "718847667fd5c9e8d6430d9df2552d685524a358132084352b3ea00b3a47f6ac",
+  "packSha256": "200c0cb257d1a1d3054c51c44dd891c82785b104bd57a9b2b2df09ec1803afbf",
   "minecraft": {
     "version": "26.1.1",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -35,9 +35,10 @@
     "version": "9.8.2",
     "distributionUrl": "https://services.gradle.org/distributions/gradle-9.8.2-bin.zip",
     "distributionSha256": "21bd5da2de49b642904077f38c0efdc7778e92b3ed0889392dca61b97e389607",
+    "wrapperJarSha256": "cb0da6751c2b753a16ac168bb354870ebb1e162e9083f116729cec9c781156b8",
     "plugins": [
       {
-        "id": "org.quiltmc.loom",
+        "id": "org.quiltmc.loom.no_remap",
         "version": "1.15.1"
       }
     ]
@@ -53,9 +54,9 @@
     }
   },
   "knownLimitations": [
-    "Only generic official template is available; its content declares Minecraft 1.20.6, so every target coordinate is an override. No target-local build/runtime compatibility claim.",
-    "Quilt Loom 1.15.1 and Gradle 9.8.2 are exact upstream artifacts but their combination is unverified for this target.",
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "Only the generic official template is available; its Minecraft 1.20.6 coordinates were overridden to exact 26.1.1 coordinates. Unobfuscated Quilt uses the no_remap plugin variant and declares no mappings, QSL, or QFAPI.",
+    "Task discovery and clean build passed with Quilt Loom 1.15.1 and Gradle 9.8.2. Production JAR SHA-256 is aa8836d840e549c13a8a126fc0064ed9631fd51dbb35eacaaccb8134f4952ccf. No GameTest is configured by this loader-only pack.",
+    "Development and packaged production servers failed before mod loading because Quilt Loader 0.20.0-beta.9 cannot read Java 25 class file major version 69. The real client remained in asset download and produced only a uniformly black capture, which was rejected. Server, client, and visual capabilities remain false; the pack remains candidate."
   ],
   "template": {
     "repository": "https://github.com/QuiltMC/quilt-template-mod",

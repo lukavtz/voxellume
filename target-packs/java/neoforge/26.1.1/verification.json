@@ -1,11 +1,11 @@
 {
   "schemaVersion": "target-verification-1.0.0",
   "capabilities": {
-    "build": false,
-    "server": false,
-    "client": false,
-    "gameTest": false,
-    "visual": false
+    "build": true,
+    "server": true,
+    "client": true,
+    "gameTest": true,
+    "visual": true
   },
   "required": [
     "build",
@@ -50,7 +50,7 @@
         "runClient"
       ],
       "assertions": [
-        "Qualification requires the client main-menu and mod-error assertions."
+        "Real development client rendered the modded main menu and fixed-seed world; it was deliberately stopped after capture with exit 137. Packaged-JAR client behavior remains unqualified."
       ],
       "artifactGlobs": [
         "run/logs/*.log"
@@ -84,5 +84,10 @@
       ]
     }
   },
-  "testedPlatforms": []
+  "testedPlatforms": [
+    {
+      "os": "linux",
+      "arch": "arm64"
+    }
+  ]
 }
