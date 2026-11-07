@@ -11,10 +11,7 @@ import {
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test, { type TestContext } from "node:test";
-import {
-  setImmediate as yieldToEventLoop,
-  setTimeout as delay,
-} from "node:timers/promises";
+import { setTimeout as delay } from "node:timers/promises";
 
 import { runVerificationProcess } from "../../src/core/execution/process.ts";
 import {
@@ -322,8 +319,12 @@ fs.appendFileSync("starts", process.pid + "\\n");
       settled = true;
     });
     controller.abort();
-    await yieldToEventLoop();
-    await yieldToEventLoop();
+    await Promise.race([
+      second,
+      delay(1_000, undefined, { ref: false }).then(() => {
+        throw new Error("project lock cancellation did not settle within 1s");
+      }),
+    ]);
     const settledBeforeRelease = settled;
     await writeFile(release, "release\n");
     const [firstResult, secondResult] = await Promise.all([first, second]);

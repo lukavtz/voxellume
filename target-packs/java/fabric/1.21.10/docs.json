@@ -23,9 +23,9 @@
   "gradlePlugins": [
     {
       "id": "net.fabricmc.fabric-loom-remap",
-      "version": "1.20.0-alpha.19",
+      "version": "1.17.21",
       "url": "https://docs.fabricmc.net/develop/loom/",
-      "revision": "1.20.0-alpha.19",
+      "revision": "1.17.21",
       "responseSha256": "296ba8190907388981fd4e111fb81204d8397f81f90aa830cfda98f17067d126"
     }
   ],

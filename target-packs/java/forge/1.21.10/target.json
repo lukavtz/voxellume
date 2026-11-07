@@ -2,9 +2,9 @@
   "schemaVersion": "target-pack-1.0.0",
   "id": "java-forge-1.21.10-r1",
   "edition": "java",
-  "status": "candidate",
+  "status": "rejected",
   "revision": 1,
-  "packSha256": "d7977a7632766a078fc820861e5753646d42c494a0a56ab5657baf5fa743e420",
+  "packSha256": "096583d9591368a6b0101ad8966c17822ac6fa2c33aac44ede11615edd95f4b1",
   "minecraft": {
     "version": "1.21.10",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -64,12 +64,17 @@
     }
   },
   "knownLimitations": [
-    "MDK declares a ForgeGradle range; exact plugin pin is selected from official Forge Maven. No build/runtime compatibility claim.",
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "Task discovery failed during ForgeGradle/Minecraft Mavenizer decompilation with MCP step exit 137 inside the required 4 GiB Docker limit. A bounded-heap retry failed identically; no tasks were listed and no production JAR was produced.",
+    "Dedicated server, configured GameTest, real client, production-JAR runtime, and visual checks were not run because task discovery and the build prerequisite failed."
   ],
-  "template": {
-    "repository": "https://maven.minecraftforge.net/net/minecraftforge/forge/1.21.10-60.1.18/forge-1.21.10-60.1.18-mdk.zip",
-    "revision": "1.21.10-60.1.18",
-    "contentSha256": "0d868b51caf50d9702aff0fd860026564211a041c4d463e56f9bbc8cb973c40e"
+  "reason": {
+    "code": "verification_failed",
+    "detail": "Official MCP config 1.21.10-20251007.101210 requests Vineflower 1.11.1 with -Xmx4G. ForgeGradle task discovery and a bounded-heap retry both failed decompilation with exit 137 in the mandatory 4 GiB container. No executable qualification or support is claimed.",
+    "evidence": [
+      {
+        "url": "https://maven.minecraftforge.net/de/oceanlabs/mcp/mcp_config/1.21.10-20251007.101210/mcp_config-1.21.10-20251007.101210.zip",
+        "sha256": "2073dfdb7e1c6a5285345c2e23024b0abd9c78ce99f51252f5269fb05657d918"
+      }
+    ]
   }
 }
