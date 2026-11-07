@@ -4,7 +4,7 @@
   "edition": "java",
   "status": "candidate",
   "revision": 1,
-  "packSha256": "cf393273ebe34f95a337d91804262038a924f530436ad68e6c0f7ba46122ffb9",
+  "packSha256": "ad01f60d2e810c0de5dd43751708af1a3e748e5221b95215a11f551c2d9f83ce",
   "minecraft": {
     "version": "1.21.6",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -64,8 +64,8 @@
     }
   },
   "knownLimitations": [
-    "MDK declares a ForgeGradle range; exact plugin pin is selected from official Forge Maven. No build/runtime compatibility claim.",
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "MDK declares a ForgeGradle range; qualification pins exact ForgeGradle 6.0.54 and bounds Gradle/fork heap to 3 GiB.",
+    "Forge 56.0.9 source comments out GameTestServer creation with an urgent TODO; configured GameTest and negative-control evidence is unavailable. Full visual qualification is incomplete; no supported claim."
   ],
   "template": {
     "repository": "https://maven.minecraftforge.net/net/minecraftforge/forge/1.21.6-56.0.9/forge-1.21.6-56.0.9-mdk.zip",

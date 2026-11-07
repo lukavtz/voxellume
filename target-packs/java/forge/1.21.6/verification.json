@@ -1,9 +1,9 @@
 {
   "schemaVersion": "target-verification-1.0.0",
   "capabilities": {
-    "build": false,
-    "server": false,
-    "client": false,
+    "build": true,
+    "server": true,
+    "client": true,
     "gameTest": false,
     "visual": false
   },
@@ -84,5 +84,10 @@
       ]
     }
   },
-  "testedPlatforms": []
+  "testedPlatforms": [
+    {
+      "os": "linux",
+      "arch": "arm64"
+    }
+  ]
 }
