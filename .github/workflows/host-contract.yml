@@ -1,0 +1,99 @@
+name: Host contracts
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - package.json
+      - pnpm-lock.yaml
+      - cordis.patch.yml
+      - support-manifest.json
+      - "src/adapters/**"
+      - "src/core/results.ts"
+      - "tests/host/**"
+      - "skills/**"
+      - "agents/**"
+      - "commands/**"
+      - "schemas/**"
+      - "scripts/ci/**"
+      - .github/workflows/host-contract.yml
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contracts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - run: corepack enable
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24.9.0
+          cache: pnpm
+      - run: corepack pnpm install --frozen-lockfile
+      - run: |
+          mkdir -p .artifacts/host-contract
+          corepack pnpm test:host 2>&1 | tee .artifacts/host-contract/host-tests.log
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        if: always()
+        with:
+          name: host-contract-tests
+          path: .artifacts/host-contract
+          if-no-files-found: error
+          retention-days: 14
+
+  package:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - run: corepack enable
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24.9.0
+          cache: pnpm
+      - run: corepack pnpm install --frozen-lockfile
+      - run: node scripts/ci/release-artifact.mjs
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        if: always()
+        with:
+          name: voxellume-package
+          path: .artifacts/release
+          if-no-files-found: error
+          retention-days: 14
+
+  clean-install:
+    needs: package
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - run: corepack enable
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24.9.0
+          cache: pnpm
+      - uses: oven-sh/setup-bun@b7a1c7ccf290d58743029c4f6903da283811b979 # v2.1.0
+        with:
+          bun-version: 1.4.4
+      - run: corepack pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          name: voxellume-package
+          path: .artifacts/release
+      - run: cd .artifacts/release && sha256sum --check SHA256SUMS
+      - run: |
+          tarball="$(node -p "require('./package.json').name + '-' + require('./package.json').version + '.tgz'")"
+          node scripts/ci/verify-host-install.mjs ".artifacts/release/$tarball" .artifacts/host-install
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        if: always()
+        with:
+          name: host-clean-install
+          path: .artifacts/host-install
+          if-no-files-found: error
+          retention-days: 14

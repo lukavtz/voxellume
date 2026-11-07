@@ -5,6 +5,11 @@ allowBuilds:
   node-pty: false
   protobufjs: false
 overrides:
+  "@modelcontextprotocol/client": 2.3.1
+  "@modelcontextprotocol/server": 2.4.0
   "@modelcontextprotocol/sdk": 1.32.0
   "@opentelemetry/api": 1.9.1
+  fflate: 0.8.3
+  undici: 8.12.2
+  uuid: 11.1.1
   zod: 4.6.6

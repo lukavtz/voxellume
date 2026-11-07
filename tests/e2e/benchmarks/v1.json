@@ -1,0 +1,337 @@
+{
+  "schemaVersion": "voxellume-e2e-benchmarks-1.0.0",
+  "benchmarkVersion": "1.0.0",
+  "execution": {
+    "modelIndependent": "required",
+    "modelBacked": "optional"
+  },
+  "target": {
+    "edition": "java",
+    "minecraftVersion": "1.21.1",
+    "loader": "fabric",
+    "targetPackId": "java-fabric-1.21.1-r2"
+  },
+  "modDefaults": {
+    "namespace": "benchmarks",
+    "javaPackage": "dev.voxellume.benchmarks",
+    "version": "1.0.0",
+    "authors": ["Voxellume E2E"],
+    "license": "MIT"
+  },
+  "scenarios": [
+    {
+      "id": "simple-item",
+      "revision": 1,
+      "mod": {
+        "modId": "ruby_blade",
+        "name": "Ruby Blade",
+        "description": "A ruby sword with complete assets and recipe data."
+      },
+      "request": "Create a new Fabric 1.21.1 mod named Ruby Blade. Add a ruby_blade sword with a 16 by 16 texture, an en_us display name, a shaped crafting recipe, and a combat creative-tab entry. Build it and prove the item, recipe, assets, damage, and durability in the real game without substituting another target.",
+      "acceptance": [
+        {
+          "id": "item-registered",
+          "check": "gameTest",
+          "expected": "A GameTest obtains exactly benchmarks:ruby_blade from the item registry and asserts its declared damage and maximum durability."
+        },
+        {
+          "id": "texture-lang",
+          "check": "resource",
+          "expected": "The item model references an existing 16 by 16 ruby_blade PNG and en_us.json contains item.benchmarks.ruby_blade with no missing references."
+        },
+        {
+          "id": "recipe",
+          "check": "server",
+          "expected": "A dedicated-server behavior check crafts the declared shaped recipe and receives exactly one ruby_blade with no recipe conflict."
+        },
+        {
+          "id": "creative-tab",
+          "check": "client",
+          "expected": "The real client combat creative tab contains ruby_blade and its icon and tooltip render without missing-texture warnings."
+        },
+        {
+          "id": "build",
+          "check": "build",
+          "expected": "A clean isolated Gradle build exits zero and the production JAR contains only intended runtime classes and resources."
+        },
+        {
+          "id": "runtime",
+          "check": "visual",
+          "expected": "Packaged-JAR client evidence shows inventory, first-person hand, third-person hand, and dropped-item views with passing runtime assertions."
+        }
+      ]
+    },
+    {
+      "id": "advanced-block",
+      "revision": 1,
+      "mod": {
+        "modId": "alloy_furnace",
+        "name": "Alloy Furnace",
+        "description": "A persistent networked furnace block with editable art."
+      },
+      "request": "Create a Fabric 1.21.1 alloy_furnace block with an editable Blockbench model and coherent textures, a block entity whose inventory and progress persist, an interactive GUI, server-authoritative networking, correct drops, and synchronized behavior for two multiplayer clients. Verify the production JAR and all block directions in game.",
+      "acceptance": [
+        {
+          "id": "block-model",
+          "check": "visual",
+          "expected": "Editable model sources and runtime exports have matching hashes, and real-client captures show all horizontal directions plus top and bottom without missing textures."
+        },
+        {
+          "id": "block-entity-persistence",
+          "check": "gameTest",
+          "expected": "A restart behavior test restores the same inventory, processing progress, and block-entity state from saved world data."
+        },
+        {
+          "id": "gui-networking",
+          "check": "client",
+          "expected": "Client interaction opens the declared GUI and server-authoritative updates reproduce the same progress and inventory after close and reopen."
+        },
+        {
+          "id": "drops",
+          "check": "gameTest",
+          "expected": "Breaking the block under the declared tool and silk-touch cases produces exactly the independently specified loot-table drops."
+        },
+        {
+          "id": "multiplayer",
+          "check": "server",
+          "expected": "Two connected clients observe identical furnace state and one client cannot mutate inventory or progress without server validation."
+        },
+        {
+          "id": "build-runtime",
+          "check": "build",
+          "expected": "Clean build, dedicated-server startup, configured GameTests, production-JAR loading, and required real-client checks all execute successfully."
+        }
+      ]
+    },
+    {
+      "id": "entity",
+      "revision": 1,
+      "mod": {
+        "modId": "ember_moth",
+        "name": "Ember Moth",
+        "description": "An animated persistent entity with complete behavior and art."
+      },
+      "request": "Create a Fabric 1.21.1 ember_moth entity with explicit goals and attributes, an editable entity model and texture, idle fly hurt and death animations, target-local spawn rules, loot, sounds, and saved-state persistence. Prove behavior, animation transitions, spawning, drops, audio references, and restart persistence in the packaged mod.",
+      "acceptance": [
+        {
+          "id": "entity-goals-attributes",
+          "check": "gameTest",
+          "expected": "Deterministic behavior checks observe the declared goals and exact attribute values without relying on a visual assertion alone."
+        },
+        {
+          "id": "editable-art",
+          "check": "resource",
+          "expected": "The editable entity source, exported geometry, texture, and asset manifest agree on hashes, format, bones, pivots, and texture references."
+        },
+        {
+          "id": "animations",
+          "check": "visual",
+          "expected": "Real-client captures and state assertions cover idle, fly, hurt, death, transitions, and retrigger behavior with no missing declared clip."
+        },
+        {
+          "id": "spawning-loot-sound",
+          "check": "server",
+          "expected": "Fixed-seed world checks observe only allowed spawn conditions, exact loot outcomes, and valid registered sound events."
+        },
+        {
+          "id": "persistence",
+          "check": "gameTest",
+          "expected": "After a full server restart the same entity identifier, attributes, inventory or state fields, and active behavior data are restored."
+        },
+        {
+          "id": "build-runtime",
+          "check": "build",
+          "expected": "Clean build, server and client startup, GameTests, production-JAR inspection, and runtime checks execute with zero false successes."
+        }
+      ]
+    },
+    {
+      "id": "worldgen",
+      "revision": 1,
+      "mod": {
+        "modId": "ruby_geodes",
+        "name": "Ruby Geodes",
+        "description": "Reproducible biome-filtered ruby geode world generation."
+      },
+      "request": "Create Fabric 1.21.1 ruby_geodes world generation using target-local configured and placed features or their exact equivalents. Restrict generation to declared biomes and rarity, then prove fixed-seed reproducibility, biome exclusion, chunk-boundary stability, and persistence across a dedicated-server restart.",
+      "acceptance": [
+        {
+          "id": "configured-placed-feature",
+          "check": "resource",
+          "expected": "Configured-feature and placed-feature JSON references resolve to registered content using the exact target pack data format."
+        },
+        {
+          "id": "biome-rarity",
+          "check": "server",
+          "expected": "Fixed-seed sampling observes generation only in included biomes and matches the independently calculated placement and rarity bounds."
+        },
+        {
+          "id": "reproducibility",
+          "check": "gameTest",
+          "expected": "Two pristine worlds with the same seed and inputs produce identical feature coordinates and block states across chunk boundaries."
+        },
+        {
+          "id": "build-runtime",
+          "check": "build",
+          "expected": "A clean build and packaged-JAR dedicated server generate, save, restart, and reload the fixed-seed world without registry errors."
+        }
+      ]
+    },
+    {
+      "id": "existing-project",
+      "revision": 1,
+      "mod": {
+        "modId": "ruby_tools",
+        "name": "Ruby Tools Existing Project",
+        "description": "A feature addition that preserves unrelated user work."
+      },
+      "request": "In the existing Fabric 1.21.1 project, inspect its exact target and add a ruby_blade item with assets and a recipe. Preserve every unrelated source, resource, build, and user-owned file byte for byte, keep existing compatibility settings, and run the pre-existing checks plus focused regression verification.",
+      "acceptance": [
+        {
+          "id": "inspection",
+          "check": "inspection",
+          "expected": "Read-only inspection reports exact Fabric 1.21.1 coordinates, existing metadata, source sets, dependencies, tasks, and user-owned files."
+        },
+        {
+          "id": "feature-added",
+          "check": "gameTest",
+          "expected": "The new item, texture, localization, and recipe are present and pass focused registry and crafting behavior assertions."
+        },
+        {
+          "id": "unrelated-files-preserved",
+          "check": "preservation",
+          "expected": "Hashes and contents of every pre-existing file outside the declared feature ownership set remain exactly unchanged after the transaction."
+        },
+        {
+          "id": "regression-verification",
+          "check": "build",
+          "expected": "All pre-existing checks and new focused checks execute against the changed project and pass without weakening any original assertion."
+        }
+      ]
+    },
+    {
+      "id": "failure-recovery",
+      "revision": 1,
+      "mod": {
+        "modId": "repair_fixture",
+        "name": "Repair Fixture",
+        "description": "Intentional source, resource, and test failures for bounded repair."
+      },
+      "request": "Given this Fabric 1.21.1 project with intentionally broken source, resources, and tests, preserve the original failures and diffs, diagnose each public-check failure, and repair all three within no more than three attempts. Make one vertical change per attempt, rerun the failed check, restore the last verified state after an unsuccessful attempt, and never weaken or delete a test.",
+      "acceptance": [
+        {
+          "id": "original-failures-recorded",
+          "check": "diagnostic",
+          "expected": "The original source, resource, and test failures and initial file hashes remain available as structured diagnostics and comparison evidence."
+        },
+        {
+          "id": "source-resource-test-repaired",
+          "check": "repair",
+          "expected": "Independent checks show that the planted Java error, broken resource reference, and failing assertion are fixed rather than removed or suppressed."
+        },
+        {
+          "id": "bounded-attempts",
+          "check": "repair",
+          "expected": "The repair journal contains one vertical diff per attempt, at most three attempts total, and no fourth retry for any failed public check."
+        },
+        {
+          "id": "last-good-restored",
+          "check": "repair",
+          "expected": "Every unsuccessful attempt leaves the canonical project byte-identical to the last verified state and retains the failed diff separately."
+        },
+        {
+          "id": "passing-verification",
+          "check": "build",
+          "expected": "The original public source, resource, and test checks are rerun after repair and all report executed passing outcomes."
+        }
+      ]
+    },
+    {
+      "id": "unsupported-target",
+      "revision": 1,
+      "mod": {
+        "modId": "unsupported_ruby",
+        "name": "Unsupported Ruby",
+        "description": "An outside-matrix request that must fail closed."
+      },
+      "target": {
+        "edition": "java",
+        "minecraftVersion": "1.20.6",
+        "loader": "fabric"
+      },
+      "request": "Create a ruby_blade item for Fabric Minecraft 1.20.6. If that exact target is unsupported, report the unsupported coordinates and reason, do not substitute a nearby Minecraft release or another loader, do not generate a project, and produce zero build, runtime, visual, or delivery success artifacts.",
+      "acceptance": [
+        {
+          "id": "explicit-unsupported",
+          "check": "unsupported",
+          "expected": "The host result explicitly reports unsupported_target for Java Fabric 1.20.6 with a structured reason and no resolved pack."
+        },
+        {
+          "id": "no-substitution",
+          "check": "unsupported",
+          "expected": "The returned requested coordinates remain exactly Java Fabric 1.20.6 and no 1.21.x or alternate-loader pack is selected."
+        },
+        {
+          "id": "zero-success-artifacts",
+          "check": "preservation",
+          "expected": "No project files, ModSpec, JAR, evidence pass, commit, pull request, or other success artifact is created for the rejected request."
+        }
+      ]
+    },
+    {
+      "id": "full-delivery",
+      "revision": 1,
+      "mod": {
+        "modId": "delivery_ruby",
+        "name": "Delivery Ruby",
+        "description": "A disposable-repository create-to-pull-request benchmark."
+      },
+      "request": "In a disposable test repository, create and verify a Fabric 1.21.1 ruby_blade mod, document reproduction and limitations, commit only reviewed owned paths, push to its test remote, and open a clean pull request with evidence. Push and pull-request creation require separate trusted approval; never expose credentials or claim external success after a partial failure.",
+      "delivery": [
+        "create",
+        "verify",
+        "document",
+        "commit",
+        "push",
+        "pull-request"
+      ],
+      "acceptance": [
+        {
+          "id": "create",
+          "check": "build",
+          "expected": "The exact supported target produces the declared source, editable assets, ModSpec, wrapper metadata, and clean production JAR."
+        },
+        {
+          "id": "verify",
+          "check": "verification",
+          "expected": "Required build, server, GameTest, client, production-JAR, and visual checks execute with hashes and a separate evidence bundle."
+        },
+        {
+          "id": "document",
+          "check": "delivery",
+          "expected": "The disposable repository documents exact reproduction commands, support status, limitations, checksums, and evidence locations."
+        },
+        {
+          "id": "commit",
+          "check": "delivery",
+          "expected": "The local commit contains only reviewed owned paths and its tree matches the verified final-tree and artifact hashes."
+        },
+        {
+          "id": "push",
+          "check": "delivery",
+          "expected": "After separate trusted approval the disposable remote reports the same commit SHA as the verified local commit."
+        },
+        {
+          "id": "pull-request",
+          "check": "delivery",
+          "expected": "After separate trusted approval a clean pull request exists with behavior, checks, evidence links, limitations, and unqualified targets."
+        },
+        {
+          "id": "no-credentials",
+          "check": "security",
+          "expected": "Repository contents, process logs, evidence, and pull-request materials contain no credentials or private session content."
+        }
+      ]
+    }
+  ]
+}

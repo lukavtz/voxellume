@@ -1,0 +1,91 @@
+name: Runtime and visual
+
+on:
+  push:
+    tags: ["v*-rc.*"]
+  workflow_dispatch:
+    inputs:
+      pack:
+        description: Exact target pack ID; empty selects every cell
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: runtime-visual-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    outputs:
+      supported_count: ${{ steps.plan.outputs.supported_count }}
+      supported_java: ${{ steps.plan.outputs.supported_java }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24.9.0
+      - id: plan
+        env:
+          REQUESTED_PACK: ${{ inputs.pack }}
+        run: |
+          args=()
+          if [[ -n "$REQUESTED_PACK" ]]; then args+=(--pack "$REQUESTED_PACK"); fi
+          node scripts/ci/target-cell.mjs plan --output .artifacts/runtime-visual/plan.json "${args[@]}"
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        if: always()
+        with:
+          name: runtime-visual-plan
+          path: .artifacts/runtime-visual/plan.json
+          if-no-files-found: error
+          retention-days: 30
+
+  gpu-preflight:
+    needs: plan
+    if: needs.plan.outputs.supported_count != '0'
+    runs-on: ${{ vars.VOXELLUME_GPU_RUNNER || 'ubuntu-24.04' }}
+    timeout-minutes: 10
+    steps:
+      - run: |
+          mkdir -p .artifacts/runtime-visual/gpu
+          test "${{ runner.environment }}" = "github-hosted"
+          test -n "${{ vars.VOXELLUME_GPU_RUNNER }}"
+          nvidia-smi -L 2>&1 | tee .artifacts/runtime-visual/gpu/nvidia-smi.log
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        if: always()
+        with:
+          name: runtime-gpu-preflight
+          path: .artifacts/runtime-visual/gpu
+          if-no-files-found: error
+          retention-days: 30
+
+  runtime:
+    needs: [plan, gpu-preflight]
+    if: needs.plan.outputs.supported_count != '0'
+    strategy:
+      fail-fast: false
+      matrix:
+        java: ${{ fromJSON(needs.plan.outputs.supported_java) }}
+    runs-on: ${{ vars.VOXELLUME_GPU_RUNNER || 'ubuntu-24.04' }}
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24.9.0
+      - uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4.8.0
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+      - run: node scripts/ci/target-cell.mjs runtime --java ${{ matrix.java }}
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        if: always()
+        with:
+          name: runtime-visual-jdk-${{ matrix.java }}
+          path: .artifacts/runtime-visual/jdk-${{ matrix.java }}
+          if-no-files-found: error
+          retention-days: 30

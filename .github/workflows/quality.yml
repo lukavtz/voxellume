@@ -1,0 +1,82 @@
+name: Quality
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quality-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  workflow-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24.9.0
+      - run: |
+          mkdir -p .artifacts/workflow-contract
+          node scripts/ci/validate-workflows.mjs 2>&1 | tee .artifacts/workflow-contract/validation.log
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        if: always()
+        with:
+          name: workflow-contract
+          path: .artifacts/workflow-contract
+          if-no-files-found: error
+          retention-days: 14
+
+  static:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - run: corepack enable
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24.9.0
+          cache: pnpm
+      - run: corepack pnpm install --frozen-lockfile
+      - run: |
+          mkdir -p .artifacts/quality
+          corepack pnpm format:check 2>&1 | tee .artifacts/quality/format.log
+      - run: corepack pnpm lint 2>&1 | tee .artifacts/quality/lint.log
+      - run: corepack pnpm typecheck 2>&1 | tee .artifacts/quality/typecheck.log
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        if: always()
+        with:
+          name: quality-static
+          path: .artifacts/quality
+          if-no-files-found: error
+          retention-days: 14
+
+  core-tests:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - run: corepack enable
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24.9.0
+          cache: pnpm
+      - run: corepack pnpm install --frozen-lockfile
+      - run: |
+          mkdir -p .artifacts/quality
+          corepack pnpm test:unit 2>&1 | tee .artifacts/quality/unit.log
+      - run: corepack pnpm test:integration 2>&1 | tee .artifacts/quality/integration.log
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        if: always()
+        with:
+          name: quality-core-tests
+          path: .artifacts/quality
+          if-no-files-found: error
+          retention-days: 14
