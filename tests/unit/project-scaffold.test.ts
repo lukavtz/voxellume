@@ -98,9 +98,10 @@ for (const status of [
   test(`refuses ${status} targets before filesystem or Git mutation`, async (t) => {
     const destination = await project(t);
     const before = await snapshot(destination);
+    const targetPack = await target(status);
     const result = await scaffoldProject({
       destination,
-      target: await target(status),
+      target: targetPack,
       // A nonexistent template root proves status is checked before template I/O.
       targetPackRoot: join(destination, "missing-target-pack"),
       mod,
@@ -109,7 +110,7 @@ for (const status of [
     assert.deepEqual(result, {
       status: "unsupported",
       code: "unsupported_target",
-      targetPackId: "java-fabric-1.21.1-r1",
+      targetPackId: targetPack.id,
       targetStatus: status,
     });
     assert.deepEqual(await snapshot(destination), before);
