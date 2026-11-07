@@ -4,7 +4,7 @@
   "edition": "java",
   "status": "candidate",
   "revision": 1,
-  "packSha256": "9d80f997c4b6a509f49cb7298f970751319072f32e199b8ee08b203fc264f792",
+  "packSha256": "7604ecb9928f7a2fba4bb0d2790aff69672309639ce5f868299558b75fca1581",
   "minecraft": {
     "version": "1.21",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -41,6 +41,7 @@
     "version": "9.2.1",
     "distributionUrl": "https://services.gradle.org/distributions/gradle-9.2.1-bin.zip",
     "distributionSha256": "72f44c9f8ebcb1af43838f45ee5c4aa9c5444898b3468ab3f4af7b6076c5bc3f",
+    "wrapperJarSha256": "7d3a4ac4de1c32b59bc6a4eb8ecb8e612ccd0cf1ae1e99f66902da64df296172",
     "plugins": [
       {
         "id": "net.neoforged.moddev",
@@ -59,7 +60,9 @@
     }
   },
   "knownLimitations": [
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "The official MDG binary patch pipeline passed task discovery and clean build; the production JAR passed a pristine packaged-JAR dedicated-server installation on Linux/arm64.",
+    "Two development-server attempts and positive GameTest discovery exceeded the 300-second outer runner during asset/download initialization; no development-server or GameTest pass is claimed.",
+    "A 60-second real-client attempt remained during Gradle configuration and its reviewed Xvfb capture was black. Client and visual capabilities remain unavailable; candidate status has no evidenceManifest."
   ],
   "template": {
     "repository": "https://github.com/NeoForgeMDKs/MDK-1.21-ModDevGradle",

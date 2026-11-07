@@ -2,9 +2,9 @@
   "schemaVersion": "target-pack-1.0.0",
   "id": "java-forge-1.21-r1",
   "edition": "java",
-  "status": "candidate",
+  "status": "rejected",
   "revision": 1,
-  "packSha256": "f74155194d03eee924374fd1ffa0707321cb42356b758051494e62463438a296",
+  "packSha256": "9d917c136abe42652fc54a6855a1afac939e64ca694432682e46025c9f12fff5",
   "minecraft": {
     "version": "1.21",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -64,12 +64,17 @@
     }
   },
   "knownLimitations": [
-    "MDK declares a ForgeGradle range; exact plugin pin is selected from official Forge Maven. No build/runtime compatibility claim.",
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "Task discovery passed with the exact ForgeGradle 6.0.54 pin, but the clean build exceeded the supervised 300-second outer runner window while downloading Minecraft dependencies; no build success or production JAR is claimed.",
+    "Dedicated server, configured GameTest, real client, production-JAR runtime, and visual checks were unavailable after the incomplete clean build."
   ],
-  "template": {
-    "repository": "https://maven.minecraftforge.net/net/minecraftforge/forge/1.21-51.0.33/forge-1.21-51.0.33-mdk.zip",
-    "revision": "1.21-51.0.33",
-    "contentSha256": "868c90c6badd7ca8c910e72989faf2c1144ee589bf304c935a9882d76ab2706c"
+  "reason": {
+    "code": "verification_failed",
+    "detail": "The exact MDK/ForgeGradle task discovery passed, but clean build timed out during dependency resolution and produced no observed production JAR. Downstream runtime and visual qualification was not executed.",
+    "evidence": [
+      {
+        "url": "https://maven.minecraftforge.net/net/minecraftforge/forge/1.21-51.0.33/forge-1.21-51.0.33-mdk.zip",
+        "sha256": "868c90c6badd7ca8c910e72989faf2c1144ee589bf304c935a9882d76ab2706c"
+      }
+    ]
   }
 }
