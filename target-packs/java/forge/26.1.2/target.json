@@ -2,9 +2,9 @@
   "schemaVersion": "target-pack-1.0.0",
   "id": "java-forge-26.1.2-r1",
   "edition": "java",
-  "status": "candidate",
+  "status": "rejected",
   "revision": 1,
-  "packSha256": "2b6853e86bc8016f2f3dc740489cd72bc50e73dcbdf8f603103de019db414870",
+  "packSha256": "e32cf1987539b4243b42c4c49d3d2b1f474d4107761fac14b9b29bb4ebd19179",
   "minecraft": {
     "version": "26.1.2",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -35,6 +35,7 @@
     "version": "9.5.0",
     "distributionUrl": "https://services.gradle.org/distributions/gradle-9.5.0-bin.zip",
     "distributionSha256": "553c78f50dafcd54d65b9a444649057857469edf836431389695608536d6b746",
+    "wrapperJarSha256": "497c8c2a7e5031f6aa847f88104aa80a93532ec32ee17bdb8d1d2f67a194a9c7",
     "plugins": [
       {
         "id": "net.minecraftforge.gradle",
@@ -53,12 +54,17 @@
     }
   },
   "knownLimitations": [
-    "MDK declares a ForgeGradle range; exact plugin pin is selected from official Forge Maven. No build/runtime compatibility claim.",
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "Task discovery, its bounded-heap retry, and clean build failed during ForgeGradle/Minecraft Mavenizer decompilation with MCP step exit 137 inside the required 4 GiB Docker limit.",
+    "No tasks were listed and no production JAR was produced. Server, GameTest, client, production-JAR runtime, and visual checks were not run because the build prerequisite failed."
   ],
-  "template": {
-    "repository": "https://maven.minecraftforge.net/net/minecraftforge/forge/26.1.2-64.1.5/forge-26.1.2-64.1.5-mdk.zip",
-    "revision": "26.1.2-64.1.5",
-    "contentSha256": "7a75b45d976ff78909e0fc0c774029acc16f0143a212ace8228cac90ac41f40e"
+  "reason": {
+    "code": "verification_failed",
+    "detail": "Official MCP config 26.1.2-20260409.101008 drove ForgeGradle decompilation to exit 137 during task discovery, a bounded-heap retry, and clean build in the mandatory 4 GiB container. No executable qualification or support is claimed.",
+    "evidence": [
+      {
+        "url": "https://maven.minecraftforge.net/de/oceanlabs/mcp/mcp_config/26.1.2-20260409.101008/mcp_config-26.1.2-20260409.101008.zip",
+        "sha256": "21902894dd58b99a694fc83bc876ca6cbba75e5bd3910cb371def9c39b86e4a4"
+      }
+    ]
   }
 }

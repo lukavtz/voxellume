@@ -4,7 +4,7 @@
   "edition": "java",
   "status": "candidate",
   "revision": 1,
-  "packSha256": "76e6829bf840bc69b964700d252fb8a60790b6ff8fdc0733869968184393bd70",
+  "packSha256": "982d6e384197bd68c1c7490df6c7bf6de5f62ca96948c998ccee87e2c623d872",
   "minecraft": {
     "version": "26.1.2",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -35,6 +35,7 @@
     "version": "9.8.2",
     "distributionUrl": "https://services.gradle.org/distributions/gradle-9.8.2-bin.zip",
     "distributionSha256": "21bd5da2de49b642904077f38c0efdc7778e92b3ed0889392dca61b97e389607",
+    "wrapperJarSha256": "cb0da6751c2b753a16ac168bb354870ebb1e162e9083f116729cec9c781156b8",
     "plugins": [
       {
         "id": "org.quiltmc.loom",
@@ -53,9 +54,9 @@
     }
   },
   "knownLimitations": [
-    "Only generic official template is available; its content declares Minecraft 1.20.6, so every target coordinate is an override. No target-local build/runtime compatibility claim.",
-    "Quilt Loom 1.15.1 and Gradle 9.8.2 are exact upstream artifacts but their combination is unverified for this target.",
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "Only the generic official template is available; its Minecraft 1.20.6 coordinates were overridden to exact 26.1.2 coordinates. No QSL/QFAPI or mappings are declared.",
+    "Task discovery and clean build passed with Quilt Loom 1.15.1 and Gradle 9.8.2. Production JAR SHA-256 is 8b95ca118b1c3250c7bae1669f998bf62c9ca92f7f4f10929f41849a7367e14f. No GameTest is configured by this loader-only pack.",
+    "Development and packaged production servers failed before mod loading because Quilt Loader 0.20.0-beta.9 cannot read Java 25 class file major version 69. Real-client and visual capabilities remain unproven; the pack remains candidate."
   ],
   "template": {
     "repository": "https://github.com/QuiltMC/quilt-template-mod",
