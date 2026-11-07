@@ -1,10 +1,10 @@
 {
   "schemaVersion": "target-pack-1.0.0",
-  "id": "java-quilt-1.21.2-r1",
+  "id": "java-quilt-1.21.2-r2",
   "edition": "java",
   "status": "candidate",
-  "revision": 1,
-  "packSha256": "9a2c96643ab2a5025e880edd570d46e40df3d5307fbce69622210556de2ec9d4",
+  "revision": 2,
+  "packSha256": "a64de57531da085be367fff00112bd75ba13c04db1f807c15a8de1dd49277b3f",
   "minecraft": {
     "version": "1.21.2",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -16,9 +16,9 @@
   },
   "loader": {
     "id": "quilt",
-    "version": "0.20.0-beta.9",
-    "coordinates": "org.quiltmc:quilt-loader:0.20.0-beta.9",
-    "artifactSha256": "a475689ac9a5b9718c045972bb0f41381ce22315a87273a99f30ec1fa3aacb8a",
+    "version": "0.30.2",
+    "coordinates": "org.quiltmc:quilt-loader:0.30.2",
+    "artifactSha256": "273033b1e92793e87f4800b02c6f3d8a89e14cbb71a8087a1f008837f24ab945",
     "apiDependencies": []
   },
   "mappings": {
@@ -38,12 +38,12 @@
     "architecture": "64-bit"
   },
   "gradle": {
-    "version": "8.9",
-    "distributionUrl": "https://services.gradle.org/distributions/gradle-8.9-bin.zip",
-    "distributionSha256": "d725d707bfabd4dfdc958c624003b3c80accc03f7037b5122c4b1d0ef15cecab",
+    "version": "9.2.0",
+    "distributionUrl": "https://services.gradle.org/distributions/gradle-9.2.0-bin.zip",
+    "distributionSha256": "df67a32e86e3276d011735facb1535f64d0d88df84fa87521e90becc2d735444",
     "plugins": [
       {
-        "id": "org.quiltmc.loom",
+        "id": "org.quiltmc.loom.remap",
         "version": "1.15.1"
       }
     ]
@@ -59,8 +59,8 @@
     }
   },
   "knownLimitations": [
-    "Only generic official template is available; its content declares Minecraft 1.20.6, so every target coordinate is an override. No target-local build/runtime compatibility claim.",
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "R2 supersedes incompatible r1: Loader 0.30.2, plugin org.quiltmc.loom.remap 1.15.1, and Gradle 9.2.0 are exact pins; mappings remain Quilt 1.21.2+build.3.",
+    "The generic template declares 1.20.6 upstream; target coordinates are explicit overrides. Clean build and production JAR passed; server, real client, pristine production runtime, and visual checks were not completed. GameTest is unavailable and not required."
   ],
   "template": {
     "repository": "https://github.com/QuiltMC/quilt-template-mod",

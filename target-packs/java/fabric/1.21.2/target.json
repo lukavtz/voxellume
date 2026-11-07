@@ -1,10 +1,10 @@
 {
   "schemaVersion": "target-pack-1.0.0",
-  "id": "java-fabric-1.21.2-r1",
+  "id": "java-fabric-1.21.2-r2",
   "edition": "java",
   "status": "candidate",
-  "revision": 1,
-  "packSha256": "b4224deee89dd96fc0fa2c3b31ac165849dcd070af72e06209962a45d50fef02",
+  "revision": 2,
+  "packSha256": "9e187551f73f4159ddb9b171a38b73993fc4cc6ead28f491394f6f2a850ac004",
   "minecraft": {
     "version": "1.21.2",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -56,7 +56,7 @@
     "plugins": [
       {
         "id": "net.fabricmc.fabric-loom-remap",
-        "version": "1.20.0-alpha.19"
+        "version": "1.17.21"
       }
     ]
   },
@@ -71,8 +71,8 @@
     }
   },
   "knownLimitations": [
-    "Template declares floating Loom 1.19-SNAPSHOT; exact 1.20.0-alpha.19 is a required override. No build/runtime compatibility claim.",
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "R2 supersedes rejected r1; only Loom changes from JVM-25-only 1.20.0-alpha.19 to exact JDK-21-compatible 1.17.21.",
+    "Clean build and production JAR passed; GameTest, dedicated server, real client, pristine production runtime, and visual checks were not completed. No supported claim."
   ],
   "template": {
     "repository": "https://github.com/FabricMC/fabric-example-mod",
