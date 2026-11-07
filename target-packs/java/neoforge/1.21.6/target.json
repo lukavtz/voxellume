@@ -4,7 +4,7 @@
   "edition": "java",
   "status": "candidate",
   "revision": 1,
-  "packSha256": "2d10d911cc2f875eab586b20c9116a5337d1fc9c14de9bc6dda1674fed838554",
+  "packSha256": "80eccabfcb474bf5afe5b67b4200900f9ad34c0feb190e056fc28de3b209d778",
   "minecraft": {
     "version": "1.21.6",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -59,7 +59,7 @@
     }
   },
   "knownLimitations": [
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "Clean build uses the official MDG binary-patch pipeline with recompilation disabled. Full visual qualification is incomplete; no supported claim."
   ],
   "template": {
     "repository": "https://github.com/NeoForgeMDKs/MDK-1.21.6-ModDevGradle",

@@ -1,10 +1,10 @@
 {
   "schemaVersion": "target-pack-1.0.0",
-  "id": "java-quilt-1.21.6-r1",
+  "id": "java-quilt-1.21.6-r2",
   "edition": "java",
   "status": "candidate",
-  "revision": 1,
-  "packSha256": "eda216b5b2b990ee664a6e43f85b51956cdea6ab318362b728d43f2e204b88bc",
+  "revision": 2,
+  "packSha256": "91a2021a28d0aa9339e2447ef4f5c9792f01485e5a629f7eb1fa4d8fce1c39a5",
   "minecraft": {
     "version": "1.21.6",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -38,9 +38,9 @@
     "architecture": "64-bit"
   },
   "gradle": {
-    "version": "8.9",
-    "distributionUrl": "https://services.gradle.org/distributions/gradle-8.9-bin.zip",
-    "distributionSha256": "d725d707bfabd4dfdc958c624003b3c80accc03f7037b5122c4b1d0ef15cecab",
+    "version": "9.2.1",
+    "distributionUrl": "https://services.gradle.org/distributions/gradle-9.2.1-bin.zip",
+    "distributionSha256": "72f44c9f8ebcb1af43838f45ee5c4aa9c5444898b3468ab3f4af7b6076c5bc3f",
     "plugins": [
       {
         "id": "org.quiltmc.loom",
@@ -59,8 +59,8 @@
     }
   },
   "knownLimitations": [
-    "Only generic official template is available; its content declares Minecraft 1.20.6, so every target coordinate is an override. No target-local build/runtime compatibility claim.",
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "Generic official template originally declares Minecraft 1.20.6; all target coordinates and loader-only entrypoint are exact overrides.",
+    "R1 Gradle 8.9 failed because Loom 1.15.1 requires Gradle plugin API 9.2.0; r2 pins Gradle 9.2.1. Full visual qualification is incomplete; no supported claim."
   ],
   "template": {
     "repository": "https://github.com/QuiltMC/quilt-template-mod",
