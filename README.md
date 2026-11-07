@@ -1,4 +1,8 @@
 <p align="center">
+  <a href="./README.md">English</a> · <a href="./README.ru.md">Русский</a> · <a href="./README.zh-CN.md">简体中文</a>
+</p>
+
+<p align="center">
   <img src="./assets/readme/hero.png" width="100%" alt="Voxellume voxel landscape with real Fabric client and deterministic scenario screenshots">
 </p>
 
