@@ -118,7 +118,7 @@ test("catalog contains exactly one deterministic revision for every release and 
   for (const pack of packs) {
     assert.equal(pack.edition, "java");
     assert.ok(loaders.includes(pack.loader.id));
-    assert.ok(releases.includes(pack.minecraft.version));
+    assert.ok(releases.some((release) => release === pack.minecraft.version));
     assert.ok(Number.isInteger(pack.revision) && pack.revision >= 1);
     assert.equal(
       pack.id,
