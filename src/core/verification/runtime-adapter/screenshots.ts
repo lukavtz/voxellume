@@ -54,7 +54,9 @@ export function createRuntimeScreenshot(
   context: RuntimeAdapterContext,
 ): (
   input: RuntimeScreenshotInput,
-) => Promise<RuntimeOperationResult<RuntimeScreenshot | Record<string, never>>> {
+) => Promise<
+  RuntimeOperationResult<RuntimeScreenshot | Record<string, never>>
+> {
   const { options, checkedRequest } = context;
 
   return async function screenshot(

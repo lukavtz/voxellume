@@ -53,11 +53,7 @@ export type RuntimeOperationResult<T> =
     }
   | {
       readonly status:
-        | "failed"
-        | "unsupported"
-        | "unavailable"
-        | "cancelled"
-        | "timed_out";
+        "failed" | "unsupported" | "unavailable" | "cancelled" | "timed_out";
       readonly code: string;
       readonly adapter: RuntimeAdapterId;
       readonly operation: string;

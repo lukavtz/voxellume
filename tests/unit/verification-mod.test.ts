@@ -1010,6 +1010,17 @@ test("production observations that disagree with scenario expectations cannot pa
       observed: { ...identityObservation, protocolVersion: 766 },
     },
     {
+      condition: "production.identity",
+      observed: {
+        ...identityObservation,
+        remap: {
+          sourceNamespace: "mojang",
+          runtimeNamespace: "mojang",
+          mappedClass: "net.minecraft.world.item.ItemStack",
+        },
+      },
+    },
+    {
       condition: "production.server_behavior:ruby_blade_durability",
       observed: {
         id: "ruby_blade_durability",

@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import { spawn } from "node:child_process";
+import { once } from "node:events";
 import test from "node:test";
 
 import {
@@ -307,6 +309,52 @@ test("does not expose server.command or schematic.paste through command", async 
     );
   }
   assert.equal(calls, 0);
+});
+
+test("generic Voxellume cleanup reports actual terminated and remaining PIDs", async (t) => {
+  const child = spawn(process.execPath, ["-e", "process.stdin.resume()"], {
+    stdio: ["pipe", "ignore", "ignore"],
+  });
+  assert.ok(child.pid);
+  const ownedPids = [child.pid];
+  t.after(() => {
+    if (child.exitCode === null && child.signalCode === null)
+      child.kill("SIGKILL");
+  });
+  const exited = once(child, "exit");
+  const result = createRuntimeAdapter({
+    target: target("1.21.10"),
+    enabledAdapters: [],
+    verificationMod: { installed: true },
+    transport: {
+      async call(tool) {
+        assert.equal(tool, "voxellume.launch");
+        return { pid: child.pid, sessionId: "owned-process-fixture" };
+      },
+    },
+  });
+  assert.equal(result.status, "available");
+  if (result.status !== "available") return;
+  const launched = await result.adapter.launch({
+    projectId: "project-fixture",
+    projectRoot: "/isolated/project",
+    mode: "hidden",
+  });
+  assert.deepEqual(launched, {
+    status: "passed",
+    value: { id: "owned-process-fixture", ownedPids },
+  });
+  assert.deepEqual(
+    await result.adapter.cleanup({
+      sessionId: "owned-process-fixture",
+      ownedPids,
+    }),
+    {
+      status: "passed",
+      value: { terminatedOwnedPids: ownedPids, remainingOwnedPids: [] },
+    },
+  );
+  await exited;
 });
 
 type OperationName =

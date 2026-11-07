@@ -5,7 +5,6 @@ import {
 } from "./operations.ts";
 import { pathFailure, validateScenarioDirectory } from "./scenarios.ts";
 import {
-  type RuntimeAdapterId,
   type RuntimeAssertInput,
   type RuntimeOperationResult,
 } from "./types.ts";
@@ -13,9 +12,7 @@ import {
 export function createRuntimeAssertion(
   id: "arclight" | "voxellume",
   context: RuntimeAdapterContext,
-): (
-  input: RuntimeAssertInput,
-) => Promise<RuntimeOperationResult<unknown>> {
+): (input: RuntimeAssertInput) => Promise<RuntimeOperationResult<unknown>> {
   return async function assert(
     input: RuntimeAssertInput,
   ): Promise<RuntimeOperationResult<unknown>> {

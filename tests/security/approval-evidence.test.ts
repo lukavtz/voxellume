@@ -318,10 +318,10 @@ test("runtime protocol checks pass without an operating-system exit code", async
         executable,
         "assert-state",
       ]);
-      assert.deepEqual(
-        (await readEvidence(options)).checks[0]!.executedArgv,
-        [executable, "assert-state"],
-      );
+      assert.deepEqual((await readEvidence(options)).checks[0]!.executedArgv, [
+        executable,
+        "assert-state",
+      ]);
     });
   }
 });

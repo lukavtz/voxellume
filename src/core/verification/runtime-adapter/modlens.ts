@@ -1,9 +1,6 @@
 import { capabilities } from "./capabilities.ts";
 import { createRuntimeLifecycle } from "./lifecycle.ts";
-import {
-  unsupported,
-  type RuntimeAdapterContext,
-} from "./operations.ts";
+import { unsupported, type RuntimeAdapterContext } from "./operations.ts";
 import { createRuntimeScreenshot } from "./screenshots.ts";
 import {
   type RuntimeAdapter,

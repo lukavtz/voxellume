@@ -7,10 +7,7 @@ import {
 } from "../../execution/paths.ts";
 import { BODY_LIMIT_BYTES } from "./loopback-transport.ts";
 import { failure, unsupported } from "./operations.ts";
-import {
-  type RuntimeAdapterId,
-  type RuntimeOperationResult,
-} from "./types.ts";
+import { type RuntimeAdapterId, type RuntimeOperationResult } from "./types.ts";
 
 class ScenarioError extends Error {
   readonly code: string;
