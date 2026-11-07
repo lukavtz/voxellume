@@ -4,7 +4,7 @@
   "edition": "java",
   "status": "candidate",
   "revision": 1,
-  "packSha256": "6b92c3248ddad38d088065d955f9da37c0fe00c20d7fdb77295d3ba753b0d120",
+  "packSha256": "19135d40878d13e2f1d65fc3e46e82730fcbaa82c8e4121290ea9fe2ec39970d",
   "minecraft": {
     "version": "26.2",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -35,6 +35,7 @@
     "version": "9.2.1",
     "distributionUrl": "https://services.gradle.org/distributions/gradle-9.2.1-bin.zip",
     "distributionSha256": "72f44c9f8ebcb1af43838f45ee5c4aa9c5444898b3468ab3f4af7b6076c5bc3f",
+    "wrapperJarSha256": "7d3a4ac4de1c32b59bc6a4eb8ecb8e612ccd0cf1ae1e99f66902da64df296172",
     "plugins": [
       {
         "id": "net.neoforged.moddev",
@@ -53,7 +54,8 @@
     }
   },
   "knownLimitations": [
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "The official MDG binary-patch pipeline passed task discovery, clean builds, development and packaged production servers, two configured positive GameTests, and a deliberate negative control on Linux/arm64. Production JAR SHA-256 is 4169adb9afb6eeba35965556a02c1db2b958e38de53fe654bbb350025cff5cd2.",
+    "Three bounded real-client attempts exited 134 before window initialization on Linux/arm64, successively reporting linux/x64 mismatches for LWJGL Shaderc, SPVC, and VMA; exact ARM64 repairs were supplied for the first two. No screenshot or Setting user assertion was established. Client and visual remain false and the pack remains candidate."
   ],
   "template": {
     "repository": "https://github.com/NeoForgeMDKs/MDK-26.2-ModDevGradle",

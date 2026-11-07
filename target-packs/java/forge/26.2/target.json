@@ -2,9 +2,9 @@
   "schemaVersion": "target-pack-1.0.0",
   "id": "java-forge-26.2-r1",
   "edition": "java",
-  "status": "candidate",
+  "status": "rejected",
   "revision": 1,
-  "packSha256": "cd69e2e3630c467d4446fecc3307e4546430910ba391d55e4b7e46db1fad876d",
+  "packSha256": "c4f3c4d96379973699fa672dc34fc26df3d34acc94b2f2827fb42614a2b815f3",
   "minecraft": {
     "version": "26.2",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -35,6 +35,7 @@
     "version": "9.5.0",
     "distributionUrl": "https://services.gradle.org/distributions/gradle-9.5.0-bin.zip",
     "distributionSha256": "553c78f50dafcd54d65b9a444649057857469edf836431389695608536d6b746",
+    "wrapperJarSha256": "497c8c2a7e5031f6aa847f88104aa80a93532ec32ee17bdb8d1d2f67a194a9c7",
     "plugins": [
       {
         "id": "net.minecraftforge.gradle",
@@ -53,12 +54,17 @@
     }
   },
   "knownLimitations": [
-    "MDK declares a ForgeGradle range; exact plugin pin is selected from official Forge Maven. No build/runtime compatibility claim.",
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "Task discovery and clean build failed during ForgeGradle/Minecraft Mavenizer decompilation with MCP step exit 137 inside the required 4 GiB Docker limit.",
+    "No tasks were listed and no production JAR was produced. Server, GameTest, client, production-JAR runtime, and visual checks were not run because the build prerequisite failed."
   ],
-  "template": {
-    "repository": "https://maven.minecraftforge.net/net/minecraftforge/forge/26.2-65.1.5/forge-26.2-65.1.5-mdk.zip",
-    "revision": "26.2-65.1.5",
-    "contentSha256": "e5c64f5ab6413f4d5ee105e024ed01eb4f791e71287125834a633a138c7e1f3d"
+  "reason": {
+    "code": "verification_failed",
+    "detail": "Official MCP config 26.2-20260616.103818 drove ForgeGradle decompilation to exit 137 during task discovery and clean build in the mandatory 4 GiB container. No executable qualification or support is claimed.",
+    "evidence": [
+      {
+        "url": "https://maven.minecraftforge.net/de/oceanlabs/mcp/mcp_config/26.2-20260616.103818/mcp_config-26.2-20260616.103818.zip",
+        "sha256": "135042b4b1926927ce96ddf9c4abf09740b212c971426dea7345e8e2c41df632"
+      }
+    ]
   }
 }

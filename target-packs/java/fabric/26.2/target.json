@@ -4,7 +4,7 @@
   "edition": "java",
   "status": "candidate",
   "revision": 1,
-  "packSha256": "01fda32c28cf265d9b2b7ba72e264921b339a164a94cf20041d049469cba1a0b",
+  "packSha256": "61f2caec7b068554c76fa513c622133c6708f3571ca05c39c19d94fbba888d9f",
   "minecraft": {
     "version": "26.2",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -42,6 +42,7 @@
     "version": "9.8.2",
     "distributionUrl": "https://services.gradle.org/distributions/gradle-9.8.2-bin.zip",
     "distributionSha256": "21bd5da2de49b642904077f38c0efdc7778e92b3ed0889392dca61b97e389607",
+    "wrapperJarSha256": "3b8a25775a69158b5ad2b1d17a80a88dc7b40a352a73eb27d06c612a7ce68e98",
     "plugins": [
       {
         "id": "net.fabricmc.fabric-loom",
@@ -60,8 +61,9 @@
     }
   },
   "knownLimitations": [
-    "Template declares floating Loom 1.19-SNAPSHOT; exact 1.20.0-alpha.19 is a required override. No build/runtime compatibility claim.",
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "Template declares floating Loom 1.19-SNAPSHOT; the reviewed template pins exact Loom 1.20.0-alpha.19.",
+    "Task discovery, clean build, development and packaged production servers, positive server GameTest, and a deliberate negative control passed on Linux/arm64. Production JAR SHA-256 is af75a56e9945e91a7e4f5e651309bc2051b9fafacf6fbd3e960baff4f3b6c530.",
+    "The resumed client GameTest exceeded the 300-second harness wall clock during asset/client execution. A separate bounded real-client capture stopped at downloadAssets; both reviewed screenshots were black and no Setting user assertion occurred. Client and visual remain false and the pack remains candidate."
   ],
   "template": {
     "repository": "https://github.com/FabricMC/fabric-example-mod",
