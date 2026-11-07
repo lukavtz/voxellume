@@ -1,10 +1,10 @@
 {
   "schemaVersion": "target-pack-1.0.0",
-  "id": "java-fabric-1.21.9-r1",
+  "id": "java-fabric-1.21.9-r2",
   "edition": "java",
   "status": "candidate",
-  "revision": 1,
-  "packSha256": "d5f148f5485cd0e2faff7bfa54b7d8537625f0e3f64f6f0802b22ce12b6cfe29",
+  "revision": 2,
+  "packSha256": "da76ecdf6dd352a186005bffdeb9cd037a6391f08519adc19173430250234330",
   "minecraft": {
     "version": "1.21.9",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -53,10 +53,11 @@
     "version": "9.8.2",
     "distributionUrl": "https://services.gradle.org/distributions/gradle-9.8.2-bin.zip",
     "distributionSha256": "21bd5da2de49b642904077f38c0efdc7778e92b3ed0889392dca61b97e389607",
+    "wrapperJarSha256": "3b8a25775a69158b5ad2b1d17a80a88dc7b40a352a73eb27d06c612a7ce68e98",
     "plugins": [
       {
         "id": "net.fabricmc.fabric-loom-remap",
-        "version": "1.20.0-alpha.19"
+        "version": "1.17.21"
       }
     ]
   },
@@ -71,8 +72,9 @@
     }
   },
   "knownLimitations": [
-    "Template declares floating Loom 1.19-SNAPSHOT; exact 1.20.0-alpha.19 is a required override. No build/runtime compatibility claim.",
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "R1 pinned Loom 1.20.0-alpha.19 and failed task discovery because that artifact requires JVM 25; r2 pins Loom 1.17.21 without changing other target identities.",
+    "R2 task discovery, clean builds, dedicated and packaged production servers, positive GameTests, and the negative control passed on Linux/arm64. Production JAR SHA-256 is 53492f5a31926924167902b55b54c577a8d5a874ad13d5abb5cf4b2e2f4ccf33.",
+    "The real client remained in downloadAssets; its 1280x720 capture was reviewed and rejected as uniformly black. Client and visual remain false and the pack remains candidate."
   ],
   "template": {
     "repository": "https://github.com/FabricMC/fabric-example-mod",

@@ -4,7 +4,7 @@
   "edition": "java",
   "status": "candidate",
   "revision": 1,
-  "packSha256": "4fd34589d69605bb168684d9255855df5a887f179e58dcd4a2ddf39aa84adb47",
+  "packSha256": "c78a0073c3446b8c4eedc1a53773d73f5c86d524927991778ed570fbfd5adb27",
   "minecraft": {
     "version": "1.21.9",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -46,6 +46,7 @@
     "version": "8.12.1",
     "distributionUrl": "https://services.gradle.org/distributions/gradle-8.12.1-bin.zip",
     "distributionSha256": "8d97a97984f6cbd2b85fe4c60a743440a347544bf18818048e611f5288d46c94",
+    "wrapperJarSha256": "cb0da6751c2b753a16ac168bb354870ebb1e162e9083f116729cec9c781156b8",
     "plugins": [
       {
         "id": "net.minecraftforge.gradle",
@@ -64,8 +65,9 @@
     }
   },
   "knownLimitations": [
-    "MDK declares a ForgeGradle range; exact plugin pin is selected from official Forge Maven. No build/runtime compatibility claim.",
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "The MDK ForgeGradle range is pinned to exact 6.0.54; task discovery and clean builds pass on Linux/arm64. Production JAR SHA-256 is a62bdf2eb1f419a83ead8c5e15de4dd64f1d90aea5e2ad2181bf7407ea2d3ab8.",
+    "Dedicated and packaged production servers, positive GameTests, the negative control, and real-client accessibility/main-menu rendering passed. The settled menu shows Minecraft 1.21.9, Forge Beta 59.0.5, and three mods.",
+    "The packaged-JAR client and full world/inventory/hand/block/animation/persistence/multiplayer visual matrix did not pass; visual remains false and the pack remains candidate."
   ],
   "template": {
     "repository": "https://maven.minecraftforge.net/net/minecraftforge/forge/1.21.9-59.0.5/forge-1.21.9-59.0.5-mdk.zip",

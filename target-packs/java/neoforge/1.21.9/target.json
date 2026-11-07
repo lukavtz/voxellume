@@ -4,7 +4,7 @@
   "edition": "java",
   "status": "candidate",
   "revision": 1,
-  "packSha256": "6e50d727f6a06efaf0b8b74670e9f3530ea278ccc78daf3d1080a9fcbe45bb16",
+  "packSha256": "5792eaef676d7cd89eaf1ed546863433f92dede48ece1d25ae44e3941ea6bcfa",
   "minecraft": {
     "version": "1.21.9",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -41,6 +41,7 @@
     "version": "9.2.1",
     "distributionUrl": "https://services.gradle.org/distributions/gradle-9.2.1-bin.zip",
     "distributionSha256": "72f44c9f8ebcb1af43838f45ee5c4aa9c5444898b3468ab3f4af7b6076c5bc3f",
+    "wrapperJarSha256": "7d3a4ac4de1c32b59bc6a4eb8ecb8e612ccd0cf1ae1e99f66902da64df296172",
     "plugins": [
       {
         "id": "net.neoforged.moddev",
@@ -59,7 +60,8 @@
     }
   },
   "knownLimitations": [
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "Task discovery, clean binary-patch builds, dedicated and packaged production servers, positive GameTests, and the negative control passed on Linux/arm64. Production JAR SHA-256 is b345b52e953cbee09202dea8d635e02100dd5a5b45a57797b09d7670b98ac938.",
+    "Real-client accessibility onboarding and the main menu rendered with Minecraft 1.21.9, NeoForge 21.9.16-beta, and three mods. The packaged-JAR client and full world/inventory/hand/block/animation/persistence/multiplayer visual matrix did not pass; visual remains false and the pack remains candidate."
   ],
   "template": {
     "repository": "https://github.com/NeoForgeMDKs/MDK-1.21.9-ModDevGradle",
