@@ -49,6 +49,18 @@
       "responseSha256": "67de5ec689439d672a91cefde7cad7a7ddd2f7f5a84d23b54599de438f9e7b2a"
     },
     {
+      "url": "https://maven.quiltmc.org/repository/release/org/quiltmc/loom/1.15.1/loom-1.15.1.jar",
+      "responseSha256": "0237bf0a894f2be15bbf11d578263b292bdf21a4ea098ef77aa2a2ea722b8029"
+    },
+    {
+      "url": "https://maven.quiltmc.org/repository/release/org/quiltmc/loom/1.15.1/loom-1.15.1.module",
+      "responseSha256": "c26ce932905e4c118801a562ab5c31edd805d350266c7add013fb3d61d49a033"
+    },
+    {
+      "url": "https://maven.quiltmc.org/repository/release/org/quiltmc/loom/org.quiltmc.loom.gradle.plugin/1.15.1/org.quiltmc.loom.gradle.plugin-1.15.1.pom",
+      "responseSha256": "3fc49b4319df2f7b946e49a853fbbcd5c4619b5688a92f1081dc29a67e73775c"
+    },
+    {
       "url": "https://maven.quiltmc.org/repository/release/org/quiltmc/quilt-installer/0.15.1/quilt-installer-0.15.1.jar",
       "responseSha256": "0a229138caa1b87fd8f5622038410696f98bb85871a279640e7002404c4d0dc2"
     },

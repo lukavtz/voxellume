@@ -1903,7 +1903,7 @@
         ]
       },
       "minecraft": "1.21.4",
-      "qualificationStatus": "candidate_eligible",
+      "qualificationStatus": "partial",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/2e024c9834568a872f8c009a97b29d8d7381d00a/1.21.4.json",
         "https://piston-data.mojang.com/v1/objects/4707d00eb834b446575d89a61a11b5d548d8c001/server.jar",
@@ -6745,16 +6745,16 @@
       "unsupported": 1
     },
     "quilt": {
-      "candidate_eligible": 12,
-      "partial": 4,
+      "candidate_eligible": 11,
+      "partial": 5,
       "rejected": 1,
       "supported": 0,
       "unsupported": 0
     },
     "total": {
       "cells": 68,
-      "candidate_eligible": 42,
-      "partial": 17,
+      "candidate_eligible": 41,
+      "partial": 18,
       "rejected": 8,
       "supported": 0,
       "unsupported": 1
