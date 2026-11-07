@@ -4,7 +4,7 @@
   "edition": "java",
   "status": "candidate",
   "revision": 2,
-  "packSha256": "6f208732b939a93606c8475af4dbe6ff0cd1f9c4475feb9fb84fcf7f55dd21e7",
+  "packSha256": "2baf5b3b673875e50c86d0e82ed0bd249d9aa8ce98e0db2c523084eef7c680b7",
   "minecraft": {
     "version": "1.21.4",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -62,7 +62,8 @@
   "knownLimitations": [
     "The generic official template declares Minecraft 1.20.6; Minecraft, mappings, Loader, and Loom are exact target overrides. No QSL or QFAPI dependency is declared.",
     "Superseded r1 used Gradle 8.9; task discovery failed because Quilt Loom 1.15.1 requires Gradle plugin API 9.2.0. r2 changes only Gradle to exact 9.2.0.",
-    "The r2 task-discovery container was stopped during qualification wrap-up before a result was recorded. No r2 clean build, server, client, production-JAR, or visual capability is claimed; status remains candidate."
+    "R2 tasks --all and clean builds passed after removing the generic template's QFAPI/QSL dependencies and using Loader's pre_launch entrypoint. Development and packaged production servers loaded exact Loader 0.20.0-beta.9 and reached Done.",
+    "Two real-client attempts remained in asset initialization. Both reviewed 1280x720 captures were uniformly black and rejected; client and visual capabilities remain false. GameTest is not configured or required. Full support is not claimed."
   ],
   "template": {
     "repository": "https://github.com/QuiltMC/quilt-template-mod",

@@ -13,7 +13,7 @@ No 1.21.4 pack is `supported`.
 | `java-fabric-1.21.4-r2`   | `candidate` | `92af9d4b9bc671bcf87ec1073a5d81f894ecbbd400fc13294049644e403202b9` | Task discovery, clean build, development and packaged production servers, positive GameTest, and negative control passed. Client and full visual checks did not pass.                                              |
 | `java-neoforge-1.21.4-r1` | `candidate` | `a5946d00fa4ccf342faf9737e5de4d591bc5c8ef7077cbad8643490ee215b1bc` | Task discovery, clean binary-patch builds, development and packaged production servers, two positive GameTests, negative control, and real-client accessibility rendering passed. Full visual matrix did not pass. |
 | `java-forge-1.21.4-r1`    | `rejected`  | `4ea5ec7358636a8c7d83f1b4b90fe3048425c7a754a331a176078367f7f10c87` | Task discovery and clean build failed during decompilation with exit 137. No runtime or visual claim.                                                                                                              |
-| `java-quilt-1.21.4-r2`    | `candidate` | `6f208732b939a93606c8475af4dbe6ff0cd1f9c4475feb9fb84fcf7f55dd21e7` | R1 task discovery proved Gradle 8.9 incompatible with Loom 1.15.1. R2 task discovery was stopped before a result during wrap-up. No build/runtime/visual capability is claimed.                                    |
+| `java-quilt-1.21.4-r2`    | `candidate` | `2baf5b3b673875e50c86d0e82ed0bd249d9aa8ce98e0db2c523084eef7c680b7` | Tasks `--all`, Loader-only clean builds, and development/packaged production servers passed. Two client attempts produced rejected black captures; client and visual capabilities remain false.                    |
 
 `pack-validation.json` records successful `loadTargetPacks` validation of all four final targets. No `evidenceManifest` is declared.
 
@@ -57,7 +57,13 @@ The official MDK `1.21.4-54.1.22` was pinned from ForgeGradle `[7.0.3,8)` to exa
 
 Exact Loader `0.20.0-beta.9`, Quilt Mappings `1.21.4+build.5:intermediary-v2`, Loom `1.15.1`, and generic template `9a6f89cd481e3f58f128596b5b043353bee6b3f2` hashes were matched. Quilt Meta profile `quilt-loader-0.20.0-beta.9-1.21.4` has exact `inheritsFrom: 1.21.4` and response SHA-256 `67de5ec689439d672a91cefde7cad7a7ddd2f7f5a84d23b54599de438f9e7b2a`. No QSL or QFAPI dependency is declared.
 
-R1 Gradle 8.9 failed because Loom 1.15.1 declares Gradle plugin API 9.2.0. R2 changes only Gradle to exact `9.2.0` with distribution SHA-256 `df67a32e86e3276d011735facb1535f64d0d88df84fa87521e90becc2d735444`. The r2 task-discovery container was stopped before a result during wrap-up. Therefore r2 remains a candidate with no executable capability claims, no production JAR SHA, and no supported qualification.
+R1 Gradle 8.9 failed because Loom 1.15.1 declares Gradle plugin API 9.2.0. R2 changes only Gradle to exact `9.2.0` with distribution SHA-256 `df67a32e86e3276d011735facb1535f64d0d88df84fa87521e90becc2d735444`. Loom JAR/module/plugin-marker SHA-256 values are `0237bf0a894f2be15bbf11d578263b292bdf21a4ea098ef77aa2a2ea722b8029`, `c26ce932905e4c118801a562ab5c31edd805d350266c7add013fb3d61d49a033`, and `3fc49b4319df2f7b946e49a853fbbcd5c4619b5688a92f1081dc29a67e73775c`.
+
+The resumed `quilt-r2-tasks-all.log` passed and discovered `runClient` and `runServer`. The first clean build passed, but the generic template still pulled QFAPI/QSL 1.20.6 and its dependency constraints selected Loader 0.25.0; `quilt-r2-server.log` retains the exact Minecraft mismatch. Removing those API dependencies, pinning Loader metadata, and using Loader's `pre_launch` entrypoint produced the passing `quilt-r2-clean-build-repair1.log`. The Loader-only template is materialized under `target-packs/java/quilt/1.21.4/templates/`.
+
+`quilt-r2-server-repair1.log` and `quilt-r2-production-server-repair1.log` both load exact Loader 0.20.0-beta.9, execute `Hello Quilt world from Mod Name!`, and reach `Done`. The production log loads `example_mod-1.0.0+1.21.4.jar` from the pristine `mods` directory. Its SHA-256 is `4794f6c8fbbaf1487df99cf0dc17323b58de44ab1ec7b895b4f11e997252ee67`; production metadata contains only exact Loader and Minecraft dependencies. The first production attempt used the installer's parent directory rather than its `server/` output directory and is retained as `quilt-r2-production-server.log`.
+
+Two real-client attempts remained in asset initialization. `artifacts/visual/quilt/main-menu.png` and `main-menu-final.png` were reviewed and rejected as uniformly black; no client or visual capability is claimed. GameTest is not configured or required. The pack remains candidate, with build and server capabilities true and client, GameTest, and visual false. Nine follow-up containers and the r2 Gradle volume were removed after capture.
 
 ## Integrity
 
