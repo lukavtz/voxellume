@@ -1,10 +1,10 @@
 {
   "schemaVersion": "target-pack-1.0.0",
-  "id": "java-quilt-1.21.10-r1",
+  "id": "java-quilt-1.21.10-r2",
   "edition": "java",
   "status": "candidate",
-  "revision": 1,
-  "packSha256": "7cc368d7c9ab66dc52fce1be07c54f4b1fa3aafc4e8b39de0aecbbc26e94461e",
+  "revision": 2,
+  "packSha256": "081961ead5968328757d57d2a7a08e60b392b7bccb0ed85ba6854de697b885ce",
   "minecraft": {
     "version": "1.21.10",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -38,9 +38,10 @@
     "architecture": "64-bit"
   },
   "gradle": {
-    "version": "8.9",
-    "distributionUrl": "https://services.gradle.org/distributions/gradle-8.9-bin.zip",
-    "distributionSha256": "d725d707bfabd4dfdc958c624003b3c80accc03f7037b5122c4b1d0ef15cecab",
+    "version": "9.2.1",
+    "distributionUrl": "https://services.gradle.org/distributions/gradle-9.2.1-bin.zip",
+    "distributionSha256": "72f44c9f8ebcb1af43838f45ee5c4aa9c5444898b3468ab3f4af7b6076c5bc3f",
+    "wrapperJarSha256": "cb0da6751c2b753a16ac168bb354870ebb1e162e9083f116729cec9c781156b8",
     "plugins": [
       {
         "id": "org.quiltmc.loom",
@@ -59,8 +60,10 @@
     }
   },
   "knownLimitations": [
-    "Only generic official template is available; its content declares Minecraft 1.20.6, so every target coordinate is an override. No target-local build/runtime compatibility claim.",
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "Only the generic official template is available; target-local overrides use the loader-only PreLaunchEntrypoint with no QSL or QFAPI dependency.",
+    "R1 Gradle 8.9 failed because Quilt Loom 1.15.1 requires Gradle plugin API 9.2.0. R2 changes only Gradle to 9.2.1.",
+    "R2 task discovery, clean build, dedicated server, and packaged production server passed on Linux/arm64. Production JAR SHA-256 is 3cd812602d7520d93f9e7ef774e8b58ea6dfb7980faeb613ad7bcb128a976c10.",
+    "No GameTest is configured by this loader-only pack. The real client remained in downloadAssets; its 1280x720 capture was reviewed and rejected as uniformly black. Client and visual remain false and the pack remains candidate."
   ],
   "template": {
     "repository": "https://github.com/QuiltMC/quilt-template-mod",

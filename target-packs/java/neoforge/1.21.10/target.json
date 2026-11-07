@@ -4,7 +4,7 @@
   "edition": "java",
   "status": "candidate",
   "revision": 1,
-  "packSha256": "90fc89b3558ef38ad2958ad514f1ca42bc9542369a07a84590358b1872ce83e2",
+  "packSha256": "926faae2e7efa80a99e4f1f1d8c973f013c2f2b9269bc1a5f91a79ad96189418",
   "minecraft": {
     "version": "1.21.10",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -41,6 +41,7 @@
     "version": "9.2.1",
     "distributionUrl": "https://services.gradle.org/distributions/gradle-9.2.1-bin.zip",
     "distributionSha256": "72f44c9f8ebcb1af43838f45ee5c4aa9c5444898b3468ab3f4af7b6076c5bc3f",
+    "wrapperJarSha256": "7d3a4ac4de1c32b59bc6a4eb8ecb8e612ccd0cf1ae1e99f66902da64df296172",
     "plugins": [
       {
         "id": "net.neoforged.moddev",
@@ -59,7 +60,8 @@
     }
   },
   "knownLimitations": [
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "Task discovery, clean binary-patch builds, dedicated and packaged production servers, two positive GameTests, negative control, and real-client rendering passed on Linux/arm64. Production JAR SHA-256 is f830f267ca271a94b80c56c01f443b5cdb2511d4b808a60dff383d626bbc90cc.",
+    "Reviewed captures show accessibility onboarding and the settled Minecraft 1.21.10 / NeoForge 21.10.64 main menu. The full visual matrix did not pass, so visual remains false and the pack remains candidate."
   ],
   "template": {
     "repository": "https://github.com/NeoForgeMDKs/MDK-1.21.10-ModDevGradle",
