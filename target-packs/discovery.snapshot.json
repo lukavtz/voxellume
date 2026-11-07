@@ -1639,7 +1639,7 @@
         ]
       },
       "minecraft": "1.21.4",
-      "qualificationStatus": "candidate_eligible",
+      "qualificationStatus": "partial",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/2e024c9834568a872f8c009a97b29d8d7381d00a/1.21.4.json",
         "https://piston-data.mojang.com/v1/objects/4707d00eb834b446575d89a61a11b5d548d8c001/server.jar",
@@ -1730,7 +1730,7 @@
         "parchmentMinecraftVersion": "1.21.4"
       },
       "minecraft": "1.21.4",
-      "qualificationStatus": "candidate_eligible",
+      "qualificationStatus": "partial",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/2e024c9834568a872f8c009a97b29d8d7381d00a/1.21.4.json",
         "https://piston-data.mojang.com/v1/objects/4707d00eb834b446575d89a61a11b5d548d8c001/server.jar",
@@ -1809,7 +1809,7 @@
         "kind": "mojang"
       },
       "minecraft": "1.21.4",
-      "qualificationStatus": "candidate_eligible",
+      "qualificationStatus": "rejected",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/2e024c9834568a872f8c009a97b29d8d7381d00a/1.21.4.json",
         "https://piston-data.mojang.com/v1/objects/4707d00eb834b446575d89a61a11b5d548d8c001/server.jar",
@@ -6724,23 +6724,23 @@
   },
   "summary": {
     "fabric": {
-      "candidate_eligible": 13,
-      "partial": 4,
+      "candidate_eligible": 12,
+      "partial": 5,
       "rejected": 0,
       "supported": 0,
       "unsupported": 0
     },
     "neoforge": {
-      "candidate_eligible": 13,
-      "partial": 4,
+      "candidate_eligible": 12,
+      "partial": 5,
       "rejected": 0,
       "supported": 0,
       "unsupported": 0
     },
     "forge": {
-      "candidate_eligible": 13,
+      "candidate_eligible": 12,
       "partial": 0,
-      "rejected": 3,
+      "rejected": 4,
       "supported": 0,
       "unsupported": 1
     },
@@ -6753,9 +6753,9 @@
     },
     "total": {
       "cells": 68,
-      "candidate_eligible": 53,
-      "partial": 11,
-      "rejected": 3,
+      "candidate_eligible": 50,
+      "partial": 13,
+      "rejected": 4,
       "supported": 0,
       "unsupported": 1
     }

@@ -4,7 +4,7 @@
   "edition": "java",
   "status": "candidate",
   "revision": 1,
-  "packSha256": "b51722643cea474a4d4341ea1338695b8a3ccdae4c233fb85551fd5d53f4816b",
+  "packSha256": "a5946d00fa4ccf342faf9737e5de4d591bc5c8ef7077cbad8643490ee215b1bc",
   "minecraft": {
     "version": "1.21.4",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -41,6 +41,7 @@
     "version": "9.2.1",
     "distributionUrl": "https://services.gradle.org/distributions/gradle-9.2.1-bin.zip",
     "distributionSha256": "72f44c9f8ebcb1af43838f45ee5c4aa9c5444898b3468ab3f4af7b6076c5bc3f",
+    "wrapperJarSha256": "7d3a4ac4de1c32b59bc6a4eb8ecb8e612ccd0cf1ae1e99f66902da64df296172",
     "plugins": [
       {
         "id": "net.neoforged.moddev",
@@ -59,7 +60,8 @@
     }
   },
   "knownLimitations": [
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "Initial clean build failed in the decompile pipeline under the mandatory 4 GiB limit. The template enables MDG's official disableRecompilation binary patch pipeline; decompiled Minecraft sources and Parchment IDE source/Javadoc augmentation are unavailable.",
+    "Clean binary-patch build, dedicated development and packaged production servers, positive GameTests and a negative control passed. The real client rendered the accessibility onboarding screen; packaged-JAR client and full world/inventory/hand/animation visual scenarios were not run, so visual is false and status remains candidate."
   ],
   "template": {
     "repository": "https://github.com/NeoForgeMDKs/MDK-1.21.4-ModDevGradle",

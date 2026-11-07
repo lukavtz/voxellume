@@ -29,6 +29,14 @@
       "responseSha256": "2dffba1a6485d09a4ada3a72e7972ac8906517b8e052f017d6853fb841b9f178"
     },
     {
+      "url": "https://maven.neoforged.net/releases/net/neoforged/neoforge/21.4.161/neoforge-21.4.161-installer.jar",
+      "responseSha256": "3696ad5d47dee24b09a557c98289a82834ef539fee7634ebd26e1e6ea92b881b"
+    },
+    {
+      "url": "https://maven.parchmentmc.org/org/parchmentmc/data/parchment-1.21.4/2025.03.23/parchment-1.21.4-2025.03.23.zip",
+      "responseSha256": "2ceb5f4228416f4a359ff9eeb4b2bb150e4c89e50d9075d74a44eba78b2ef774"
+    },
+    {
       "url": "https://piston-meta.mojang.com/v1/packages/2e024c9834568a872f8c009a97b29d8d7381d00a/1.21.4.json",
       "responseSha256": "110a9db5df120e614728e248ee0d705af07438d1de1d261bc7c3c85d17cf8e12"
     }

@@ -1,10 +1,10 @@
 {
   "schemaVersion": "target-verification-1.0.0",
   "capabilities": {
-    "build": false,
-    "server": false,
+    "build": true,
+    "server": true,
     "client": false,
-    "gameTest": false,
+    "gameTest": true,
     "visual": false
   },
   "required": [
@@ -16,73 +16,35 @@
   ],
   "checks": {
     "build": {
-      "argv": [
-        "./gradlew",
-        "--no-daemon",
-        "clean",
-        "build"
-      ],
-      "assertions": [
-        "Qualification requires exit code 0 and a production JAR."
-      ],
-      "artifactGlobs": [
-        "build/libs/*.jar",
-        "build/reports/**"
-      ]
+      "argv": ["./gradlew", "--no-daemon", "clean", "build"],
+      "assertions": ["Qualification requires exit code 0 and a production JAR."],
+      "artifactGlobs": ["build/libs/*.jar", "build/reports/**"]
     },
     "server": {
-      "argv": [
-        "./gradlew",
-        "--no-daemon",
-        "runServer"
-      ],
-      "assertions": [
-        "Qualification requires the dedicated server startup assertion."
-      ],
-      "artifactGlobs": [
-        "run/logs/*.log"
-      ]
+      "argv": ["./gradlew", "--no-daemon", "runServer"],
+      "assertions": ["Qualification requires the dedicated server startup assertion."],
+      "artifactGlobs": ["run/logs/*.log"]
     },
     "client": {
-      "argv": [
-        "./gradlew",
-        "--no-daemon",
-        "runClient"
-      ],
-      "assertions": [
-        "Qualification requires the client main-menu and mod-error assertions."
-      ],
-      "artifactGlobs": [
-        "run/logs/*.log"
-      ]
+      "argv": ["./gradlew", "--no-daemon", "runClient"],
+      "assertions": ["Qualification requires the client main-menu and mod-error assertions."],
+      "artifactGlobs": ["run/logs/*.log"]
     },
     "visual": {
-      "argv": [
-        "./gradlew",
-        "--no-daemon",
-        "runClient"
-      ],
-      "assertions": [
-        "Qualification requires reviewed inventory, hand, world, GUI, and animation captures."
-      ],
-      "artifactGlobs": [
-        "verification/screenshots/*.png"
-      ]
+      "argv": ["./gradlew", "--no-daemon", "runClient"],
+      "assertions": ["Qualification requires reviewed inventory, hand, world, GUI, and animation captures."],
+      "artifactGlobs": ["verification/screenshots/*.png"]
     },
     "gameTest": {
-      "argv": [
-        "./gradlew",
-        "--no-daemon",
-        "runGametest"
-      ],
-      "assertions": [
-        "Qualification requires all configured GameTests to pass."
-      ],
-      "artifactGlobs": [
-        "build/reports/gametest/**",
-        "run/logs/*.log"
-      ]
+      "argv": ["./gradlew", "--no-daemon", "runGametest"],
+      "assertions": ["Qualification requires all configured GameTests to pass."],
+      "artifactGlobs": ["build/reports/gametest/**", "run/logs/*.log"]
     }
   },
-  "testedPlatforms": []
+  "testedPlatforms": [
+    {
+      "os": "linux",
+      "arch": "arm64"
+    }
+  ]
 }
