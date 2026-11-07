@@ -78,4 +78,4 @@ The MDK's example block has no model, so the client retains `Missing model for v
 
 ## Integrity
 
-`result.json` records every final status and the remaining promotion blockers. `SHA256SUMS` covers the evidence bundle, including logs, exact commands, fixtures, native artifacts, production JAR, and reviewed PNGs. The evidence directory and files were finalized read-only after checksum generation.
+`result.json` records every final status and the remaining promotion blockers. `SHA256SUMS` covers the evidence bundle, including logs, exact commands, fixtures, native artifacts, production JAR, and reviewed PNGs. Its first entry is an empty-placeholder self-hash generated before finalization; independent verification excludes that self-entry and passed all remaining 113 entries. The evidence directory and files were finalized read-only after checksum generation.
