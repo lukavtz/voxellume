@@ -1,10 +1,10 @@
 {
   "schemaVersion": "target-pack-1.0.0",
-  "id": "java-quilt-1.21.9-r1",
+  "id": "java-quilt-1.21.9-r2",
   "edition": "java",
   "status": "candidate",
-  "revision": 1,
-  "packSha256": "5b665a235668af087fde84339b4ec2b52059eebcfd979084ac4ff6998c366905",
+  "revision": 2,
+  "packSha256": "7c441ac2ed57d0d937d3a4890f48c4c0dba31dedd210ae6e74dce6e6bc582199",
   "minecraft": {
     "version": "1.21.9",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -38,12 +38,13 @@
     "architecture": "64-bit"
   },
   "gradle": {
-    "version": "8.9",
-    "distributionUrl": "https://services.gradle.org/distributions/gradle-8.9-bin.zip",
-    "distributionSha256": "d725d707bfabd4dfdc958c624003b3c80accc03f7037b5122c4b1d0ef15cecab",
+    "version": "9.2.0",
+    "distributionUrl": "https://services.gradle.org/distributions/gradle-9.2.0-bin.zip",
+    "distributionSha256": "df67a32e86e3276d011735facb1535f64d0d88df84fa87521e90becc2d735444",
+    "wrapperJarSha256": "cb0da6751c2b753a16ac168bb354870ebb1e162e9083f116729cec9c781156b8",
     "plugins": [
       {
-        "id": "org.quiltmc.loom",
+        "id": "org.quiltmc.loom.remap",
         "version": "1.15.1"
       }
     ]
@@ -59,8 +60,10 @@
     }
   },
   "knownLimitations": [
-    "Only generic official template is available; its content declares Minecraft 1.20.6, so every target coordinate is an override. No target-local build/runtime compatibility claim.",
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "Only generic official template is available; its original content declares Minecraft 1.20.6, so every target coordinate is an override.",
+    "R1 Gradle 8.9 failed because Loom 1.15.1 declares Gradle plugin API 9.2.0. R2 pins Gradle 9.2.0 and org.quiltmc.loom.remap without changing other target identities.",
+    "R2 task discovery, Loader-only clean builds, and dedicated and packaged production servers passed on Linux/arm64. Production JAR SHA-256 is f3fc55d08ce63a080bb668893883cc0348775c5ea27dfbb7ae7fa38371c6a780.",
+    "The real client remained in downloadAssets; its 1280x720 capture was reviewed and rejected as uniformly black. Client and visual remain false and the pack remains candidate."
   ],
   "template": {
     "repository": "https://github.com/QuiltMC/quilt-template-mod",
