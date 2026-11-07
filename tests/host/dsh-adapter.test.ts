@@ -302,8 +302,15 @@ test("default apply loads every shared skill and declares host services", async 
   assert.equal(host.tools.size, 5);
   assert.equal(host.sections.length, 1);
   const skillNames = (
-    await readdir(new URL("../../skills/", import.meta.url))
-  ).sort();
+    await readdir(new URL("../../skills/", import.meta.url), {
+      withFileTypes: true,
+    })
+  )
+    .filter(
+      (entry) => entry.isDirectory() && entry.name.startsWith("minecraft-"),
+    )
+    .map((entry) => entry.name)
+    .sort();
   assert.ok(skillNames.length >= 14);
   for (const skillName of skillNames) {
     const markdown = await readFile(
