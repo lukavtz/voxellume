@@ -1,10 +1,10 @@
 {
   "schemaVersion": "target-pack-1.0.0",
-  "id": "java-quilt-1.21.3-r1",
+  "id": "java-quilt-1.21.3-r2",
   "edition": "java",
   "status": "candidate",
-  "revision": 1,
-  "packSha256": "c99640cb2cb64f62ffd58d7a317f6e5c30e84279904e1e2c69cd141d9b4742a7",
+  "revision": 2,
+  "packSha256": "4f3ffcf565050e7f173b8ed33aa104f75f3dbf74e1ae0c271782bc5855346ec8",
   "minecraft": {
     "version": "1.21.3",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -38,9 +38,9 @@
     "architecture": "64-bit"
   },
   "gradle": {
-    "version": "8.9",
-    "distributionUrl": "https://services.gradle.org/distributions/gradle-8.9-bin.zip",
-    "distributionSha256": "d725d707bfabd4dfdc958c624003b3c80accc03f7037b5122c4b1d0ef15cecab",
+    "version": "9.2.1",
+    "distributionUrl": "https://services.gradle.org/distributions/gradle-9.2.1-bin.zip",
+    "distributionSha256": "72f44c9f8ebcb1af43838f45ee5c4aa9c5444898b3468ab3f4af7b6076c5bc3f",
     "plugins": [
       {
         "id": "org.quiltmc.loom",
@@ -59,8 +59,10 @@
     }
   },
   "knownLimitations": [
-    "Only generic official template is available; its content declares Minecraft 1.20.6, so every target coordinate is an override. No target-local build/runtime compatibility claim.",
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "The generic official template declares Minecraft 1.20.6; every target coordinate is overridden exactly and apiDependencies remains empty.",
+    "Revision r1 with Gradle 8.9 failed the Quilt Loom 1.15.1 Gradle 9.2.0 API floor; r2 pins exact Gradle 9.2.1.",
+    "Clean build, dedicated server, production-JAR server, real client, and reviewed main-menu capture passed on Linux/arm64. GameTest is not required and no GameTest command was inferred.",
+    "World, inventory, hand, placed-block, alternate GUI-state, and animation visual scenarios were not run; visual remains false and candidate status remains."
   ],
   "template": {
     "repository": "https://github.com/QuiltMC/quilt-template-mod",
