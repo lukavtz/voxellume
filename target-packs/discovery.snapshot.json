@@ -2776,7 +2776,7 @@
         ]
       },
       "minecraft": "1.21.7",
-      "qualificationStatus": "candidate_eligible",
+      "qualificationStatus": "partial",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/1b478ff245de95b05e3c1a1589f391ade22e1bd3/1.21.7.json",
         "https://piston-data.mojang.com/v1/objects/05e4b48fbc01f0385adb74bcff9751d34552486c/server.jar",
@@ -2867,7 +2867,7 @@
         "parchmentMinecraftVersion": "1.21.7"
       },
       "minecraft": "1.21.7",
-      "qualificationStatus": "candidate_eligible",
+      "qualificationStatus": "partial",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/1b478ff245de95b05e3c1a1589f391ade22e1bd3/1.21.7.json",
         "https://piston-data.mojang.com/v1/objects/05e4b48fbc01f0385adb74bcff9751d34552486c/server.jar",
@@ -2946,7 +2946,7 @@
         "kind": "mojang"
       },
       "minecraft": "1.21.7",
-      "qualificationStatus": "candidate_eligible",
+      "qualificationStatus": "partial",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/1b478ff245de95b05e3c1a1589f391ade22e1bd3/1.21.7.json",
         "https://piston-data.mojang.com/v1/objects/05e4b48fbc01f0385adb74bcff9751d34552486c/server.jar",
@@ -3040,7 +3040,7 @@
         ]
       },
       "minecraft": "1.21.7",
-      "qualificationStatus": "candidate_eligible",
+      "qualificationStatus": "partial",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/1b478ff245de95b05e3c1a1589f391ade22e1bd3/1.21.7.json",
         "https://piston-data.mojang.com/v1/objects/05e4b48fbc01f0385adb74bcff9751d34552486c/server.jar",
@@ -6724,37 +6724,37 @@
   },
   "summary": {
     "fabric": {
-      "candidate_eligible": 6,
-      "partial": 11,
+      "candidate_eligible": 5,
+      "partial": 12,
       "rejected": 0,
       "supported": 0,
       "unsupported": 0
     },
     "neoforge": {
+      "candidate_eligible": 5,
+      "partial": 11,
+      "rejected": 1,
+      "supported": 0,
+      "unsupported": 0
+    },
+    "forge": {
+      "candidate_eligible": 5,
+      "partial": 3,
+      "rejected": 8,
+      "supported": 0,
+      "unsupported": 1
+    },
+    "quilt": {
       "candidate_eligible": 6,
       "partial": 10,
       "rejected": 1,
       "supported": 0,
       "unsupported": 0
     },
-    "forge": {
-      "candidate_eligible": 6,
-      "partial": 2,
-      "rejected": 8,
-      "supported": 0,
-      "unsupported": 1
-    },
-    "quilt": {
-      "candidate_eligible": 7,
-      "partial": 9,
-      "rejected": 1,
-      "supported": 0,
-      "unsupported": 0
-    },
     "total": {
       "cells": 68,
-      "candidate_eligible": 25,
-      "partial": 32,
+      "candidate_eligible": 21,
+      "partial": 36,
       "rejected": 10,
       "supported": 0,
       "unsupported": 1

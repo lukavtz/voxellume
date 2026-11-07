@@ -4,7 +4,7 @@
   "edition": "java",
   "status": "candidate",
   "revision": 1,
-  "packSha256": "972667ac3dbd5311107f27a2cd8fb83de7420f169529ec34caf212a991cae6d8",
+  "packSha256": "b6023aa0e697d7071174fc267b5e0059b81e4097a12a39e434b1e39eb9f8a373",
   "minecraft": {
     "version": "1.21.7",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -41,6 +41,7 @@
     "version": "9.2.1",
     "distributionUrl": "https://services.gradle.org/distributions/gradle-9.2.1-bin.zip",
     "distributionSha256": "72f44c9f8ebcb1af43838f45ee5c4aa9c5444898b3468ab3f4af7b6076c5bc3f",
+    "wrapperJarSha256": "7d3a4ac4de1c32b59bc6a4eb8ecb8e612ccd0cf1ae1e99f66902da64df296172",
     "plugins": [
       {
         "id": "net.neoforged.moddev",
@@ -59,7 +60,9 @@
     }
   },
   "knownLimitations": [
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "MDG's exact disableRecompilation binary patch pipeline passed task discovery and clean builds on Linux/arm64; no decompile success is claimed.",
+    "Dedicated and packaged production servers, two explicit positive GameTests, the negative control, and a real modded client main menu passed. Production JAR SHA-256 is 698946a7598afab3a709d1afa2020066fdbb3564396f9a1bb7023ba25b44cf2d.",
+    "Only accessibility onboarding and the real 1280x720 main menu were reviewed. World, inventory, hand, placed-block, alternate GUI-state, animation, clipping, and z-fighting scenarios were not run; visual remains false and the pack remains candidate."
   ],
   "template": {
     "repository": "https://github.com/NeoForgeMDKs/MDK-1.21.7-ModDevGradle",
