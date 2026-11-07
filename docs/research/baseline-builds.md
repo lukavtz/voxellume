@@ -64,3 +64,5 @@ Both builds reached `:createMinecraftArtifacts`, completed the earlier NFRT stag
 Finalized `SHA256SUMS` deterministically covers 9 files; `shasum -a 256 -c` reported 9/9 OK. All 10 evidence files were observed as mode `0444`, and the directory as `0555`, making the finalized evidence read-only.
 
 Next repair: diagnose the Vineflower/NFRT decompiler exit using its full console, exact inputs, and resource behavior before changing anything or retrying again. A third blind retry is not qualification evidence.
+
+The rerun under `/Users/luxvtz/.local/share/voxellume/evidence/neoforge-1.21.1-r1-20261107T000410Z/` verified exact wrapper JAR and Gradle 9.2.1 ZIP hashes plus offline `distributionSha256Sum`, then reproduced `OOMKilled=true` on the initial build and a targeted 256 MiB Gradle-heap retry. NFRT forces at least `-Xmx4096m` for Vineflower inside the 4 GiB container. GameTest and production-JAR checks were unavailable; all 27 `SHA256SUMS` entries verified and no check containers remain. The pack remains `candidate` with unchanged versions.
