@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "modid-gametest",
+  "version": "1.0.0",
+  "name": "Example Mod GameTests",
+  "environment": "*",
+  "entrypoints": {
+    "fabric-gametest": ["com.example.ExampleModGameTests"]
+  },
+  "depends": {
+    "fabricloader": ">=0.20.1",
+    "minecraft": "~1.21.3",
+    "java": ">=21",
+    "fabric-api": "*",
+    "modid": "*"
+  }
+}

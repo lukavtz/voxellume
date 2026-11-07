@@ -1,10 +1,10 @@
 {
   "schemaVersion": "target-pack-1.0.0",
-  "id": "java-fabric-1.21.3-r1",
+  "id": "java-fabric-1.21.3-r2",
   "edition": "java",
   "status": "candidate",
-  "revision": 1,
-  "packSha256": "46cf4d6939ee935e72868173a49f8ffad315a13e6908b1dda05e9f8c1c8794a5",
+  "revision": 2,
+  "packSha256": "7b209bce35d65207e9df8a5afca322ac3307f0b89f3b21bdadac102244ba4fb1",
   "minecraft": {
     "version": "1.21.3",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -56,7 +56,7 @@
     "plugins": [
       {
         "id": "net.fabricmc.fabric-loom-remap",
-        "version": "1.20.0-alpha.19"
+        "version": "1.17.21"
       }
     ]
   },
@@ -71,8 +71,9 @@
     }
   },
   "knownLimitations": [
-    "Template declares floating Loom 1.19-SNAPSHOT; exact 1.20.0-alpha.19 is a required override. No build/runtime compatibility claim.",
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "Revision r1 with Loom 1.20.0-alpha.19 failed because that plugin requires JVM 25; r2 pins exact Loom 1.17.21, which supports JVM 21.",
+    "Clean build, configured server GameTest, deliberate negative control, dedicated server, production-JAR server, real client, and reviewed main-menu capture passed on Linux/arm64.",
+    "Fabric API 0.114.1+1.21.3 has no client-GameTest API. World, inventory, hand, placed-block, alternate GUI-state, and animation visual scenarios were not run; visual remains false and candidate status remains."
   ],
   "template": {
     "repository": "https://github.com/FabricMC/fabric-example-mod",

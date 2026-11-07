@@ -2,9 +2,9 @@
   "schemaVersion": "target-pack-1.0.0",
   "id": "java-neoforge-1.21.3-r1",
   "edition": "java",
-  "status": "candidate",
+  "status": "rejected",
   "revision": 1,
-  "packSha256": "9122fd5e50384138460e42cd7bf9859d1bee23bfec230a89eedc5ed3e1fe3c1d",
+  "packSha256": "0c643f0ea041055a5eb2ec47bbcb4590213da4f6ddac928adda91084a1a84a6a",
   "minecraft": {
     "version": "1.21.3",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -59,11 +59,16 @@
     }
   },
   "knownLimitations": [
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "Task discovery passed, but the exact clean build was OOM-killed during Vineflower decompilation under the mandatory 4 GiB limit; no runtime or production-JAR support is claimed."
   ],
-  "template": {
-    "repository": "https://github.com/NeoForgeMDKs/MDK-1.21.3-ModDevGradle",
-    "revision": "64d72484ebb1650bb9cbf4ea990631e00bcc529e",
-    "contentSha256": "81c7cc1a0ea5c8759162816fc92df44a78d578965706fa1cdc15fb24f0a2b458"
+  "reason": {
+    "code": "verification_failed",
+    "detail": "ModDevGradle 2.0.148 and NeoForge 21.3.100 failed createMinecraftArtifacts during Vineflower 1.10.1 decompilation; Docker reported OOMKilled=true.",
+    "evidence": [
+      {
+        "url": "https://maven.neoforged.net/releases/net/neoforged/neoforge/21.3.100/neoforge-21.3.100-universal.jar",
+        "sha256": "a101bd8c87143cd5d716a3dd1f9ff76e4f5f0146a29b11a86e230e07c56bfd7c"
+      }
+    ]
   }
 }

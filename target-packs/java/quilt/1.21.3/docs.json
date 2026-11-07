@@ -25,6 +25,10 @@
   ],
   "catalogs": [
     {
+      "url": "https://maven.quiltmc.org/repository/release/org/quiltmc/loom/1.15.1/loom-1.15.1.module",
+      "responseSha256": "c26ce932905e4c118801a562ab5c31edd805d350266c7add013fb3d61d49a033"
+    },
+    {
       "url": "https://maven.quiltmc.org/repository/release/org/quiltmc/loom/maven-metadata.xml",
       "responseSha256": "ee5852ee0df1e2249c06c740a5c67c542c5b75828e32028fd1fe7694819d2ce9"
     },

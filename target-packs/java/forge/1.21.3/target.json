@@ -2,9 +2,9 @@
   "schemaVersion": "target-pack-1.0.0",
   "id": "java-forge-1.21.3-r1",
   "edition": "java",
-  "status": "candidate",
+  "status": "rejected",
   "revision": 1,
-  "packSha256": "8ae3d04180779af3d875419987e60b918f6ef8901f8bbb585d365abce4dd3233",
+  "packSha256": "b51fad70b2124c134fd210bf67119e327d52739485b5adf2b352cc5d12211cd3",
   "minecraft": {
     "version": "1.21.3",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -64,12 +64,16 @@
     }
   },
   "knownLimitations": [
-    "MDK declares a ForgeGradle range; exact plugin pin is selected from official Forge Maven. No build/runtime compatibility claim.",
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "Exact ForgeGradle 7.0.40 failed during Mavenizer decompilation with exit 137 under the mandatory 4 GiB limit; no runtime or production-JAR support is claimed."
   ],
-  "template": {
-    "repository": "https://maven.minecraftforge.net/net/minecraftforge/forge/1.21.3-53.1.16/forge-1.21.3-53.1.16-mdk.zip",
-    "revision": "1.21.3-53.1.16",
-    "contentSha256": "ba89f4b7b5f6807020d31fa4cc2bb60ee1abb60a3f7f0d0fe08691135149d397"
+  "reason": {
+    "code": "verification_failed",
+    "detail": "Forge 1.21.3-53.1.16 and ForgeGradle 7.0.40 failed task discovery and clean build during Mavenizer decompilation with MCP step exit 137.",
+    "evidence": [
+      {
+        "url": "https://maven.minecraftforge.net/net/minecraftforge/forge/1.21.3-53.1.16/forge-1.21.3-53.1.16-installer.jar",
+        "sha256": "bacc5912ead42894a2e3edc67268c78f3860b1808df6456ce78e55a4667c0b1c"
+      }
+    ]
   }
 }
