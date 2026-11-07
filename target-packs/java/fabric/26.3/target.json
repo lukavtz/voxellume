@@ -4,7 +4,6 @@
   "edition": "java",
   "status": "candidate",
   "revision": 1,
-  "packSha256": "f275c047068eed1302a067182179efeeb19f72e824b6b9ebe0254a1dc94c8c02",
   "minecraft": {
     "version": "26.3",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -42,6 +41,7 @@
     "version": "9.8.2",
     "distributionUrl": "https://services.gradle.org/distributions/gradle-9.8.2-bin.zip",
     "distributionSha256": "21bd5da2de49b642904077f38c0efdc7778e92b3ed0889392dca61b97e389607",
+    "wrapperJarSha256": "3b8a25775a69158b5ad2b1d17a80a88dc7b40a352a73eb27d06c612a7ce68e98",
     "plugins": [
       {
         "id": "net.fabricmc.fabric-loom",
@@ -60,12 +60,14 @@
     }
   },
   "knownLimitations": [
-    "Template declares floating Loom 1.19-SNAPSHOT; exact 1.20.0-alpha.19 is a required override. No build/runtime compatibility claim.",
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "Template declares floating Loom 1.19-SNAPSHOT; exact 1.20.0-alpha.19 is a required override.",
+    "Clean build, development and packaged production servers, positive server GameTests, and a valid negative control passed on Linux/arm64.",
+    "Three rendered client GameTest attempts did not pass; asset download stalled and no real-client visual pass was established. Full support is not claimed."
   ],
   "template": {
     "repository": "https://github.com/FabricMC/fabric-example-mod",
     "revision": "91f19010a4e764f193fe50acfe2c8ee68f1f15cd",
     "contentSha256": "ccacbfa1dfb686fec2112d285bd09cdb58fa2e4ee36b5d1298a3e4c3e64241bf"
-  }
+  },
+  "packSha256": "1836fae799401a5fcfb4896cc80c5e9b765895ffe40e7778445577941d487697"
 }

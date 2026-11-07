@@ -1,0 +1,11 @@
+[versions]
+minecraft = "26.3"
+quilt_loom = "1.15.1"
+quilt_loader = "0.20.0-beta.9"
+
+[libraries]
+minecraft = { module = "com.mojang:minecraft", version.ref = "minecraft" }
+quilt_loader = { module = "org.quiltmc:quilt-loader", version.ref = "quilt_loader" }
+
+[plugins]
+quilt_loom = { id = "org.quiltmc.loom.no_remap", version.ref = "quilt_loom" }
