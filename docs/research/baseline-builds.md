@@ -4,7 +4,7 @@ Date: 2026-11-06.
 
 ## Qualification result
 
-Both `java-fabric-1.21.1-r1` and `java-neoforge-1.21.1-r1` remain **`candidate`**. Neither clean build passed, neither produced a production JAR, and **zero targets are supported** by these runs. No dedicated-server, client, GameTest, production-JAR, or visual qualification was completed; this report makes no runtime or visual-support claim.
+Both `java-fabric-1.21.1-r1` and `java-neoforge-1.21.1-r1` were **`candidate`** during these runs. Neither clean build passed, neither produced a production JAR, and **zero targets are supported** by these runs. No dedicated-server, client, GameTest, production-JAR, or visual qualification was completed; this report makes no runtime or visual-support claim.
 
 ## Fabric `java-fabric-1.21.1-r1`
 

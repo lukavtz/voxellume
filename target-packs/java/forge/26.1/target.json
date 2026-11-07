@@ -2,9 +2,9 @@
   "schemaVersion": "target-pack-1.0.0",
   "id": "java-forge-26.1-r1",
   "edition": "java",
-  "status": "candidate",
+  "status": "rejected",
   "revision": 1,
-  "packSha256": "7f053ee96425c2b9cb1e855a74924c85035e0d5ce3df88141b290d3ace4d435e",
+  "packSha256": "5628f0adb32c26bc2f079b0dbcf716af8b0a09246402b2348b5bdef8cbb6f546",
   "minecraft": {
     "version": "26.1",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -35,6 +35,7 @@
     "version": "9.3.1",
     "distributionUrl": "https://services.gradle.org/distributions/gradle-9.3.1-bin.zip",
     "distributionSha256": "b266d5ff6b90eada6dc3b20cb090e3731302e553a27c5d3e4df1f0d76beaff06",
+    "wrapperJarSha256": "2db75c40782f5e8ba1fc278a5574bab070adccb2d21ca5a6e5ed840888448046",
     "plugins": [
       {
         "id": "net.minecraftforge.gradle",
@@ -53,12 +54,17 @@
     }
   },
   "knownLimitations": [
-    "MDK declares a ForgeGradle range; exact plugin pin is selected from official Forge Maven. No build/runtime compatibility claim.",
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "Task discovery and clean build failed during ForgeGradle/Minecraft Mavenizer decompilation: Vineflower 1.11.2 requested -Xms4G and exited 137 inside the required 4 GiB Docker limit; no tasks were listed and no production JAR was produced.",
+    "Dedicated server, configured GameTest and negative control, real client, pristine production-JAR runtime, and visual checks were not run because the required clean build failed; no runtime or visual support claim."
   ],
-  "template": {
-    "repository": "https://maven.minecraftforge.net/net/minecraftforge/forge/26.1-62.0.9/forge-26.1-62.0.9-mdk.zip",
-    "revision": "26.1-62.0.9",
-    "contentSha256": "542ad04b8243b15677781e9b18e994fe9f52728ee5769c5de284da1e2d6b8a17"
+  "reason": {
+    "code": "verification_failed",
+    "detail": "Minecraft Mavenizer 0.5.21 invoked Vineflower 1.11.2 with -Xms4G inside the mandatory 4 GiB container. Task discovery and clean build both failed during decompilation with MCP step exit 137. No production JAR, server, client, GameTest, pristine-install, or visual qualification completed.",
+    "evidence": [
+      {
+        "url": "https://maven.minecraftforge.net/de/oceanlabs/mcp/mcp_config/26.1-20260326.105027/mcp_config-26.1-20260326.105027.zip",
+        "sha256": "4f4619905579e6b94e2ecd162df6eb601a7564f8dc38e4280e5e5fe95728b338"
+      }
+    ]
   }
 }

@@ -1,10 +1,10 @@
 {
   "schemaVersion": "target-pack-1.0.0",
-  "id": "java-fabric-1.21.1-r1",
+  "id": "java-fabric-1.21.1-r2",
   "edition": "java",
   "status": "candidate",
-  "revision": 1,
-  "packSha256": "c4ac153d2581381df83bf05d2b2973f61556eca6a620a15449b3e13da890727f",
+  "revision": 2,
+  "packSha256": "13af4230da6d7a7e1c19b46112bb1fbef2b454b979c5f59fd0dbc6018d90bf50",
   "minecraft": {
     "version": "1.21.1",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -57,7 +57,7 @@
     "plugins": [
       {
         "id": "net.fabricmc.fabric-loom-remap",
-        "version": "1.20.0-alpha.19"
+        "version": "1.17.21"
       }
     ]
   },
@@ -72,9 +72,9 @@
     }
   },
   "knownLimitations": [
-    "Template declares floating Loom 1.19-SNAPSHOT; exact 1.20.0-alpha.19 is a required override. No build/runtime compatibility claim.",
-    "Baseline build evidence: Fabric Loom 1.20.0-alpha.19 requires JVM 25 or newer, but this target requires JDK 21; task discovery and clean build failed during configuration.",
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "Template declares floating Loom 1.19-SNAPSHOT; exact 1.17.21 is a required override.",
+    "Mandatory-sandbox task discovery, clean build, dedicated server, one configured GameTest, production-JAR packaging, and pristine packaged-JAR dedicated-server installation passed on Linux/arm64.",
+    "Real-client main-menu and reviewed GUI captures passed with Xvfb/llvmpipe, but world creation exited 137 with OOMKilled=true under the mandatory 4 GiB limit; world, inventory, hand, and animation visual checks remain unavailable, so full qualification is incomplete and no evidenceManifest is declared."
   ],
   "template": {
     "repository": "https://github.com/FabricMC/fabric-example-mod",

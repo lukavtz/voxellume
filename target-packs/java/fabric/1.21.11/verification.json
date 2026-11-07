@@ -1,10 +1,10 @@
 {
   "schemaVersion": "target-verification-1.0.0",
   "capabilities": {
-    "build": false,
-    "server": false,
-    "client": false,
-    "gameTest": false,
+    "build": true,
+    "server": true,
+    "client": true,
+    "gameTest": true,
     "visual": false
   },
   "required": [
@@ -47,13 +47,14 @@
       "argv": [
         "./gradlew",
         "--no-daemon",
-        "runClient"
+        "runClientGameTest"
       ],
       "assertions": [
-        "Qualification requires the client main-menu and mod-error assertions."
+        "Records configured client GameTest evidence only; this is not production-client main-menu or mod-error qualification."
       ],
       "artifactGlobs": [
-        "run/logs/*.log"
+        "build/run/clientGameTest/**",
+        "build/reports/**"
       ]
     },
     "visual": {
@@ -73,16 +74,21 @@
       "argv": [
         "./gradlew",
         "--no-daemon",
-        "runGametest"
+        "build"
       ],
       "assertions": [
-        "Qualification requires all configured GameTests to pass."
+        "Qualification requires build to complete all configured server GameTests through its runGameTest dependency."
       ],
       "artifactGlobs": [
-        "build/reports/gametest/**",
-        "run/logs/*.log"
+        "build/run/gameTest/**",
+        "build/reports/**"
       ]
     }
   },
-  "testedPlatforms": []
+  "testedPlatforms": [
+    {
+      "os": "linux",
+      "arch": "arm64"
+    }
+  ]
 }

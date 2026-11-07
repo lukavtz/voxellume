@@ -129,7 +129,7 @@
         ]
       },
       "minecraft": "1.21",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/f7840475dae7c9ca4968b8198055db8d708a162d/1.21.json",
         "https://piston-data.mojang.com/v1/objects/450698d1863ab5180c25d7c804ef0fe6369dd1ba/server.jar",
@@ -220,7 +220,7 @@
         "parchmentMinecraftVersion": "1.21"
       },
       "minecraft": "1.21",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/f7840475dae7c9ca4968b8198055db8d708a162d/1.21.json",
         "https://piston-data.mojang.com/v1/objects/450698d1863ab5180c25d7c804ef0fe6369dd1ba/server.jar",
@@ -299,7 +299,7 @@
         "kind": "mojang"
       },
       "minecraft": "1.21",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/f7840475dae7c9ca4968b8198055db8d708a162d/1.21.json",
         "https://piston-data.mojang.com/v1/objects/450698d1863ab5180c25d7c804ef0fe6369dd1ba/server.jar",
@@ -415,7 +415,7 @@
         ]
       },
       "minecraft": "1.21",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/f7840475dae7c9ca4968b8198055db8d708a162d/1.21.json",
         "https://piston-data.mojang.com/v1/objects/450698d1863ab5180c25d7c804ef0fe6369dd1ba/server.jar",
@@ -436,7 +436,10 @@
         },
         "declaredMinecraftVersion": "1.20.6",
         "overrides": {
-          "api_dependencies": ["quilted-fabric-api", "qsl"],
+          "api_dependencies": [
+            "quilted-fabric-api",
+            "qsl"
+          ],
           "java_release": 21,
           "minecraft": "1.21",
           "quilt_loader": "0.20.0-beta.9",
@@ -473,15 +476,15 @@
         "plugins": [
           {
             "artifact": {
-              "coordinates": "net.fabricmc:fabric-loom:1.20.0-alpha.19",
-              "sha256": "0a742bd8f3542f4058de52e40dcdebdbed6b135d8ac74a0917503c9db0c69bb0",
-              "size": 1579291,
-              "url": "https://maven.fabricmc.net/net/fabricmc/fabric-loom/1.20.0-alpha.19/fabric-loom-1.20.0-alpha.19.jar"
+              "coordinates": "net.fabricmc:fabric-loom:1.17.21",
+              "sha256": "89c08938d865621172e3fb31036081399b2731a4971f599b42724b2509ff5b64",
+              "size": 1411398,
+              "url": "https://maven.fabricmc.net/net/fabricmc/fabric-loom/1.17.21/fabric-loom-1.17.21.jar"
             },
             "id": "net.fabricmc.fabric-loom-remap",
-            "selectionBasis": "plan-pinned exact Fabric Maven artifact",
+            "selectionBasis": "approved r2 exact Fabric Maven artifact",
             "templateDeclaredVersion": "1.19-SNAPSHOT",
-            "version": "1.20.0-alpha.19"
+            "version": "1.17.21"
           }
         ],
         "version": "9.8.2"
@@ -530,7 +533,7 @@
         ]
       },
       "minecraft": "1.21.1",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "partial",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/82ba6501da174a665c1787775f946487422f2432/1.21.1.json",
         "https://piston-data.mojang.com/v1/objects/59353fb40c36d304f2035d51e7d6e6baa98dc05c/server.jar",
@@ -549,7 +552,7 @@
         "declaredMinecraftVersion": "1.21.1",
         "overrides": {
           "loom_version": {
-            "exactValue": "1.20.0-alpha.19",
+            "exactValue": "1.17.21",
             "templateValue": "1.19-SNAPSHOT"
           }
         },
@@ -558,7 +561,7 @@
         "scope": "exact_release"
       },
       "warnings": [
-        "Template declares floating Loom 1.19-SNAPSHOT; exact 1.20.0-alpha.19 is a required override. No build/runtime compatibility claim."
+        "Template declares floating Loom 1.19-SNAPSHOT; exact 1.17.21 is a required override for r2. Build/server/GameTest/pristine-JAR/client-main-menu checks passed with cap_drop=ALL; full visual qualification is unavailable after a 4 GiB OOM during world creation."
       ]
     },
     {
@@ -621,7 +624,7 @@
         "parchmentMinecraftVersion": "1.21.1"
       },
       "minecraft": "1.21.1",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "partial",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/82ba6501da174a665c1787775f946487422f2432/1.21.1.json",
         "https://piston-data.mojang.com/v1/objects/59353fb40c36d304f2035d51e7d6e6baa98dc05c/server.jar",
@@ -700,7 +703,7 @@
         "kind": "mojang"
       },
       "minecraft": "1.21.1",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "rejected",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/82ba6501da174a665c1787775f946487422f2432/1.21.1.json",
         "https://piston-data.mojang.com/v1/objects/59353fb40c36d304f2035d51e7d6e6baa98dc05c/server.jar",
@@ -749,9 +752,9 @@
       "candidateEligible": true,
       "discoveryStatus": "candidate_eligible",
       "gradle": {
-        "checksumSourceUrl": "https://services.gradle.org/distributions/gradle-8.9-bin.zip.sha256",
-        "distributionSha256": "d725d707bfabd4dfdc958c624003b3c80accc03f7037b5122c4b1d0ef15cecab",
-        "distributionUrl": "https://services.gradle.org/distributions/gradle-8.9-bin.zip",
+        "checksumSourceUrl": "https://services.gradle.org/distributions/gradle-9.2.0-bin.zip.sha256",
+        "distributionSha256": "df67a32e86e3276d011735facb1535f64d0d88df84fa87521e90becc2d735444",
+        "distributionUrl": "https://services.gradle.org/distributions/gradle-9.2.0-bin.zip",
         "plugins": [
           {
             "artifact": {
@@ -760,30 +763,30 @@
               "size": 1395904,
               "url": "https://maven.quiltmc.org/repository/release/org/quiltmc/loom/1.15.1/loom-1.15.1.jar"
             },
-            "id": "org.quiltmc.loom",
-            "selectionBasis": "latest exact Quilt Loom release in official Maven metadata",
+            "id": "org.quiltmc.loom.remap",
+            "selectionBasis": "exact Quilt Loom remap plugin compatible with Gradle 9.2.0",
             "templateDeclaredVersion": "1.7.4",
             "version": "1.15.1"
           }
         ],
-        "version": "8.9"
+        "version": "9.2.0"
       },
       "javaMajor": 21,
       "loader": {
         "artifact": {
-          "coordinates": "org.quiltmc:quilt-loader:0.20.0-beta.9",
-          "sha256": "a475689ac9a5b9718c045972bb0f41381ce22315a87273a99f30ec1fa3aacb8a",
-          "size": 1550096,
-          "url": "https://maven.quiltmc.org/repository/release/org/quiltmc/quilt-loader/0.20.0-beta.9/quilt-loader-0.20.0-beta.9.jar"
+          "coordinates": "org.quiltmc:quilt-loader:0.30.2",
+          "sha256": "273033b1e92793e87f4800b02c6f3d8a89e14cbb71a8087a1f008837f24ab945",
+          "size": 3159782,
+          "url": "https://maven.quiltmc.org/repository/release/org/quiltmc/quilt-loader/0.30.2/quilt-loader-0.30.2.jar"
         },
-        "channel": "beta",
+        "channel": "release",
         "profile": {
-          "id": "quilt-loader-0.20.0-beta.9-1.21.1",
+          "id": "quilt-loader-0.30.2-1.21.1",
           "inheritsFrom": "1.21.1",
-          "sha256": "70785465ad656c07d7c2e750d4dc11632fcf2c68adaf126d859f29e67aa02b16",
-          "url": "https://meta.quiltmc.org/v3/versions/loader/1.21.1/0.20.0-beta.9/profile/json"
+          "sha256": "043a502c64a7a41b54654930934dc511a8c64752662b1646f70fc67f6f5a7661",
+          "url": "https://meta.quiltmc.org/v3/versions/loader/1.21.1/0.30.2/profile/json"
         },
-        "version": "0.20.0-beta.9"
+        "version": "0.30.2"
       },
       "loaderId": "quilt",
       "mappings": {
@@ -806,12 +809,12 @@
         ]
       },
       "minecraft": "1.21.1",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "partial",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/82ba6501da174a665c1787775f946487422f2432/1.21.1.json",
         "https://piston-data.mojang.com/v1/objects/59353fb40c36d304f2035d51e7d6e6baa98dc05c/server.jar",
         "https://www.minecraft.net/en-us/article/minecraft-java-edition-1-21-1",
-        "https://meta.quiltmc.org/v3/versions/loader/1.21.1/0.20.0-beta.9/profile/json",
+        "https://meta.quiltmc.org/v3/versions/loader/1.21.1/0.30.2/profile/json",
         "https://maven.quiltmc.org/repository/release/org/quiltmc/quilt-mappings/maven-metadata.xml",
         "https://maven.quiltmc.org/repository/release/org/quiltmc/qsl/maven-metadata.xml",
         "https://maven.quiltmc.org/repository/release/org/quiltmc/quilted-fabric-api/quilted-fabric-api/maven-metadata.xml",
@@ -827,10 +830,12 @@
         },
         "declaredMinecraftVersion": "1.20.6",
         "overrides": {
-          "api_dependencies": ["qsl"],
+          "api_dependencies": [
+            "qsl"
+          ],
           "java_release": 21,
           "minecraft": "1.21.1",
-          "quilt_loader": "0.20.0-beta.9",
+          "quilt_loader": "0.30.2",
           "quilt_loom": "1.15.1",
           "quilt_mappings": "1.21.1+build.9"
         },
@@ -921,7 +926,7 @@
         ]
       },
       "minecraft": "1.21.2",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/5941d98532ff0c7de72bd3f514d226d66977b7f0/1.21.2.json",
         "https://piston-data.mojang.com/v1/objects/7bf95409b0d9b5388bfea3704ec92012d273c14c/server.jar",
@@ -1004,7 +1009,7 @@
         "kind": "mojang"
       },
       "minecraft": "1.21.2",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/5941d98532ff0c7de72bd3f514d226d66977b7f0/1.21.2.json",
         "https://piston-data.mojang.com/v1/objects/7bf95409b0d9b5388bfea3704ec92012d273c14c/server.jar",
@@ -1062,7 +1067,7 @@
         "kind": "mojang"
       },
       "minecraft": "1.21.2",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "unsupported",
       "reason": {
         "code": "loader_release_unavailable",
         "detail": "Official Forge promotions and Forge Maven metadata contain no exact 1.21.2 Forge release or MDK."
@@ -1140,7 +1145,7 @@
         ]
       },
       "minecraft": "1.21.2",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/5941d98532ff0c7de72bd3f514d226d66977b7f0/1.21.2.json",
         "https://piston-data.mojang.com/v1/objects/7bf95409b0d9b5388bfea3704ec92012d273c14c/server.jar",
@@ -1255,7 +1260,7 @@
         ]
       },
       "minecraft": "1.21.3",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/5fa4228474e3d59b829637553262b6c06c0a38cf/1.21.3.json",
         "https://piston-data.mojang.com/v1/objects/45810d238246d90e811d896f87b14695b7fb6839/server.jar",
@@ -1346,7 +1351,7 @@
         "parchmentMinecraftVersion": "1.21.3"
       },
       "minecraft": "1.21.3",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/5fa4228474e3d59b829637553262b6c06c0a38cf/1.21.3.json",
         "https://piston-data.mojang.com/v1/objects/45810d238246d90e811d896f87b14695b7fb6839/server.jar",
@@ -1425,7 +1430,7 @@
         "kind": "mojang"
       },
       "minecraft": "1.21.3",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/5fa4228474e3d59b829637553262b6c06c0a38cf/1.21.3.json",
         "https://piston-data.mojang.com/v1/objects/45810d238246d90e811d896f87b14695b7fb6839/server.jar",
@@ -1519,7 +1524,7 @@
         ]
       },
       "minecraft": "1.21.3",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/5fa4228474e3d59b829637553262b6c06c0a38cf/1.21.3.json",
         "https://piston-data.mojang.com/v1/objects/45810d238246d90e811d896f87b14695b7fb6839/server.jar",
@@ -1634,7 +1639,7 @@
         ]
       },
       "minecraft": "1.21.4",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/2e024c9834568a872f8c009a97b29d8d7381d00a/1.21.4.json",
         "https://piston-data.mojang.com/v1/objects/4707d00eb834b446575d89a61a11b5d548d8c001/server.jar",
@@ -1725,7 +1730,7 @@
         "parchmentMinecraftVersion": "1.21.4"
       },
       "minecraft": "1.21.4",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/2e024c9834568a872f8c009a97b29d8d7381d00a/1.21.4.json",
         "https://piston-data.mojang.com/v1/objects/4707d00eb834b446575d89a61a11b5d548d8c001/server.jar",
@@ -1804,7 +1809,7 @@
         "kind": "mojang"
       },
       "minecraft": "1.21.4",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/2e024c9834568a872f8c009a97b29d8d7381d00a/1.21.4.json",
         "https://piston-data.mojang.com/v1/objects/4707d00eb834b446575d89a61a11b5d548d8c001/server.jar",
@@ -1898,7 +1903,7 @@
         ]
       },
       "minecraft": "1.21.4",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/2e024c9834568a872f8c009a97b29d8d7381d00a/1.21.4.json",
         "https://piston-data.mojang.com/v1/objects/4707d00eb834b446575d89a61a11b5d548d8c001/server.jar",
@@ -2013,7 +2018,7 @@
         ]
       },
       "minecraft": "1.21.5",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/5ca2012338100e4dbfef0d2114a5fa66959ab1e5/1.21.5.json",
         "https://piston-data.mojang.com/v1/objects/e6ec2f64e6080b9b5d9b471b291c33cc7f509733/server.jar",
@@ -2104,7 +2109,7 @@
         "parchmentMinecraftVersion": "1.21.5"
       },
       "minecraft": "1.21.5",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/5ca2012338100e4dbfef0d2114a5fa66959ab1e5/1.21.5.json",
         "https://piston-data.mojang.com/v1/objects/e6ec2f64e6080b9b5d9b471b291c33cc7f509733/server.jar",
@@ -2183,7 +2188,7 @@
         "kind": "mojang"
       },
       "minecraft": "1.21.5",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/5ca2012338100e4dbfef0d2114a5fa66959ab1e5/1.21.5.json",
         "https://piston-data.mojang.com/v1/objects/e6ec2f64e6080b9b5d9b471b291c33cc7f509733/server.jar",
@@ -2277,7 +2282,7 @@
         ]
       },
       "minecraft": "1.21.5",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/5ca2012338100e4dbfef0d2114a5fa66959ab1e5/1.21.5.json",
         "https://piston-data.mojang.com/v1/objects/e6ec2f64e6080b9b5d9b471b291c33cc7f509733/server.jar",
@@ -2392,7 +2397,7 @@
         ]
       },
       "minecraft": "1.21.6",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/4eb09bebca2356f7505e45544087d3109e8ce0e3/1.21.6.json",
         "https://piston-data.mojang.com/v1/objects/6e64dcabba3c01a7271b4fa6bd898483b794c59b/server.jar",
@@ -2483,7 +2488,7 @@
         "parchmentMinecraftVersion": "1.21.6"
       },
       "minecraft": "1.21.6",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/4eb09bebca2356f7505e45544087d3109e8ce0e3/1.21.6.json",
         "https://piston-data.mojang.com/v1/objects/6e64dcabba3c01a7271b4fa6bd898483b794c59b/server.jar",
@@ -2562,7 +2567,7 @@
         "kind": "mojang"
       },
       "minecraft": "1.21.6",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/4eb09bebca2356f7505e45544087d3109e8ce0e3/1.21.6.json",
         "https://piston-data.mojang.com/v1/objects/6e64dcabba3c01a7271b4fa6bd898483b794c59b/server.jar",
@@ -2656,7 +2661,7 @@
         ]
       },
       "minecraft": "1.21.6",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/4eb09bebca2356f7505e45544087d3109e8ce0e3/1.21.6.json",
         "https://piston-data.mojang.com/v1/objects/6e64dcabba3c01a7271b4fa6bd898483b794c59b/server.jar",
@@ -2771,7 +2776,7 @@
         ]
       },
       "minecraft": "1.21.7",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/1b478ff245de95b05e3c1a1589f391ade22e1bd3/1.21.7.json",
         "https://piston-data.mojang.com/v1/objects/05e4b48fbc01f0385adb74bcff9751d34552486c/server.jar",
@@ -2862,7 +2867,7 @@
         "parchmentMinecraftVersion": "1.21.7"
       },
       "minecraft": "1.21.7",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/1b478ff245de95b05e3c1a1589f391ade22e1bd3/1.21.7.json",
         "https://piston-data.mojang.com/v1/objects/05e4b48fbc01f0385adb74bcff9751d34552486c/server.jar",
@@ -2941,7 +2946,7 @@
         "kind": "mojang"
       },
       "minecraft": "1.21.7",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/1b478ff245de95b05e3c1a1589f391ade22e1bd3/1.21.7.json",
         "https://piston-data.mojang.com/v1/objects/05e4b48fbc01f0385adb74bcff9751d34552486c/server.jar",
@@ -3035,7 +3040,7 @@
         ]
       },
       "minecraft": "1.21.7",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/1b478ff245de95b05e3c1a1589f391ade22e1bd3/1.21.7.json",
         "https://piston-data.mojang.com/v1/objects/05e4b48fbc01f0385adb74bcff9751d34552486c/server.jar",
@@ -3150,7 +3155,7 @@
         ]
       },
       "minecraft": "1.21.8",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/17db9704e95a73d53452f07a9b472e428288defa/1.21.8.json",
         "https://piston-data.mojang.com/v1/objects/6bce4ef400e4efaa63a13d5e6f6b500be969ef81/server.jar",
@@ -3241,7 +3246,7 @@
         "parchmentMinecraftVersion": "1.21.8"
       },
       "minecraft": "1.21.8",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/17db9704e95a73d53452f07a9b472e428288defa/1.21.8.json",
         "https://piston-data.mojang.com/v1/objects/6bce4ef400e4efaa63a13d5e6f6b500be969ef81/server.jar",
@@ -3320,7 +3325,7 @@
         "kind": "mojang"
       },
       "minecraft": "1.21.8",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/17db9704e95a73d53452f07a9b472e428288defa/1.21.8.json",
         "https://piston-data.mojang.com/v1/objects/6bce4ef400e4efaa63a13d5e6f6b500be969ef81/server.jar",
@@ -3414,7 +3419,7 @@
         ]
       },
       "minecraft": "1.21.8",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/17db9704e95a73d53452f07a9b472e428288defa/1.21.8.json",
         "https://piston-data.mojang.com/v1/objects/6bce4ef400e4efaa63a13d5e6f6b500be969ef81/server.jar",
@@ -3529,7 +3534,7 @@
         ]
       },
       "minecraft": "1.21.9",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/811c9cc308cd5b928defa6434a7975233eaa6184/1.21.9.json",
         "https://piston-data.mojang.com/v1/objects/11e54c2081420a4d49db3007e66c80a22579ff2a/server.jar",
@@ -3620,7 +3625,7 @@
         "parchmentMinecraftVersion": "1.21.9"
       },
       "minecraft": "1.21.9",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/811c9cc308cd5b928defa6434a7975233eaa6184/1.21.9.json",
         "https://piston-data.mojang.com/v1/objects/11e54c2081420a4d49db3007e66c80a22579ff2a/server.jar",
@@ -3699,7 +3704,7 @@
         "kind": "mojang"
       },
       "minecraft": "1.21.9",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/811c9cc308cd5b928defa6434a7975233eaa6184/1.21.9.json",
         "https://piston-data.mojang.com/v1/objects/11e54c2081420a4d49db3007e66c80a22579ff2a/server.jar",
@@ -3793,7 +3798,7 @@
         ]
       },
       "minecraft": "1.21.9",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/811c9cc308cd5b928defa6434a7975233eaa6184/1.21.9.json",
         "https://piston-data.mojang.com/v1/objects/11e54c2081420a4d49db3007e66c80a22579ff2a/server.jar",
@@ -3908,7 +3913,7 @@
         ]
       },
       "minecraft": "1.21.10",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/b0dc919ace9cee9a91d5a6dcaa594d41a26fcb1b/1.21.10.json",
         "https://piston-data.mojang.com/v1/objects/95495a7f485eedd84ce928cef5e223b757d2f764/server.jar",
@@ -3999,7 +4004,7 @@
         "parchmentMinecraftVersion": "1.21.10"
       },
       "minecraft": "1.21.10",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/b0dc919ace9cee9a91d5a6dcaa594d41a26fcb1b/1.21.10.json",
         "https://piston-data.mojang.com/v1/objects/95495a7f485eedd84ce928cef5e223b757d2f764/server.jar",
@@ -4078,7 +4083,7 @@
         "kind": "mojang"
       },
       "minecraft": "1.21.10",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/b0dc919ace9cee9a91d5a6dcaa594d41a26fcb1b/1.21.10.json",
         "https://piston-data.mojang.com/v1/objects/95495a7f485eedd84ce928cef5e223b757d2f764/server.jar",
@@ -4172,7 +4177,7 @@
         ]
       },
       "minecraft": "1.21.10",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/b0dc919ace9cee9a91d5a6dcaa594d41a26fcb1b/1.21.10.json",
         "https://piston-data.mojang.com/v1/objects/95495a7f485eedd84ce928cef5e223b757d2f764/server.jar",
@@ -4287,7 +4292,7 @@
         ]
       },
       "minecraft": "1.21.11",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "partial",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/35f8a9bc4874e2c95e51b3ad21e043a33776f7c2/1.21.11.json",
         "https://piston-data.mojang.com/v1/objects/64bb6d763bed0a9f1d632ec347938594144943ed/server.jar",
@@ -4378,7 +4383,7 @@
         "parchmentMinecraftVersion": "1.21.11"
       },
       "minecraft": "1.21.11",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "partial",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/35f8a9bc4874e2c95e51b3ad21e043a33776f7c2/1.21.11.json",
         "https://piston-data.mojang.com/v1/objects/64bb6d763bed0a9f1d632ec347938594144943ed/server.jar",
@@ -4457,7 +4462,7 @@
         "kind": "mojang"
       },
       "minecraft": "1.21.11",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "rejected",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/35f8a9bc4874e2c95e51b3ad21e043a33776f7c2/1.21.11.json",
         "https://piston-data.mojang.com/v1/objects/64bb6d763bed0a9f1d632ec347938594144943ed/server.jar",
@@ -4551,7 +4556,7 @@
         ]
       },
       "minecraft": "1.21.11",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "partial",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/35f8a9bc4874e2c95e51b3ad21e043a33776f7c2/1.21.11.json",
         "https://piston-data.mojang.com/v1/objects/64bb6d763bed0a9f1d632ec347938594144943ed/server.jar",
@@ -4645,7 +4650,7 @@
         "kind": "none"
       },
       "minecraft": "26.1",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "partial",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/90d81d9cd00c1ce55eb2b40aad4f1112bb58f12a/26.1.json",
         "https://piston-data.mojang.com/v1/objects/3872a7f07a1a595e651aef8b058dfc2bb3772f46/server.jar",
@@ -4715,7 +4720,7 @@
         "kind": "none"
       },
       "minecraft": "26.1",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "partial",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/90d81d9cd00c1ce55eb2b40aad4f1112bb58f12a/26.1.json",
         "https://piston-data.mojang.com/v1/objects/3872a7f07a1a595e651aef8b058dfc2bb3772f46/server.jar",
@@ -4781,7 +4786,7 @@
         "kind": "none"
       },
       "minecraft": "26.1",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "rejected",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/90d81d9cd00c1ce55eb2b40aad4f1112bb58f12a/26.1.json",
         "https://piston-data.mojang.com/v1/objects/3872a7f07a1a595e651aef8b058dfc2bb3772f46/server.jar",
@@ -4860,7 +4865,7 @@
         "kind": "none"
       },
       "minecraft": "26.1",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/90d81d9cd00c1ce55eb2b40aad4f1112bb58f12a/26.1.json",
         "https://piston-data.mojang.com/v1/objects/3872a7f07a1a595e651aef8b058dfc2bb3772f46/server.jar",
@@ -4956,7 +4961,7 @@
         "kind": "none"
       },
       "minecraft": "26.1.1",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/f242283c7b8a4c2a75668578248aee60928d2613/26.1.1.json",
         "https://piston-data.mojang.com/v1/objects/49c8195703ad0ba4f0a4efbccfd85a4a8ca57431/server.jar",
@@ -5026,7 +5031,7 @@
         "kind": "none"
       },
       "minecraft": "26.1.1",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/f242283c7b8a4c2a75668578248aee60928d2613/26.1.1.json",
         "https://piston-data.mojang.com/v1/objects/49c8195703ad0ba4f0a4efbccfd85a4a8ca57431/server.jar",
@@ -5092,7 +5097,7 @@
         "kind": "none"
       },
       "minecraft": "26.1.1",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/f242283c7b8a4c2a75668578248aee60928d2613/26.1.1.json",
         "https://piston-data.mojang.com/v1/objects/49c8195703ad0ba4f0a4efbccfd85a4a8ca57431/server.jar",
@@ -5171,7 +5176,7 @@
         "kind": "none"
       },
       "minecraft": "26.1.1",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/f242283c7b8a4c2a75668578248aee60928d2613/26.1.1.json",
         "https://piston-data.mojang.com/v1/objects/49c8195703ad0ba4f0a4efbccfd85a4a8ca57431/server.jar",
@@ -5267,7 +5272,7 @@
         "kind": "none"
       },
       "minecraft": "26.1.2",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/4e49d699db7dba839226d0ed1fcf36c465c2edbe/26.1.2.json",
         "https://piston-data.mojang.com/v1/objects/97ccd4c0ed3f81bbb7bfacddd1090b0c56f9bc51/server.jar",
@@ -5337,7 +5342,7 @@
         "kind": "none"
       },
       "minecraft": "26.1.2",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/4e49d699db7dba839226d0ed1fcf36c465c2edbe/26.1.2.json",
         "https://piston-data.mojang.com/v1/objects/97ccd4c0ed3f81bbb7bfacddd1090b0c56f9bc51/server.jar",
@@ -5403,7 +5408,7 @@
         "kind": "none"
       },
       "minecraft": "26.1.2",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/4e49d699db7dba839226d0ed1fcf36c465c2edbe/26.1.2.json",
         "https://piston-data.mojang.com/v1/objects/97ccd4c0ed3f81bbb7bfacddd1090b0c56f9bc51/server.jar",
@@ -5482,7 +5487,7 @@
         "kind": "none"
       },
       "minecraft": "26.1.2",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/4e49d699db7dba839226d0ed1fcf36c465c2edbe/26.1.2.json",
         "https://piston-data.mojang.com/v1/objects/97ccd4c0ed3f81bbb7bfacddd1090b0c56f9bc51/server.jar",
@@ -5578,7 +5583,7 @@
         "kind": "none"
       },
       "minecraft": "26.2",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/09165f570b16394790c4e37c93b0918729615d17/26.2.json",
         "https://piston-data.mojang.com/v1/objects/823e2250d24b3ddac457a60c92a6a941943fcd6a/server.jar",
@@ -5648,7 +5653,7 @@
         "kind": "none"
       },
       "minecraft": "26.2",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/09165f570b16394790c4e37c93b0918729615d17/26.2.json",
         "https://piston-data.mojang.com/v1/objects/823e2250d24b3ddac457a60c92a6a941943fcd6a/server.jar",
@@ -5714,7 +5719,7 @@
         "kind": "none"
       },
       "minecraft": "26.2",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/09165f570b16394790c4e37c93b0918729615d17/26.2.json",
         "https://piston-data.mojang.com/v1/objects/823e2250d24b3ddac457a60c92a6a941943fcd6a/server.jar",
@@ -5793,7 +5798,7 @@
         "kind": "none"
       },
       "minecraft": "26.2",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/09165f570b16394790c4e37c93b0918729615d17/26.2.json",
         "https://piston-data.mojang.com/v1/objects/823e2250d24b3ddac457a60c92a6a941943fcd6a/server.jar",
@@ -5889,7 +5894,7 @@
         "kind": "none"
       },
       "minecraft": "26.3",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/80608ff6753705b6a82e2cb86a5937d4d233abd4/26.3.json",
         "https://piston-data.mojang.com/v1/objects/33680f5f2ac32864d6d7cf5e56a705fdb3e05f4c/server.jar",
@@ -5959,7 +5964,7 @@
         "kind": "none"
       },
       "minecraft": "26.3",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/80608ff6753705b6a82e2cb86a5937d4d233abd4/26.3.json",
         "https://piston-data.mojang.com/v1/objects/33680f5f2ac32864d6d7cf5e56a705fdb3e05f4c/server.jar",
@@ -6025,7 +6030,7 @@
         "kind": "none"
       },
       "minecraft": "26.3",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/80608ff6753705b6a82e2cb86a5937d4d233abd4/26.3.json",
         "https://piston-data.mojang.com/v1/objects/33680f5f2ac32864d6d7cf5e56a705fdb3e05f4c/server.jar",
@@ -6104,7 +6109,7 @@
         "kind": "none"
       },
       "minecraft": "26.3",
-      "qualificationStatus": "not_run",
+      "qualificationStatus": "candidate_eligible",
       "sources": [
         "https://piston-meta.mojang.com/v1/packages/80608ff6753705b6a82e2cb86a5937d4d233abd4/26.3.json",
         "https://piston-data.mojang.com/v1/objects/33680f5f2ac32864d6d7cf5e56a705fdb3e05f4c/server.jar",
@@ -6700,7 +6705,7 @@
     }
   },
   "retrievedAt": "2026-11-06T14:50:17Z",
-  "runtimeEvidenceExecuted": false,
+  "runtimeEvidenceExecuted": true,
   "schemaVersion": "voxellume-target-discovery-1.0.0",
   "selectionPolicy": [
     "Mojang release type, Java and obfuscation come from version JSON; pack formats come from version.json inside the official server JAR.",
@@ -6713,32 +6718,44 @@
   "statusSemantics": {
     "candidate_eligible": "All selected exact upstream artifacts, immutable template input, Java/pack identity, Gradle distribution checksum and plugin coordinates exist. No build or runtime qualification has run.",
     "supported": "Requires separate clean build/server/client/GameTest/visual evidence; zero cells are supported by this discovery.",
-    "unsupported": "Exact upstream loader/MDK combination is absent; no nearby-version substitution."
+    "unsupported": "Exact upstream loader/MDK combination is absent; no nearby-version substitution.",
+    "rejected": "Qualification executed and failed; exact failure evidence is preserved with no supported or candidate claim.",
+    "partial": "At least one exact build or runtime capability passed; remaining required checks prevent supported status."
   },
   "summary": {
     "fabric": {
-      "candidate_eligible": 17,
+      "candidate_eligible": 14,
+      "partial": 3,
+      "rejected": 0,
+      "supported": 0,
+      "unsupported": 0
+    },
+    "neoforge": {
+      "candidate_eligible": 14,
+      "partial": 3,
+      "rejected": 0,
       "supported": 0,
       "unsupported": 0
     },
     "forge": {
-      "candidate_eligible": 16,
+      "candidate_eligible": 13,
+      "partial": 0,
+      "rejected": 3,
       "supported": 0,
       "unsupported": 1
     },
-    "neoforge": {
-      "candidate_eligible": 17,
-      "supported": 0,
-      "unsupported": 0
-    },
     "quilt": {
-      "candidate_eligible": 17,
+      "candidate_eligible": 15,
+      "partial": 2,
+      "rejected": 0,
       "supported": 0,
       "unsupported": 0
     },
     "total": {
-      "candidate_eligible": 67,
       "cells": 68,
+      "candidate_eligible": 56,
+      "partial": 8,
+      "rejected": 3,
       "supported": 0,
       "unsupported": 1
     }

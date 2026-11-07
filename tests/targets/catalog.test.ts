@@ -99,9 +99,17 @@ function packById(id: string) {
   return pack;
 }
 
-test("catalog contains exactly one deterministic r1 pack for every release and loader", async () => {
+test("catalog contains exactly one deterministic revision for every release and loader", async () => {
+  const revisionFor = (loader: string, minecraftVersion: string) =>
+    minecraftVersion === "1.21.1" &&
+    ["fabric", "neoforge", "quilt"].includes(loader)
+      ? "r2"
+      : "r1";
   const expectedIds = releases.flatMap((minecraftVersion) =>
-    loaders.map((loader) => `java-${loader}-${minecraftVersion}-r1`),
+    loaders.map(
+      (loader) =>
+        `java-${loader}-${minecraftVersion}-${revisionFor(loader, minecraftVersion)}`,
+    ),
   );
 
   assert.equal(packs.length, 68);
@@ -118,13 +126,13 @@ test("catalog contains exactly one deterministic r1 pack for every release and l
 
   for (const minecraftVersion of releases) {
     for (const loader of loaders) {
-      const id = `java-${loader}-${minecraftVersion}-r1`;
+      const id = `java-${loader}-${minecraftVersion}-${revisionFor(loader, minecraftVersion)}`;
       const pack = packById(id);
       assert.equal(pack.id, id);
       assert.equal(pack.edition, "java");
       assert.equal(pack.loader.id, loader);
       assert.equal(pack.minecraft.version, minecraftVersion);
-      assert.equal(pack.revision, 1);
+      assert.equal(pack.revision, Number(id.slice(id.lastIndexOf("-r") + 2)));
     }
   }
 
@@ -181,10 +189,27 @@ test("every template hash identifies its source discovery archive bytes", () => 
   }
 });
 
-test("Fabric 1.21.1 r1 is a candidate with the verified immutable pins", () => {
-  const pack = packById("java-fabric-1.21.1-r1");
+test("rejected packs expose no execution plan and every required check has a contract", () => {
+  for (const pack of packs) {
+    if (pack.status === "rejected") {
+      assert.equal(pack.template, undefined, pack.id);
+      assert.deepEqual(pack.verification.required, [], pack.id);
+      assert.deepEqual(pack.verification.checks, {}, pack.id);
+    }
+    for (const capability of pack.verification.required) {
+      assert.ok(
+        pack.verification.checks[capability],
+        `${pack.id} missing ${capability}`,
+      );
+    }
+  }
+});
+
+test("Fabric 1.21.1 r2 is a candidate with the verified immutable pins", () => {
+  const pack = packById("java-fabric-1.21.1-r2");
 
   assert.equal(pack.status, "candidate");
+  assert.equal(pack.revision, 2);
   assert.deepEqual(pack.minecraft, {
     version: "1.21.1",
     releaseManifestUrl:
@@ -247,7 +272,7 @@ test("Fabric 1.21.1 r1 is a candidate with the verified immutable pins", () => {
     plugins: [
       {
         id: "net.fabricmc.fabric-loom-remap",
-        version: "1.20.0-alpha.19",
+        version: "1.17.21",
       },
     ],
   });
@@ -259,10 +284,25 @@ test("Fabric 1.21.1 r1 is a candidate with the verified immutable pins", () => {
   });
 });
 
-test("NeoForge 1.21.1 r1 is a candidate with the verified immutable pins", () => {
-  const pack = packById("java-neoforge-1.21.1-r1");
+test("Quilt 1.21.1 r2 is a candidate without an inferred GameTest workflow", () => {
+  const pack = packById("java-quilt-1.21.1-r2");
+  assert.equal(pack.status, "candidate");
+  assert.equal(pack.revision, 2);
+  assert.equal(pack.reason, undefined);
+  assert.deepEqual(pack.template, {
+    repository: "https://github.com/QuiltMC/quilt-template-mod",
+    revision: "9a6f89cd481e3f58f128596b5b043353bee6b3f2",
+    contentSha256:
+      "a2afaa5ab8037021c4538fc8f1bbcca6e30b713c57359245c7eec315e0aaf849",
+  });
+  assert.equal(pack.verification.required.includes("gameTest"), false);
+});
+
+test("NeoForge 1.21.1 r2 is a candidate with the verified immutable pins", () => {
+  const pack = packById("java-neoforge-1.21.1-r2");
 
   assert.equal(pack.status, "candidate");
+  assert.equal(pack.revision, 2);
   assert.deepEqual(pack.minecraft, {
     version: "1.21.1",
     releaseManifestUrl:
@@ -316,4 +356,5 @@ test("NeoForge 1.21.1 r1 is a candidate with the verified immutable pins", () =>
     contentSha256:
       "1101d5f9baf5eb4dd31f826e4eef7f7380a01a776ce1af230133e32a95e46e13",
   });
+  assert.equal(pack.reason, undefined);
 });

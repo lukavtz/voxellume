@@ -1,10 +1,10 @@
 {
   "schemaVersion": "target-pack-1.0.0",
-  "id": "java-quilt-1.21.1-r1",
+  "id": "java-quilt-1.21.1-r2",
   "edition": "java",
   "status": "candidate",
-  "revision": 1,
-  "packSha256": "ae43815a6e24c6a01d146d3df9e3f7730d179ec81f56ba4cbe2b832e1190dc9d",
+  "revision": 2,
+  "packSha256": "580bf644bb1220307f43c055bda7141b04d952aa98238b7addf6cb8b643d4414",
   "minecraft": {
     "version": "1.21.1",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -16,9 +16,9 @@
   },
   "loader": {
     "id": "quilt",
-    "version": "0.20.0-beta.9",
-    "coordinates": "org.quiltmc:quilt-loader:0.20.0-beta.9",
-    "artifactSha256": "a475689ac9a5b9718c045972bb0f41381ce22315a87273a99f30ec1fa3aacb8a",
+    "version": "0.30.2",
+    "coordinates": "org.quiltmc:quilt-loader:0.30.2",
+    "artifactSha256": "273033b1e92793e87f4800b02c6f3d8a89e14cbb71a8087a1f008837f24ab945",
     "apiDependencies": [
       {
         "id": "qsl",
@@ -45,12 +45,13 @@
     "architecture": "64-bit"
   },
   "gradle": {
-    "version": "8.9",
-    "distributionUrl": "https://services.gradle.org/distributions/gradle-8.9-bin.zip",
-    "distributionSha256": "d725d707bfabd4dfdc958c624003b3c80accc03f7037b5122c4b1d0ef15cecab",
+    "version": "9.2.0",
+    "distributionUrl": "https://services.gradle.org/distributions/gradle-9.2.0-bin.zip",
+    "distributionSha256": "df67a32e86e3276d011735facb1535f64d0d88df84fa87521e90becc2d735444",
+    "wrapperJarSha256": "cb0da6751c2b753a16ac168bb354870ebb1e162e9083f116729cec9c781156b8",
     "plugins": [
       {
-        "id": "org.quiltmc.loom",
+        "id": "org.quiltmc.loom.remap",
         "version": "1.15.1"
       }
     ]
@@ -66,8 +67,10 @@
     }
   },
   "knownLimitations": [
-    "Only generic official template is available; its content declares Minecraft 1.20.6, so every target coordinate is an override. No target-local build/runtime compatibility claim.",
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "Generic template declares Minecraft 1.20.6; qualification overrode every target coordinate exactly.",
+    "Mandatory-sandbox task discovery, clean build, dedicated server, and production-JAR packaging passed on Linux/arm64.",
+    "GameTest is unavailable; no GameTest command was inferred.",
+    "Real-client and visual checks use the approved Xvfb/Mesa runtime; full qualification remains incomplete and no evidenceManifest is declared."
   ],
   "template": {
     "repository": "https://github.com/QuiltMC/quilt-template-mod",

@@ -2,9 +2,9 @@
   "schemaVersion": "target-pack-1.0.0",
   "id": "java-forge-1.21.1-r1",
   "edition": "java",
-  "status": "candidate",
+  "status": "rejected",
   "revision": 1,
-  "packSha256": "61592becbec90c5db7e5be9baf325c32a66de651f30771636b4ef39632f9a4b1",
+  "packSha256": "e3b3f8002fb5d884470e1ba75de18a44765f431aafc1dc9f1a721726ae39f1ec",
   "minecraft": {
     "version": "1.21.1",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -64,12 +64,18 @@
     }
   },
   "knownLimitations": [
-    "MDK declares a ForgeGradle range; exact plugin pin is selected from official Forge Maven. No build/runtime compatibility claim.",
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "Task discovery and clean build failed during ForgeGradle/Minecraft Mavenizer decompilation: Vineflower 1.10.1 requested -Xms4G and exited 137 inside the required 4 GiB Docker limit; no tasks were listed and no production JAR was produced.",
+    "Dedicated server, configured GameTest, real client, production-JAR runtime, and visual checks were not run because the required clean build failed; no runtime or visual support claim.",
+    "Cold MDK resolution used plugins.gradle.org and api.foojay.io, which are absent from existing approvals.json; compliant cold qualification requires explicit approvals or an approved pinned-cache route."
   ],
-  "template": {
-    "repository": "https://maven.minecraftforge.net/net/minecraftforge/forge/1.21.1-52.1.20/forge-1.21.1-52.1.20-mdk.zip",
-    "revision": "1.21.1-52.1.20",
-    "contentSha256": "0589cc6748934ca6fdf29cc8e7fb8a08d1133eb5e3baf68e03e910fbdeb0773c"
+  "reason": {
+    "code": "verification_failed",
+    "detail": "Official MCP config sets Vineflower JVM arguments to -Xmx4G; Mavenizer invoked it with -Xms4G inside the mandatory 4 GiB container. Task discovery and clean build both failed during decompilation with MCP step exit 137. No production JAR, server, client, GameTest, or visual qualification completed. Cold resolution also used unapproved plugin-portal and Foojay endpoints, so no compliant network qualification is claimed.",
+    "evidence": [
+      {
+        "url": "https://maven.minecraftforge.net/de/oceanlabs/mcp/mcp_config/1.21.1-20240808.132146/mcp_config-1.21.1-20240808.132146.zip",
+        "sha256": "7aaa35810c5d3d831d4db986b622f763d3be631d6c66dbba1f8ee3e7f4c87bbb"
+      }
+    ]
   }
 }

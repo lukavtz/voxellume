@@ -1,9 +1,9 @@
 {
   "schemaVersion": "target-verification-1.0.0",
   "capabilities": {
-    "build": false,
-    "server": false,
-    "client": false,
+    "build": true,
+    "server": true,
+    "client": true,
     "gameTest": false,
     "visual": false
   },
@@ -11,7 +11,6 @@
     "build",
     "server",
     "client",
-    "gameTest",
     "visual"
   ],
   "checks": {
@@ -23,7 +22,8 @@
         "build"
       ],
       "assertions": [
-        "Qualification requires exit code 0 and a production JAR."
+        "Qualification requires exit code 0 and a production JAR.",
+        "Qualification requires Java bytecode major 65 and no QSL or QFAPI dependency."
       ],
       "artifactGlobs": [
         "build/libs/*.jar",
@@ -70,5 +70,10 @@
       ]
     }
   },
-  "testedPlatforms": []
+  "testedPlatforms": [
+    {
+      "os": "linux",
+      "arch": "arm64"
+    }
+  ]
 }

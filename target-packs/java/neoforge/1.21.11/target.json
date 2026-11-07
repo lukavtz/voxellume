@@ -4,7 +4,7 @@
   "edition": "java",
   "status": "candidate",
   "revision": 1,
-  "packSha256": "737469147377354a293690f573b489df4f5af6d9d5e6e8cbb41f29ba75cf05d1",
+  "packSha256": "a5073c7baa8360947d83a3ff6fb9cd3e55cdd708adc511c06554e23c8394b4a7",
   "minecraft": {
     "version": "1.21.11",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -41,6 +41,7 @@
     "version": "9.2.1",
     "distributionUrl": "https://services.gradle.org/distributions/gradle-9.2.1-bin.zip",
     "distributionSha256": "72f44c9f8ebcb1af43838f45ee5c4aa9c5444898b3468ab3f4af7b6076c5bc3f",
+    "wrapperJarSha256": "7d3a4ac4de1c32b59bc6a4eb8ecb8e612ccd0cf1ae1e99f66902da64df296172",
     "plugins": [
       {
         "id": "net.neoforged.moddev",
@@ -59,7 +60,10 @@
     }
   },
   "knownLimitations": [
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "MDG 2.0.148 disableRecompilation uses the binary patch pipeline: decompiled Minecraft sources and Parchment IDE source/Javadoc augmentation are unavailable; Parchment coordinate identity remains pinned for compatible parameter metadata.",
+    "Linux/arm64 client qualification requires the evidence-pinned LWJGL 3.3.3 natives-linux-arm64 runtime fixture because Mojang's 1.21.11 linux natives are x64; this fixture is not packaged into the mod.",
+    "Real-client evidence is limited to development accessibility onboarding, main menu, and Example Mod list. No packaged-JAR client, world, inventory, hand, placed-block, animation, persistence, or multiplayer scenario was run. The sandbox narrator and OpenAL audio are unavailable; no client-log-cleanliness or sound claim is made.",
+    "Candidate status remains: the production JAR passed a clean dedicated production server, but the complete packaged-JAR real-client and full visual matrix is not qualified and no trusted-human aesthetic approval was collected; verification evidenceManifest is therefore absent."
   ],
   "template": {
     "repository": "https://github.com/NeoForgeMDKs/MDK-1.21.11-ModDevGradle",

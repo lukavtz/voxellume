@@ -4,7 +4,7 @@
   "edition": "java",
   "status": "candidate",
   "revision": 1,
-  "packSha256": "ffe7ee13a87ea61efab8437ad0dc9c26b8cf33a22bf08a47f328c3db5db17e92",
+  "packSha256": "bd6174af86b87f54d515a6e59b5aae14d47099b10a28001129860169f20c3ca0",
   "minecraft": {
     "version": "26.1",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -42,6 +42,7 @@
     "version": "9.8.2",
     "distributionUrl": "https://services.gradle.org/distributions/gradle-9.8.2-bin.zip",
     "distributionSha256": "21bd5da2de49b642904077f38c0efdc7778e92b3ed0889392dca61b97e389607",
+    "wrapperJarSha256": "3b8a25775a69158b5ad2b1d17a80a88dc7b40a352a73eb27d06c612a7ce68e98",
     "plugins": [
       {
         "id": "net.fabricmc.fabric-loom",
@@ -60,8 +61,11 @@
     }
   },
   "knownLimitations": [
-    "Template declares floating Loom 1.19-SNAPSHOT; exact 1.20.0-alpha.19 is a required override. No build/runtime compatibility claim.",
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "Template declares floating Loom 1.19-SNAPSHOT; exact 1.20.0-alpha.19 is a required override for the JDK 25 toolchain.",
+    "The unobfuscated target uses no mappings; Yarn, Mojang mappings, and Intermediary are not substitutes.",
+    "Server GameTests run through build after fabricApi.configureTests; runClientGameTest records client-test evidence only and does not qualify the production client.",
+    "Mandatory-sandbox task discovery, clean jar build, dedicated server, configured server GameTests with a failing negative control, production-JAR packaging, pristine packaged-JAR server installation, and reviewed visual surfaces passed on Linux/arm64.",
+    "runClientGameTest reached its singleplayer assertion and runClient rendered all reviewed surfaces, but both client paths exited 134 in libopenal.so during shutdown. Client capability remains false, the pack remains candidate, and no supported claim is made."
   ],
   "template": {
     "repository": "https://github.com/FabricMC/fabric-example-mod",

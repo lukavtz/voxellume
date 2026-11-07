@@ -4,7 +4,7 @@
   "edition": "java",
   "status": "candidate",
   "revision": 1,
-  "packSha256": "592ef5d72ff9af5528b64eb2d206bd250351e3601105e3c4c69cefe1a26694ba",
+  "packSha256": "f42c9347799b85ea09b6cc4091551d4c269f1b6be9332c6b21a8e461174cc8d9",
   "minecraft": {
     "version": "26.1",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -53,7 +53,10 @@
     }
   },
   "knownLimitations": [
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "MDG 2.0.148 disableRecompilation is required to use the binary patch pipeline and avoid mandatory 4 GiB decompilation; decompiled Minecraft sources are unavailable and this pack makes no decompiled-source claim.",
+    "Qualified on Linux/arm64 through clean builds, positive and negative GameTests, development and pristine production servers, and a real development client with reviewed main-menu/mod-list captures; evidence: ~/.local/share/voxellume/evidence/neoforge-26.1-r1-20261107T170158Z/.",
+    "No packaged-JAR real-client or world/inventory/hand/placed-block/animation/clipping/z-fighting visual matrix was run; candidate status is retained.",
+    "The MDK example_block has no model; its missing-model warning and unavailable Linux narrator remain in the client log."
   ],
   "template": {
     "repository": "https://github.com/NeoForgeMDKs/MDK-26.1-ModDevGradle",

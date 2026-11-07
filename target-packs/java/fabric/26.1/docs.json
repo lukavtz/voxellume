@@ -35,6 +35,10 @@
       "responseSha256": "329422f5ae847e329b14d2ae8e9091adf946a40b0f7b63266362e52e534bbaf4"
     },
     {
+      "url": "https://maven.fabricmc.net/net/fabricmc/fabric-loom/1.20.0-alpha.19/fabric-loom-1.20.0-alpha.19.jar",
+      "responseSha256": "0a742bd8f3542f4058de52e40dcdebdbed6b135d8ac74a0917503c9db0c69bb0"
+    },
+    {
       "url": "https://maven.fabricmc.net/net/fabricmc/fabric-loom/maven-metadata.xml",
       "responseSha256": "f073b55e99d984be731b98dd9e84152d24a34abf935f7a47ba5c25cbd79dcc34"
     },
