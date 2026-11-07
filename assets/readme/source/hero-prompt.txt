@@ -1,0 +1,9 @@
+Model: cheapvibecode/gpt-image-2
+
+Project-specific hero background for Voxellume, an evidence-driven Minecraft Java mod engineering agent. A wide cinematic voxel landscape at blue hour: dark near-black basalt and obsidian geometric terrain, a stepped quarry transforming into an organized sequence of luminous verification beacons and a completed block-built artifact inside a square archive vault. A subtle teal light path connects the quarry to the finished artifact. Precise cubic geometry, restrained premium technical editorial style, crisp materials, sparse composition, no text or logos. The generated layer is only atmospheric project identity; real Minecraft client screenshots are composited above it as proof.
+
+Scene: Dark voxel quarry and archive vault, visual focus on the right half, generous near-black negative space across the left 45 percent for typography.
+Composition: Wide isometric landscape, right-weighted, clean silhouette edges, no UI, no people, no letters, no watermark.
+Lighting: Blue-hour ambient light, restrained teal rim lights from upper right, deep readable shadows, low bloom.
+Style: Premium voxel editorial illustration, sharp cubic geometry, not cyberpunk city, not generic glowing AI imagery.
+Aspect ratio: 16:9, 1536x1024.

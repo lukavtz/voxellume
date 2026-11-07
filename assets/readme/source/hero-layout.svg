@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="500" viewBox="0 0 1200 500" role="img" aria-labelledby="title desc">
+  <title id="title">Voxellume — from mod idea to evidence-backed delivery</title>
+  <desc id="desc">Generated voxel quarry and archive scene with real Fabric client and deterministic seed screenshots, exact targets, editable assets, and runtime evidence.</desc>
+  <defs>
+    <linearGradient id="titleShade" x1="0" x2="1">
+      <stop offset="0" stop-color="#03090d" stop-opacity="0.98"/>
+      <stop offset="0.55" stop-color="#03090d" stop-opacity="0.82"/>
+      <stop offset="1" stop-color="#03090d" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="tealRule" x1="0" x2="1">
+      <stop stop-color="#45f0d2"/>
+      <stop offset="1" stop-color="#45f0d2" stop-opacity="0"/>
+    </linearGradient>
+    <clipPath id="mainClip"><rect x="570" y="48" width="586" height="330" rx="18"/></clipPath>
+    <clipPath id="scenarioClip"><rect x="796" y="312" width="360" height="168" rx="14"/></clipPath>
+  </defs>
+
+  <rect width="1200" height="500" rx="24" fill="#03090d"/>
+  <image href="hero-subject.png" x="0" y="-145" width="1200" height="800" preserveAspectRatio="xMidYMid slice"/>
+  <rect width="1200" height="500" rx="24" fill="url(#titleShade)"/>
+
+  <g transform="translate(56 54)" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">
+    <text fill="#7ddfd1" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="16" font-weight="600" letter-spacing="2.2">MINECRAFT JAVA · AGENT ENGINEERING</text>
+    <text y="78" fill="#f3f7f6" font-size="68" font-weight="750" letter-spacing="-2.2">VOXELLUME</text>
+    <rect y="99" width="390" height="2" fill="url(#tealRule)"/>
+    <text y="142" fill="#f3f7f6" font-size="29" font-weight="560">From mod idea to</text>
+    <text y="179" fill="#f3f7f6" font-size="29" font-weight="560">evidence-backed delivery.</text>
+    <text y="220" fill="#b7c8c6" font-size="18">Exact targets. Editable assets. Runtime proof.</text>
+
+    <g transform="translate(0 268)" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="15">
+      <rect width="218" height="34" rx="7" fill="#0b1e22" stroke="#2e746c"/>
+      <text x="14" y="23" fill="#a7f4e6">REAL CLIENT EVIDENCE</text>
+      <text y="62" fill="#89a19e">NO NEAREST VERSIONS.</text>
+      <text y="88" fill="#89a19e">NO UNEXECUTED PASSES.</text>
+    </g>
+    <text y="410" fill="#7ddfd1" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="15" letter-spacing="1.3">OMP · DSH · MCP</text>
+  </g>
+
+  <g>
+    <rect x="566" y="44" width="594" height="338" rx="20" fill="#071115" stroke="#45f0d2" stroke-opacity="0.7"/>
+    <image href="fabric-main.png" x="570" y="48" width="586" height="330" preserveAspectRatio="xMidYMid slice" clip-path="url(#mainClip)"/>
+    <rect x="584" y="60" width="228" height="32" rx="7" fill="#03090d" fill-opacity="0.88"/>
+    <text x="598" y="82" fill="#a7f4e6" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="15" font-weight="600">FABRIC 1.21.1 · CLIENT</text>
+    <rect x="792" y="308" width="368" height="176" rx="16" fill="#071115" stroke="#7ddfd1" stroke-opacity="0.8"/>
+    <image href="fabric-seed.png" x="796" y="312" width="360" height="168" preserveAspectRatio="xMidYMid slice" clip-path="url(#scenarioClip)"/>
+    <rect x="808" y="320" width="230" height="30" rx="7" fill="#03090d" fill-opacity="0.9"/>
+    <text x="820" y="341" fill="#a7f4e6" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="14" font-weight="600">DETERMINISTIC SCENARIO</text>
+  </g>
+</svg>
