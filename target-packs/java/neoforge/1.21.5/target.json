@@ -4,7 +4,7 @@
   "edition": "java",
   "status": "candidate",
   "revision": 1,
-  "packSha256": "87189c6a89291ba272cfb15ce89be07355d99f1a0368a1407e3e972ec24d2ddf",
+  "packSha256": "49a4c59d21a73a288d318856dfb52a065652ead05366b37daa1e5640e293033c",
   "minecraft": {
     "version": "1.21.5",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -41,6 +41,7 @@
     "version": "9.2.1",
     "distributionUrl": "https://services.gradle.org/distributions/gradle-9.2.1-bin.zip",
     "distributionSha256": "72f44c9f8ebcb1af43838f45ee5c4aa9c5444898b3468ab3f4af7b6076c5bc3f",
+    "wrapperJarSha256": "7d3a4ac4de1c32b59bc6a4eb8ecb8e612ccd0cf1ae1e99f66902da64df296172",
     "plugins": [
       {
         "id": "net.neoforged.moddev",
@@ -59,7 +60,8 @@
     }
   },
   "knownLimitations": [
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "The template enables MDG's official disableRecompilation binary patch pipeline; decompiled Minecraft sources and Parchment IDE source/Javadoc augmentation are unavailable.",
+    "Task discovery, clean binary-patch builds, dedicated development and packaged production servers, positive data-driven GameTests, and a deliberate negative control passed. The real client rendered accessibility onboarding and the main menu with Minecraft 1.21.5, NeoForge 21.5.101, and three mods. Packaged-JAR client and full world/inventory/hand/animation visual scenarios were not run, so visual is false and status remains candidate."
   ],
   "template": {
     "repository": "https://github.com/NeoForgeMDKs/MDK-1.21.5-ModDevGradle",
