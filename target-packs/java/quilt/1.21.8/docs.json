@@ -16,7 +16,7 @@
   ],
   "gradlePlugins": [
     {
-      "id": "org.quiltmc.loom",
+      "id": "org.quiltmc.loom.remap",
       "version": "1.15.1",
       "url": "https://github.com/QuiltMC/quilt-loom",
       "revision": "1.15.1",

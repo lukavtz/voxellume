@@ -4,7 +4,7 @@
   "edition": "java",
   "status": "candidate",
   "revision": 1,
-  "packSha256": "66598aeb4e0f996b4efd7d11195bf6798c8d8dd1b5811ad55e0fd8564d78d163",
+  "packSha256": "e051c1f0ea6ad198cdb33d6e21a81502fa98a2b1c3e74c597ce53814b55fd881",
   "minecraft": {
     "version": "1.21.8",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -41,6 +41,7 @@
     "version": "9.2.1",
     "distributionUrl": "https://services.gradle.org/distributions/gradle-9.2.1-bin.zip",
     "distributionSha256": "72f44c9f8ebcb1af43838f45ee5c4aa9c5444898b3468ab3f4af7b6076c5bc3f",
+    "wrapperJarSha256": "7d3a4ac4de1c32b59bc6a4eb8ecb8e612ccd0cf1ae1e99f66902da64df296172",
     "plugins": [
       {
         "id": "net.neoforged.moddev",
@@ -59,7 +60,9 @@
     }
   },
   "knownLimitations": [
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "The template enables MDG's official disableRecompilation binary patch pipeline; decompiled Minecraft sources and Parchment IDE source/Javadoc augmentation are unavailable.",
+    "Task discovery, clean binary-patch builds, dedicated development server, and positive data-driven GameTests plus a deliberate negative control passed on Linux/arm64. Production JAR SHA-256 is 313c16c6f2806d6d1bbf11d9178c02f3b9abadf5f68c6fa09144c7fdd7c98102.",
+    "The packaged production server reached Done. Real-client captures show accessibility onboarding and the rendered Minecraft menu; packaged-JAR client and full world/inventory/hand/animation visual scenarios were not run, so visual is false and status remains candidate."
   ],
   "template": {
     "repository": "https://github.com/NeoForgeMDKs/MDK-1.21.8-ModDevGradle",

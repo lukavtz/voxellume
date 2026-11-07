@@ -1,10 +1,10 @@
 {
   "schemaVersion": "target-verification-1.0.0",
   "capabilities": {
-    "build": false,
-    "server": false,
-    "client": false,
-    "gameTest": false,
+    "build": true,
+    "server": true,
+    "client": true,
+    "gameTest": true,
     "visual": false
   },
   "required": [
@@ -23,7 +23,7 @@
         "build"
       ],
       "assertions": [
-        "Qualification requires exit code 0 and a production JAR."
+        "Qualification requires exit code 0, disableRecompilation active, no decompile execution, and a production JAR."
       ],
       "artifactGlobs": [
         "build/libs/*.jar",
@@ -84,5 +84,10 @@
       ]
     }
   },
-  "testedPlatforms": []
+  "testedPlatforms": [
+    {
+      "os": "linux",
+      "arch": "arm64"
+    }
+  ]
 }
