@@ -4,7 +4,7 @@
   "edition": "java",
   "status": "candidate",
   "revision": 1,
-  "packSha256": "93c4b5776eff59339d08ee6a7b435f2b1131b4b8da446fdd4df9d79b18528314",
+  "packSha256": "12005f5cc4bf77b3b5e2084db31e0854dd6f23a5e7a86835501728c26b19cbfd",
   "minecraft": {
     "version": "1.21.7",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -46,6 +46,7 @@
     "version": "8.12.1",
     "distributionUrl": "https://services.gradle.org/distributions/gradle-8.12.1-bin.zip",
     "distributionSha256": "8d97a97984f6cbd2b85fe4c60a743440a347544bf18818048e611f5288d46c94",
+    "wrapperJarSha256": "cb0da6751c2b753a16ac168bb354870ebb1e162e9083f116729cec9c781156b8",
     "plugins": [
       {
         "id": "net.minecraftforge.gradle",
@@ -64,8 +65,9 @@
     }
   },
   "knownLimitations": [
-    "MDK declares a ForgeGradle range; exact plugin pin is selected from official Forge Maven. No build/runtime compatibility claim.",
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "The MDK's ForgeGradle range is pinned exactly to 6.0.54; its 5 GiB Gradle/decompiler settings are bounded to 1 GiB/2 GiB for the mandatory sandbox.",
+    "Task discovery, clean builds, dedicated and packaged production servers, two explicit positive GameTests, the negative control, and a real modded client main menu passed on Linux/arm64. Production JAR SHA-256 is 261e20c3089de534350a8d50720b73dd3ca4f78a2fb37c79ddcc9041c721a809.",
+    "Only accessibility onboarding and the real 1280x720 main menu were reviewed. World, inventory, hand, placed-block, alternate GUI-state, animation, clipping, and z-fighting scenarios were not run; visual remains false and the pack remains candidate."
   ],
   "template": {
     "repository": "https://maven.minecraftforge.net/net/minecraftforge/forge/1.21.7-57.0.3/forge-1.21.7-57.0.3-mdk.zip",
