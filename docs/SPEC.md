@@ -137,7 +137,7 @@ Separate skills own distinct triggers:
 - visual quality review;
 - release and GitHub delivery.
 
-Skills contain procedures and pointers to versioned references. They do not duplicate executable logic owned by tools.
+Skills contain procedures and pointers to versioned references. They do not duplicate executable logic owned by tools. Ready-made sources and adoption limits are recorded in `docs/research/skill-sources.md`; Universal Modder, SirEdvin, Jahrome, and Adhi methods remain subordinate to exact packs and executable evidence.
 
 ### 5.2 Deterministic tools
 
@@ -154,7 +154,13 @@ The shared core provides these conceptual operations:
 
 Exact public interfaces and test seams are architecture decisions and must be confirmed before tests are written.
 
-### 5.3 Host adapters
+### 5.3 Optional integrations
+
+- **MCreator:** a separately enabled, literal-loopback client for schema inspection, workspace/datalist discovery, governed mod-element operations, build status, console, and run-directory logs. Every ADD/REPLACE/PATCH validates a fresh runtime schema; PATCH also validates the merged definition. Arbitrary file edits and client/server launch tools are outside the adapter contract.
+- **Player Games:** browser OAuth with dynamic client registration and PKCE S256. Runtime `tools/list` schemas gate calls; tokens remain in memory and are redacted from results. Every `generate_mod` or `iterate_mod` call requires separate credit-use approval. Download URLs remain untrusted data and are never fetched or executed by the adapter.
+- Both adapters enforce bounded responses, cancellation, stable sanitized errors, and explicit transport failures. Neither is required for local mod design, implementation, or verification.
+
+### 5.4 Host adapters
 
 - **OMP:** package manifest, extension module, conventional skills, agents, commands, tools, and optional MCP configuration.
 - **DeepSeek Harness:** external Cordis bundle, typed model-facing tools, bundle patch, lifecycle handling, and host-native execution policy.

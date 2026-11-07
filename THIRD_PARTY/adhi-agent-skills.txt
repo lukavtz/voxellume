@@ -1,0 +1,27 @@
+Source: https://github.com/adhi-jp/agent-skills
+Reviewed revision: 16613367d14423aa5eca4bb83a42a5a4176df0c6
+Integration: selected source-agnostic workflow ideas adapted; the MCP-dependent workbench is not vendored or enabled.
+
+Reusable methods: project profile fields, explicit evidence levels, build-is-not-runtime-proof, GameTest decision/wiring checks, per-loader evidence, and mappings-before-loader-lifecycle porting. Rejected: all recipes requiring the disabled source facade, version defaults, and MCP-specific output contracts.
+
+MIT License
+
+Copyright (c) 2026 adhi-jp
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

@@ -245,6 +245,10 @@ Mosaicary must pass GLB/bone/channel/multi-texture/coplanar/curved-mesh conversi
 
 The completed mc-asset pilot passed 22/22 pilot assertions and 19/19 deterministic artifact pairs; the sosadly pilot exercised rig/generator/analyzer/paint methods and found the planted open-loop gap. These are tool-selection evidence only. Neither executed real Minecraft nor obtained human aesthetic approval, so neither satisfies §5.2 or authorizes broader raw integration.
 
+### 5.4 Optional service adapters
+
+MCreator contract tests use a fake MCP transport to prove protocol/session headers, loopback endpoint rejection, fresh schemas before every mutation, merged-PATCH validation, locked/generated-file boundaries, truthful background-build states, response caps, sanitized errors, and cancellation. Player Games contract tests prove OAuth metadata and PKCE/state handling, runtime schema rejection before dispatch, per-call paid approval, memory-only refresh/redaction, untrusted download handling, JSON and multiline SSE framing, response caps, and cancellation. These fixtures do not establish live-service availability or account authorization; live calls remain separately approved optional integration checks.
+
 ## 6. Performance and reliability
 
 Measure against the same benchmark and environment:

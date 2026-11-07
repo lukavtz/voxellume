@@ -1,0 +1,8 @@
+Source: https://github.com/MCreator/MCreator
+Reviewed revision: 31747bc416d222a66193445c87f3f2416b344ca6
+Integration: optional external Streamable-HTTP MCP client; no MCreator source is vendored here.
+Primary contracts: src/main/java/net/mcreator/ui/mcp/MCreatorMcp.java and src/main/java/net/mcreator/io/mcp.
+
+MCreator is GPL-3.0. Its core is not copied into Voxellume. Generated mod output and template exceptions are evaluated separately from this external-process integration. MCreator trademarks and brand assets are not granted.
+
+The reviewed MCP is disabled by default and unauthenticated on loopback. Enable it only on a trusted single-user host; never proxy or expose it remotely.

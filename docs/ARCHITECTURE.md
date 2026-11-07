@@ -88,6 +88,10 @@ Verification accepts only fixed `./gradlew --no-daemon <allowlisted-task>` argv 
 
 Transaction journals and evidence bundles use domain-separated HMAC-SHA256 over canonical JSON with the persistent mode-`0600` secret. Evidence `SHA256SUMS` separately covers every stored log, artifact, and manifest byte; `readEvidence` verifies both the checksums and manifest MAC. Typed review subjects bind source/export, production-JAR/client-scenario, and human design-review evidence. Stand-in or rejected reviewers cannot pass the human gate. Authentication does not replace immutable external evidence custody.
 
+### ADR-011: Optional services stay outside the local mod pipeline
+
+`src/core/integrations/mcreator.ts` accepts only literal loopback HTTP endpoints, negotiates the pinned MCreator protocol, and gates every mutating element operation on fresh runtime schemas. Its allowlist omits arbitrary project-file edits and game launch. `src/core/integrations/player-games.ts` fixes the Player Games HTTPS origins, discovers OAuth metadata, registers a loopback redirect client, and uses authorization-code PKCE S256. Access, refresh, and client secrets remain private client state; runtime AJV schemas gate tool arguments, and paid generation requires an approval callback per call. Both clients cap response bytes, reject redirects and malformed identities, sanitize failures, and propagate cancellation. Neither adapter shares authority with target packs, transaction staging, or the evidence supervisor.
+
 ## 3. Repository layout
 
 ```text

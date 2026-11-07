@@ -4,4 +4,5 @@ coverage/
 .artifacts/
 pnpm-lock.yaml
 target-packs/
+THIRD_PARTY/
 fixtures/target-packs/malformed-json/

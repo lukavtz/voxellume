@@ -1,0 +1,7 @@
+Source: https://www.player.games/en-US/mcp
+Endpoint: https://mcp.player.games
+Integration: optional hosted MCP client using browser OAuth; no Player Games source or proprietary content is vendored here.
+
+Player Games tool names and OAuth metadata were reviewed on 2026-11-07. Input schemas are discovered from authenticated tools/list responses at runtime rather than copied or invented.
+
+generate_mod and iterate_mod spend credits and require explicit approval before every operation. Browsing, status, details, downloads, and credit-balance reads are free. Hosted output and downloaded artifacts remain untrusted and require Voxellume validation before any build or runtime use.

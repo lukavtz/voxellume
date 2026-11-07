@@ -1,0 +1,2 @@
+# Vendored sources retain upstream whitespace byte-for-byte.
+THIRD_PARTY/** -whitespace

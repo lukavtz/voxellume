@@ -1,0 +1,18 @@
+SirEdvin minecraft-modding-skills
+=================================
+
+Source: https://github.com/SirEdvin/minecraft-modding-skills
+Revision: b8e1133597d08eb41ac0d00d5d9555af8c1ba895
+License: MIT
+Copyright: Copyright (c) 2026 SirEdvin
+
+Vendored procedures: fabric-modding, neoforge-modding,
+minecraft-26-1-migration, testiarium-gametest, and modrinth-api,
+including their directly referenced local references and migration template.
+All vendored files, including LICENSE, are unmodified from the revision above.
+
+These procedures retain their upstream scope. Their presence does not add
+Voxellume target-pack support for Forge, Quilt, or unqualified Minecraft
+versions. Testiarium's referenced implementation sources and external
+dependencies are not vendored; their own licenses and notices still apply
+to any separately obtained implementation code.

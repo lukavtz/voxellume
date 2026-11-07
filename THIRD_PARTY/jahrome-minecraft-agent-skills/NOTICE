@@ -1,0 +1,18 @@
+Jahrome907 minecraft-agent-skills
+=================================
+
+Source: https://github.com/Jahrome907/minecraft-agent-skills
+Revision: 22d61ce6b7a0c5f215008824aa6b94ecc73f2a43
+License: MIT
+Copyright: Copyright (c) 2026 Jahrome907
+
+Vendored procedures: minecraft-modding, minecraft-testing,
+minecraft-resource-pack, and minecraft-ci-release, with their local references.
+Scripts, mirrored skill trees, AGENTS.md, and unrelated repository content are
+not vendored. LICENSE and all selected files are unmodified except that the
+single automatic EULA-acceptance line was removed from
+minecraft-testing/SKILL.md; Voxellume requires separate explicit EULA approval.
+
+These procedures do not add Voxellume target-pack support for Quilt or Forge
+1.21+. The vendored Forge reference is limited to its upstream Forge 1.20.1
+scope and does not establish Voxellume qualification for that target.
