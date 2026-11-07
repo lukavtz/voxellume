@@ -1,6 +1,6 @@
 {
   "schemaVersion": "target-docs-1.0.0",
-  "retrievedAt": "2026-11-06T14:50:17Z",
+  "retrievedAt": "2026-11-07T18:32:42Z",
   "minecraftRelease": {
     "url": "https://www.minecraft.net/en-us/article/minecraft-java-edition-1-21-5",
     "revision": "1.21.5",
@@ -16,7 +16,7 @@
   ],
   "gradlePlugins": [
     {
-      "id": "org.quiltmc.loom",
+      "id": "org.quiltmc.loom.remap",
       "version": "1.15.1",
       "url": "https://github.com/QuiltMC/quilt-loom",
       "revision": "1.15.1",
@@ -39,6 +39,14 @@
     {
       "url": "https://maven.quiltmc.org/repository/release/org/quiltmc/quilted-fabric-api/quilted-fabric-api/maven-metadata.xml",
       "responseSha256": "d50168591fb9986ebe050527647b35521c8177d9d27cba84708d7986588a39b9"
+    },
+    {
+      "url": "https://maven.quiltmc.org/repository/release/org/quiltmc/quilt-loader/0.20.0-beta.9/quilt-loader-0.20.0-beta.9.jar",
+      "responseSha256": "a475689ac9a5b9718c045972bb0f41381ce22315a87273a99f30ec1fa3aacb8a"
+    },
+    {
+      "url": "https://maven.quiltmc.org/repository/release/org/quiltmc/quilt-mappings/1.21.5+build.10/quilt-mappings-1.21.5+build.10-intermediary-v2.jar",
+      "responseSha256": "1316188a36fc063d26d76d1957da9e076c7f633fb9dccbeaa2f1507582f0feee"
     },
     {
       "url": "https://meta.quiltmc.org/v3/versions",

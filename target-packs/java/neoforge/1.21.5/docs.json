@@ -1,6 +1,6 @@
 {
   "schemaVersion": "target-docs-1.0.0",
-  "retrievedAt": "2026-11-06T14:50:17Z",
+  "retrievedAt": "2026-11-07T18:32:42Z",
   "minecraftRelease": {
     "url": "https://www.minecraft.net/en-us/article/minecraft-java-edition-1-21-5",
     "revision": "1.21.5",
@@ -27,6 +27,14 @@
     {
       "url": "https://maven.neoforged.net/releases/net/neoforged/neoforge/maven-metadata.xml",
       "responseSha256": "2dffba1a6485d09a4ada3a72e7972ac8906517b8e052f017d6853fb841b9f178"
+    },
+    {
+      "url": "https://maven.neoforged.net/releases/net/neoforged/neoforge/21.5.101/neoforge-21.5.101-installer.jar",
+      "responseSha256": "a337d3d6de4b0bc5e0c38bde829078b071ddd55352395b944f4f9020a1b37974"
+    },
+    {
+      "url": "https://maven.parchmentmc.org/org/parchmentmc/data/parchment-1.21.5/2025.06.15/parchment-1.21.5-2025.06.15.zip",
+      "responseSha256": "4239553657908ce235a7a1d4c7f732e7790abed6598c924d28e2df6c97710da0"
     },
     {
       "url": "https://piston-meta.mojang.com/v1/packages/5ca2012338100e4dbfef0d2114a5fa66959ab1e5/1.21.5.json",
