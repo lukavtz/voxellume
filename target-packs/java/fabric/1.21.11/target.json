@@ -4,7 +4,7 @@
   "edition": "java",
   "status": "candidate",
   "revision": 1,
-  "packSha256": "6077e44e130ed17c4d06bacad305019f2fee6be05095cfde81cb12d9f09e7f4d",
+  "packSha256": "f03c5c3296c8d96764fefb9989095afe4ab950a7ba8aadaa304eb7c5b4f3a889",
   "minecraft": {
     "version": "1.21.11",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -53,10 +53,11 @@
     "version": "9.8.2",
     "distributionUrl": "https://services.gradle.org/distributions/gradle-9.8.2-bin.zip",
     "distributionSha256": "21bd5da2de49b642904077f38c0efdc7778e92b3ed0889392dca61b97e389607",
+    "wrapperJarSha256": "3b8a25775a69158b5ad2b1d17a80a88dc7b40a352a73eb27d06c612a7ce68e98",
     "plugins": [
       {
         "id": "net.fabricmc.fabric-loom-remap",
-        "version": "1.20.0-alpha.19"
+        "version": "1.17.21"
       }
     ]
   },
@@ -71,8 +72,9 @@
     }
   },
   "knownLimitations": [
-    "Template declares floating Loom 1.19-SNAPSHOT; exact 1.20.0-alpha.19 is a required override. No build/runtime compatibility claim.",
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "Template declares floating Loom 1.19-SNAPSHOT; exact stable 1.17.21 is a required override for the JDK 21 toolchain.",
+    "Mandatory-sandbox task discovery, clean build, dedicated server, configured server and client GameTests with a negative control, production-JAR packaging, pristine packaged-JAR server installation/restart, and packaged-JAR real-client launch passed on Linux/arm64.",
+    "The production client rendered reviewed main-menu, fixed-seed world, inventory, hand, and alternate-direction captures, then exited 137 under the mandatory 4 GiB limit before the full visual matrix completed; visual remains false, candidate status remains, and no evidenceManifest is declared."
   ],
   "template": {
     "repository": "https://github.com/FabricMC/fabric-example-mod",

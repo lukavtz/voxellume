@@ -1,10 +1,10 @@
 {
   "schemaVersion": "target-pack-1.0.0",
-  "id": "java-neoforge-1.21.1-r1",
+  "id": "java-neoforge-1.21.1-r2",
   "edition": "java",
   "status": "candidate",
-  "revision": 1,
-  "packSha256": "0b51340489fbf459f19e9c48af1a6e6f0892bf104fbcededab6bf7bd8947691c",
+  "revision": 2,
+  "packSha256": "16dae75830cc9849f1910920e8bdf9a307b9bd0aa9d74e35c49e616eea7475d8",
   "minecraft": {
     "version": "1.21.1",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -59,13 +59,16 @@
       "applicationVersion": "5.2.2"
     }
   },
-  "knownLimitations": [
-    "Baseline build evidence: NeoForm Runtime decompile failed with Vineflower 1.10.1 exit code 1 on clean build and warm-cache retry; no production JAR was produced.",
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
-  ],
   "template": {
     "repository": "https://github.com/NeoForgeMDKs/MDK-1.21.1-ModDevGradle",
     "revision": "e93d7f09d4eec12c76d1d7be9bf4eaad0246e9e0",
     "contentSha256": "1101d5f9baf5eb4dd31f826e4eef7f7380a01a776ce1af230133e32a95e46e13"
-  }
+  },
+  "knownLimitations": [
+    "MDG 2.0.148 disableRecompilation uses the binary patch pipeline: decompiled Minecraft sources and Parchment IDE source/Javadoc augmentation are unavailable; Parchment coordinate identity remains pinned for compatible parameter metadata.",
+    "R1 decompilation evidence remains rejected; r2 is a separate official pipeline and does not claim a decompile repair or heap override.",
+    "Linux/arm64 client qualification requires the evidence-pinned LWJGL 3.3.3 natives-linux-arm64 runtime fixture because Mojang's 1.21.1 linux natives are x64; this fixture is not packaged into the mod.",
+    "Real-client evidence is limited to the development main menu and Example Mod list. No packaged-JAR client, world, inventory, hand, or animation scenario was run. llvmpipe captures also show a magenta/black panorama background, although menus and mod metadata are legible.",
+    "Candidate status remains: the production JAR passed a clean dedicated production server, but the complete packaged-JAR real-client and full visual matrix is not qualified; verification evidenceManifest is therefore absent."
+  ]
 }

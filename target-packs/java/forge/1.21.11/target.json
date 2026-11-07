@@ -2,9 +2,9 @@
   "schemaVersion": "target-pack-1.0.0",
   "id": "java-forge-1.21.11-r1",
   "edition": "java",
-  "status": "candidate",
+  "status": "rejected",
   "revision": 1,
-  "packSha256": "fe1b20cee1110a017d5440b73d221398db0027794cfebba5264763318d94e08d",
+  "packSha256": "ac203aaf9b256ae8b420194b389951723ec1996dbcf40c22b1e483d99135626e",
   "minecraft": {
     "version": "1.21.11",
     "releaseManifestUrl": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
@@ -64,12 +64,17 @@
     }
   },
   "knownLimitations": [
-    "MDK declares a ForgeGradle range; exact plugin pin is selected from official Forge Maven. No build/runtime compatibility claim.",
-    "No successful build, server, client, GameTest, or visual qualification evidence has been collected."
+    "Task discovery and clean build failed during ForgeGradle/Minecraft Mavenizer decompilation: Vineflower 1.11.2 requested -Xms4G and exited 137 inside the required 4 GiB Docker limit; no tasks were listed and no production JAR was produced.",
+    "Dedicated server, configured GameTest and negative control, real client, pristine production-JAR runtime, and visual checks were not run because the required clean build failed; no runtime or visual support claim."
   ],
-  "template": {
-    "repository": "https://maven.minecraftforge.net/net/minecraftforge/forge/1.21.11-61.2.4/forge-1.21.11-61.2.4-mdk.zip",
-    "revision": "1.21.11-61.2.4",
-    "contentSha256": "e1b9cd94390af7ab82bbf49b293337f739e92f78ce81c5e44fb84a0e582dd4fc"
+  "reason": {
+    "code": "verification_failed",
+    "detail": "Official MCP config 1.21.11-20251223.124241 sets Vineflower JVM arguments to -Xmx4G; Mavenizer invoked it with -Xms4G inside the mandatory 4 GiB container. Task discovery and clean build both failed during decompilation with MCP step exit 137. No production JAR, server, client, GameTest, pristine-install, or visual qualification completed.",
+    "evidence": [
+      {
+        "url": "https://maven.minecraftforge.net/de/oceanlabs/mcp/mcp_config/1.21.11-20251223.124241/mcp_config-1.21.11-20251223.124241.zip",
+        "sha256": "1d389d1400f44e51c81487d9fbdd7abc098095129ff415bca9039ab1de252a14"
+      }
+    ]
   }
 }

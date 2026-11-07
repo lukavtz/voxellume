@@ -38,8 +38,11 @@ base {
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
 neoForge {
-    // Specify the version of NeoForge to use.
-    version = project.neo_version
+    // Use the official binary patch pipeline selected in gradle.properties.
+    enable {
+        version = project.neo_version
+        disableRecompilation = project.property('neoForge.enable.disableRecompilation').toBoolean()
+    }
 
     parchment {
         mappingsVersion = project.parchment_mappings_version

@@ -15,7 +15,7 @@
 
 ## Подтверждённые baseline inputs для 1.21.1
 
-Это воспроизводимые входы для `java-fabric-1.21.1-r1` и `java-neoforge-1.21.1-r1`. **Оба pack имеют только статус `candidate`.** Переход в `supported` возможен лишь после успешных clean build, dedicated server, real client, configured GameTest, проверки packaged production JAR и visual review с сохранёнными evidence. Наличие артефактов и совместимых версий не доказывает runtime-поддержку.
+Это воспроизводимые входы для `java-fabric-1.21.1-r2` и `java-neoforge-1.21.1-r2`. **Оба pack имеют статус `candidate`.** Переход в `supported` возможен только после полной build/server/GameTest/client/production-JAR/visual qualification. Наличие артефактов и частичных runtime-проверок не доказывает полную поддержку.
 
 ### Общие данные Minecraft 1.21.1
 

@@ -1,11 +1,11 @@
 {
   "schemaVersion": "target-verification-1.0.0",
   "capabilities": {
-    "build": false,
-    "server": false,
-    "client": false,
-    "gameTest": false,
-    "visual": false
+    "build": true,
+    "server": true,
+    "client": true,
+    "gameTest": true,
+    "visual": true
   },
   "required": [
     "build",
@@ -23,7 +23,7 @@
         "build"
       ],
       "assertions": [
-        "Qualification requires exit code 0 and a production JAR."
+        "Two fixture-free clean builds exited 0 with disableRecompilation active, binaryPatch and applyDevTransforms execution, no decompile task, OOMKilled=false, and a production JAR."
       ],
       "artifactGlobs": [
         "build/libs/*.jar",
@@ -37,7 +37,7 @@
         "runServer"
       ],
       "assertions": [
-        "Qualification requires the dedicated server startup assertion."
+        "Dedicated server reached Done with Example Mod under the existing EULA approval; the packaged JAR separately reached Done on a pristine NeoForge 26.1.0.19-beta production server."
       ],
       "artifactGlobs": [
         "run/logs/*.log"
@@ -50,7 +50,8 @@
         "runClient"
       ],
       "assertions": [
-        "Qualification requires the client main-menu and mod-error assertions."
+        "Real client loaded Example Mod 1.0.0, reached Setting user Dev and LWJGL 3.4.1+2, and displayed the main menu and mod list without a mod-loading error.",
+        "Linux/arm64 qualification used exact LWJGL 3.4.1 natives-linux-arm64 artifacts through org.lwjgl.librarypath; no production dependency changed. Narrator/flite and the MDK missing-block-model warnings are retained limitations."
       ],
       "artifactGlobs": [
         "run/logs/*.log"
@@ -63,10 +64,10 @@
         "runClient"
       ],
       "assertions": [
-        "Qualification requires reviewed inventory, hand, world, GUI, and animation captures."
+        "Reviewed 1280x720 Xvfb/Mesa captures show the real main menu and Example Mod 1.0.0 in the mod list with correct llvmpipe panorama rendering. Scope excludes packaged-JAR client, world, inventory, hand, placed-block, animation, clipping, and z-fighting scenes."
       ],
       "artifactGlobs": [
-        "verification/screenshots/*.png"
+        "artifacts/visual/*.png"
       ]
     },
     "gameTest": {
@@ -76,7 +77,8 @@
         "runGameTestServer"
       ],
       "assertions": [
-        "Qualification requires all configured GameTests to pass."
+        "26.1 datapack test instances invoked registered functions; registry_and_item and place_example_block emitted explicit pass markers and All 3 required tests passed.",
+        "deliberate_negative_control was discovered, failed with exit 1 while both positive tests passed, and was removed before the final production build; production JAR inspection found no fixture classes or resources."
       ],
       "artifactGlobs": [
         "run/logs/*.log",
@@ -84,5 +86,10 @@
       ]
     }
   },
-  "testedPlatforms": []
+  "testedPlatforms": [
+    {
+      "os": "linux",
+      "arch": "arm64"
+    }
+  ]
 }
