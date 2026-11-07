@@ -93,11 +93,21 @@ test("support manifest records every actual pack without inventing qualification
   const expected = [];
 
   for (const loader of (
-    await readdir(new URL("target-packs/java/", root))
-  ).sort()) {
+    await readdir(new URL("target-packs/java/", root), {
+      withFileTypes: true,
+    })
+  )
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort()) {
     for (const minecraft of (
-      await readdir(new URL(`target-packs/java/${loader}/`, root))
-    ).sort()) {
+      await readdir(new URL(`target-packs/java/${loader}/`, root), {
+        withFileTypes: true,
+      })
+    )
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => entry.name)
+      .sort()) {
       const base = `target-packs/java/${loader}/${minecraft}/`;
       const pack = await readJson<TargetPack>(`${base}target.json`);
       const verification = await readJson<Verification>(

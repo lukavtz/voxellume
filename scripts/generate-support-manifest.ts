@@ -10,9 +10,13 @@ const pkg = JSON.parse(await readFile(join(root, "package.json"), "utf8")) as {
 };
 const targetPacks = [];
 
-for (const loader of await readdir(targetRoot)) {
-  for (const minecraft of await readdir(join(targetRoot, loader))) {
-    const directory = join(targetRoot, loader, minecraft);
+for (const loader of await readdir(targetRoot, { withFileTypes: true })) {
+  if (!loader.isDirectory()) continue;
+  for (const minecraft of await readdir(join(targetRoot, loader.name), {
+    withFileTypes: true,
+  })) {
+    if (!minecraft.isDirectory()) continue;
+    const directory = join(targetRoot, loader.name, minecraft.name);
     const pack = JSON.parse(
       await readFile(join(directory, "target.json"), "utf8"),
     ) as {
