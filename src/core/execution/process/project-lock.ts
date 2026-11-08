@@ -1,5 +1,13 @@
-import { realpathSync } from "node:fs";
-import { basename, dirname, join } from "node:path";
+import { readlinkSync, realpathSync } from "node:fs";
+import {
+  basename,
+  dirname,
+  join,
+  parse,
+  relative,
+  resolve,
+  sep,
+} from "node:path";
 
 declare const capabilityBrand: unique symbol;
 
@@ -24,21 +32,44 @@ interface CapabilityState {
 const projectLocks = new Map<string, Promise<void>>();
 const capabilities = new WeakMap<ProjectLockCapability, CapabilityState>();
 
+function canonicalWindowsProjectKey(projectRoot: string): string {
+  let current = resolve(projectRoot);
+  for (let depth = 0; depth < 32; depth += 1) {
+    const root = parse(current).root;
+    const segments = relative(root, current).split(sep).filter(Boolean);
+    let candidate = root;
+    let restarted = false;
+    for (const segment of segments) {
+      candidate = join(candidate, segment);
+      try {
+        const target = readlinkSync(candidate);
+        current = resolve(dirname(candidate), target);
+        restarted = true;
+        break;
+      } catch (error) {
+        const code = (error as NodeJS.ErrnoException).code;
+        if (code !== "EINVAL" && code !== "ENOENT" && code !== "ENOTDIR") {
+          throw error;
+        }
+      }
+    }
+    if (!restarted) return candidate.toLowerCase();
+  }
+  throw new Error("Too many symbolic links in project root");
+}
+
 export async function canonicalProjectKey(
   projectRoot: string,
 ): Promise<string> {
+  if (process.platform === "win32") {
+    return canonicalWindowsProjectKey(projectRoot);
+  }
   try {
     // Keep lock acquisition off the libuv pool used by native process waits.
-    const resolved = realpathSync(projectRoot);
-    // Windows symlink resolution can preserve 8.3 components; a second pass
-    // expands them so direct and aliased roots share one lock identity.
-    return process.platform === "win32" ? realpathSync(resolved) : resolved;
+    return realpathSync(projectRoot);
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
-    const parent = realpathSync(dirname(projectRoot));
-    const canonicalParent =
-      process.platform === "win32" ? realpathSync(parent) : parent;
-    return join(canonicalParent, basename(projectRoot));
+    return join(realpathSync(dirname(projectRoot)), basename(projectRoot));
   }
 }
 

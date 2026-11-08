@@ -148,8 +148,11 @@ export async function runVerificationProcess(
   let lockRoot: string;
   let releaseLock: ProjectLockRelease | undefined;
   try {
-    // Native process waits can occupy the libuv pool needed by async realpath.
-    projectRoot = realpathSync(resolve(options.projectRoot));
+    const requestedRoot = resolve(options.projectRoot);
+    projectRoot =
+      process.platform === "win32"
+        ? requestedRoot
+        : realpathSync(requestedRoot);
     if (options.projectLock === undefined) {
       const held = await acquireHeldProjectLock(
         resolve(options.lockRoot ?? projectRoot),

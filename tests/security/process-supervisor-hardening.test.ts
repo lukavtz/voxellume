@@ -234,13 +234,8 @@ fs.appendFileSync("starts", process.pid + "\\n");
     { ...fixture, projectRoot: alias },
     { signal: controller.signal },
   );
-  void second.then((result) =>
-    console.error("second-settled", Date.now(), result.status),
-  );
   controller.abort();
-  console.error("release-before", Date.now());
   writeFileSync(release, "release\n");
-  console.error("release-after", Date.now());
   const [firstResult, secondResult] = await Promise.all([first, second]);
 
   assert.equal(firstResult.status, "passed", JSON.stringify(firstResult));
@@ -284,12 +279,7 @@ fs.writeFileSync("started", process.pid + "\\n");
     secondStartedBeforeRelease = await exists(secondStarted);
   }
 
-  void second.then((result) =>
-    console.error("second-settled-serial", Date.now(), result.status),
-  );
-  console.error("release-before-serial", Date.now());
   writeFileSync(join(firstFixture.projectRoot, "release"), "release\n");
-  console.error("release-after-serial", Date.now());
   const firstResult = await first;
   await waitFor(join(secondFixture.projectRoot, "started"));
   writeFileSync(join(secondFixture.projectRoot, "release"), "release\n");
