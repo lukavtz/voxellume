@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { writeFileSync } from "node:fs";
 import {
   chmod,
   mkdir,
@@ -234,7 +235,7 @@ fs.appendFileSync("starts", process.pid + "\\n");
     { signal: controller.signal },
   );
   controller.abort();
-  await writeFile(release, "release\n");
+  writeFileSync(release, "release\n");
   const [firstResult, secondResult] = await Promise.all([first, second]);
 
   assert.equal(firstResult.status, "passed", JSON.stringify(firstResult));
@@ -278,10 +279,10 @@ fs.writeFileSync("started", process.pid + "\\n");
     secondStartedBeforeRelease = await exists(secondStarted);
   }
 
-  await writeFile(join(firstFixture.projectRoot, "release"), "release\n");
+  writeFileSync(join(firstFixture.projectRoot, "release"), "release\n");
   const firstResult = await first;
   await waitFor(join(secondFixture.projectRoot, "started"));
-  await writeFile(join(secondFixture.projectRoot, "release"), "release\n");
+  writeFileSync(join(secondFixture.projectRoot, "release"), "release\n");
   const secondResult = await second;
 
   assert.equal(firstResult.status, "passed", JSON.stringify(firstResult));
@@ -329,7 +330,7 @@ fs.appendFileSync("starts", process.pid + "\\n");
     }),
   ]);
   const settledBeforeRelease = settled;
-  await writeFile(release, "release\n");
+  writeFileSync(release, "release\n");
   const [firstResult, secondResult] = await Promise.all([first, second]);
 
   assert.equal(settledBeforeRelease, true);
