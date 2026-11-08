@@ -707,9 +707,10 @@ function mcAssetCommand(
     };
   }
   if (process.platform === "linux" && existsSync("/usr/bin/unshare")) {
+    // User-namespace capabilities permit an unprivileged caller to create the network namespace.
     return {
       executable: "/usr/bin/unshare",
-      argv: ["--net", "--", process.execPath, tool.entryPoint, ...args],
+      argv: ["-Urn", "--", process.execPath, tool.entryPoint, ...args],
     };
   }
   return null;

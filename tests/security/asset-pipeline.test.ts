@@ -816,7 +816,7 @@ test("reported argv is the exact sandbox wrapper, node, entry point, and spawned
           "-p",
           "(version 1)(allow default)(deny network-outbound)",
         ]
-      : ["/usr/bin/unshare", "--net", "--"];
+      : ["/usr/bin/unshare", "-Urn", "--"];
   assert.deepEqual(result.executed.argv, [
     ...sandbox,
     process.execPath,

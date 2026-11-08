@@ -91,6 +91,7 @@ async function callHeadless(options: {
     return { status: "cancelled", stdout: "", stderr: "" };
   const darwinSandbox =
     process.platform === "darwin" && existsSync("/usr/bin/sandbox-exec");
+  // -Urn supplies namespace-local capability; --net alone requires host CAP_SYS_ADMIN.
   const linuxSandbox =
     process.platform === "linux" && existsSync("/usr/bin/unshare");
   if (!darwinSandbox && !linuxSandbox) {
@@ -130,7 +131,7 @@ async function callHeadless(options: {
         options.tool.executable,
         ...args,
       ]
-    : ["--net", "--", options.tool.executable, ...args];
+    : ["-Urn", "--", options.tool.executable, ...args];
   const { promise, resolve } = Promise.withResolvers<Observation>();
   const child = spawn(executable, argv, {
     cwd: options.cwd,

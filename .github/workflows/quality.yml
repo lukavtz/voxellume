@@ -77,6 +77,7 @@ jobs:
           mkdir -p .artifacts/quality-${{ matrix.os }}
           corepack pnpm test:unit 2>&1 | tee .artifacts/quality-${{ matrix.os }}/unit.log
         shell: bash
+      - run: node scripts/ci/preseed-source-artifacts.mjs
       - run: corepack pnpm test:integration 2>&1 | tee .artifacts/quality-${{ matrix.os }}/integration.log
         shell: bash
       - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
