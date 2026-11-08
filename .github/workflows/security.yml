@@ -30,11 +30,7 @@ jobs:
       - run: corepack pnpm install --frozen-lockfile
       - run: |
           mkdir -p .artifacts/security-${{ matrix.os }}
-          if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            node --test --experimental-strip-types --test-name-pattern="parent-directory swap" tests/security/path-supervisor.test.ts 2>&1 | tee .artifacts/security-${{ matrix.os }}/adversarial.log
-          else
-            corepack pnpm test:security 2>&1 | tee .artifacts/security-${{ matrix.os }}/adversarial.log
-          fi
+          corepack pnpm test:security 2>&1 | tee .artifacts/security-${{ matrix.os }}/adversarial.log
         shell: bash
       - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         if: always()

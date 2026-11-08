@@ -198,6 +198,7 @@ test("a parent-directory swap during rename cannot redirect output outside stagi
   await mkdir(outsideParent);
   await writeFile(join(outsideParent, "sentinel.txt"), "outside\n");
 
+  let parentSwapped = false;
   const outcome = await writeAuthorizedFile(fixture.staging, {
     path: "parent/output.txt",
     contents: "candidate\n",
@@ -205,7 +206,13 @@ test("a parent-directory swap during rename cannot redirect output outside stagi
     hooks: {
       beforeRename: async () => {
         await rename(parent, retired);
-        await rename(outsideParent, parent);
+        try {
+          await rename(outsideParent, parent);
+          parentSwapped = true;
+        } catch (error) {
+          await rename(retired, parent);
+          throw error;
+        }
       },
     },
   }).then(
@@ -225,11 +232,12 @@ test("a parent-directory swap during rename cannot redirect output outside stagi
       "candidate\n",
     );
   }
+  const exposedParent = parentSwapped ? parent : outsideParent;
   assert.equal(
-    await readFile(join(parent, "sentinel.txt"), "utf8"),
+    await readFile(join(exposedParent, "sentinel.txt"), "utf8"),
     "outside\n",
   );
-  await assert.rejects(readFile(join(parent, "output.txt")), {
+  await assert.rejects(readFile(join(exposedParent, "output.txt")), {
     code: "ENOENT",
   });
 });
