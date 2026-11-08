@@ -138,10 +138,11 @@ jobs:
           $env:PNPM_HOME = "$env:RUNNER_TEMP\pnpm-home"
           $env:PATH = "$env:PNPM_HOME;$env:PNPM_HOME\bin;$env:PATH"
           $env:VOXELLUME_SETUP_YES = '1'
+          $setupDir = Join-Path (Get-Location) '.artifacts/setup'
+          New-Item -ItemType Directory -Path $setupDir -Force | Out-Null
           $log = Join-Path $env:RUNNER_TEMP 'full-setup.log'
           & .artifacts/installers/install.ps1 | Tee-Object -FilePath $log
-          New-Item -ItemType Directory -Path .artifacts/setup -Force | Out-Null
-          Copy-Item -LiteralPath $log -Destination .artifacts/setup/install.log -Force
+          Copy-Item -LiteralPath $log -Destination (Join-Path $setupDir 'install.log') -Force
       - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         if: always()
         with:
