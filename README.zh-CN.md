@@ -63,7 +63,7 @@ minecraft_project_verify
 
 ### 1. 安装共享包
 
-要求：Node.js `>=24.9.0` 和 Corepack。远程安装程序使用不可变源码归档，并在构建前验证其 SHA-256。只有执行相应的构建和运行时检查时，才需要用于 1.21.x 的 JDK 21、用于 26.x 的 JDK 25 和 Docker。
+要求：Node.js `>=24.9.0`，并使用其自带的 npm 和 npx。远程安装程序使用不可变源码归档，并在构建前验证其 SHA-256。只有执行相应的构建和运行时检查时，才需要用于 1.21.x 的 JDK 21、用于 26.x 的 JDK 25 和 Docker。
 
 **Linux 和 macOS**
 

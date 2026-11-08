@@ -29,12 +29,12 @@ try {
     if ($nodeVersion -lt [version]'24.9.0') {
         throw 'Voxellume install failed: Node.js 24.9.0 or newer is required.'
     }
-    if (-not (Get-Command corepack -ErrorAction SilentlyContinue)) {
-        throw 'Voxellume install failed: Corepack is required.'
+    if (-not (Get-Command npx -ErrorAction SilentlyContinue)) {
+        throw 'Voxellume install failed: npx is required.'
     }
-    & corepack prepare pnpm@12.18.0 --activate | Out-Null
+    & npx --yes corepack@0.34.5 prepare pnpm@12.18.0 --activate | Out-Null
     Assert-NativeSuccess 'Could not activate pnpm 12.18.0 through Corepack.'
-    & corepack pnpm --version | Out-Null
+    & npx --yes corepack@0.34.5 pnpm --version | Out-Null
     Assert-NativeSuccess 'pnpm is unavailable through Corepack.'
 
     if ($env:PNPM_HOME) {
@@ -84,22 +84,22 @@ try {
 
     Push-Location $sourceDir
     try {
-        & corepack pnpm install --frozen-lockfile
+        & npx --yes corepack@0.34.5 pnpm install --frozen-lockfile
         Assert-NativeSuccess 'Dependency installation failed.'
-        & corepack pnpm pack --pack-destination $packDir
+        & npx --yes corepack@0.34.5 pnpm pack --pack-destination $packDir
         Assert-NativeSuccess 'Package build failed.'
         $packages = @(Get-ChildItem -LiteralPath $packDir -Filter '*.tgz' -File)
         if ($packages.Count -ne 1) {
             throw 'Voxellume install failed: Expected exactly one packed artifact.'
         }
-        & corepack pnpm add -g $packages[0].FullName
+        & npx --yes corepack@0.34.5 pnpm add -g $packages[0].FullName
         Assert-NativeSuccess 'Global package installation failed.'
     }
     finally {
         Pop-Location
     }
 
-    $globalBin = (& corepack pnpm bin -g | Select-Object -Last 1)
+    $globalBin = (& npx --yes corepack@0.34.5 pnpm bin -g | Select-Object -Last 1)
     Assert-NativeSuccess 'Could not determine the global pnpm bin directory.'
     Write-Output 'Installed. Run: voxellume-mcp'
     if (($env:PATH -split [IO.Path]::PathSeparator) -notcontains $globalBin) {

@@ -32,9 +32,9 @@ trap cleanup EXIT HUP INT TERM
 
 command -v node >/dev/null 2>&1 || fail 'Node.js 24.9.0 or newer is required.'
 node -e 'const [major, minor] = process.versions.node.split(".").map(Number); if (major < 24 || (major === 24 && minor < 9)) process.exit(1)' || fail 'Node.js 24.9.0 or newer is required.'
-command -v corepack >/dev/null 2>&1 || fail 'Corepack is required.'
-corepack prepare pnpm@12.18.0 --activate || fail 'Could not activate pnpm 12.18.0 through Corepack.'
-corepack pnpm --version >/dev/null 2>&1 || fail 'pnpm is unavailable through Corepack.'
+command -v npx >/dev/null 2>&1 || fail 'npx is required.'
+npx --yes corepack@0.34.5 prepare pnpm@12.18.0 --activate || fail 'Could not activate pnpm 12.18.0 through Corepack.'
+npx --yes corepack@0.34.5 pnpm --version >/dev/null 2>&1 || fail 'pnpm is unavailable through Corepack.'
 
 if [ -n "${PNPM_HOME:-}" ]; then
   PATH="$PNPM_HOME:$PNPM_HOME/bin:$PATH"
@@ -87,13 +87,13 @@ else
 fi
 
 cd "$source_dir"
-corepack pnpm install --frozen-lockfile
-corepack pnpm pack --pack-destination "$pack_dir"
+npx --yes corepack@0.34.5 pnpm install --frozen-lockfile
+npx --yes corepack@0.34.5 pnpm pack --pack-destination "$pack_dir"
 set -- "$pack_dir"/*.tgz
 [ "$#" -eq 1 ] && [ -f "$1" ] || fail 'Expected exactly one packed artifact.'
-corepack pnpm add -g "$1"
+npx --yes corepack@0.34.5 pnpm add -g "$1"
 
-global_bin="$(corepack pnpm bin -g)" || fail 'Could not determine the global pnpm bin directory.'
+global_bin="$(npx --yes corepack@0.34.5 pnpm bin -g)" || fail 'Could not determine the global pnpm bin directory.'
 printf 'Installed. Run: voxellume-mcp\n'
 case ":$PATH:" in
   *":$global_bin:"*) ;;

@@ -63,7 +63,7 @@ A natural-language request becomes a versioned **ModSpec**: mod identity, exact 
 
 ### 1. Install the shared package
 
-Requirements: Node.js `>=24.9.0` and Corepack. The remote installer uses an immutable source archive and verifies its SHA-256 before building. JDK 21 for 1.21.x, JDK 25 for 26.x, and Docker are needed only for their corresponding build/runtime checks.
+Requirements: Node.js `>=24.9.0` with the bundled npm/npx. The remote installer uses an immutable source archive and verifies its SHA-256 before building. JDK 21 for 1.21.x, JDK 25 for 26.x, and Docker are needed only for their corresponding build/runtime checks.
 
 **Linux and macOS**
 
