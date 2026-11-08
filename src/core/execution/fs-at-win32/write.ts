@@ -278,6 +278,7 @@ function renameTemporary(
   // x64 padding precedes RootDirectory; FileName immediately follows FileNameLength.
   information.write(targetName, 20, nameBytes, "utf16le");
   const ioStatus: IoStatus = { Status: 0, Information: 0 };
+  console.error("renameTemporary:before", path);
   const status = nativeCall(
     "NtSetInformationFile(FileRenameInformationEx)",
     path,
@@ -290,6 +291,7 @@ function renameTemporary(
         FileRenameInformationEx,
       ),
   );
+  console.error("renameTemporary:after", path, status);
   checkStatus("NtSetInformationFile(FileRenameInformationEx)", path, status);
 }
 
