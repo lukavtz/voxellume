@@ -172,6 +172,11 @@ console.log("BUILD SUCCESSFUL");
       allowHostExecution: true,
       ...(signal === undefined ? {} : { signal }),
     });
+    assert.notEqual(
+      processResult.status,
+      "unavailable",
+      JSON.stringify(processResult),
+    );
     const checked = processResult.status !== "unavailable";
     const logs = [];
     if (checked) {
