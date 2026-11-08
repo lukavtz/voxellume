@@ -14,7 +14,16 @@ const evidence = resolve(process.argv[3] ?? ".artifacts/host-install");
 await mkdir(evidence, { recursive: true });
 const temporary = await mkdtemp(join(tmpdir(), "voxellume-host-install-"));
 const home = join(temporary, "home");
+const ompPackage = join(temporary, "omp-package");
 await mkdir(home, { recursive: true });
+await mkdir(ompPackage, { recursive: true });
+await execFileAsync("tar", [
+  "-xzf",
+  tarball,
+  "-C",
+  ompPackage,
+  "--strip-components=1",
+]);
 const env = {
   PATH: process.env.PATH,
   HOME: home,
@@ -28,6 +37,8 @@ const env = {
   NO_COLOR: "1",
 };
 const results = [];
+const omp = resolve("node_modules/.bin/omp");
+const dsh = resolve("node_modules/.bin/dsh");
 
 async function run(id, command, args, outputFile) {
   const started = Date.now();
@@ -84,8 +95,8 @@ async function run(id, command, args, outputFile) {
 try {
   const ompList = await run(
     "omp-install",
-    "corepack",
-    ["pnpm", "exec", "omp", "plugin", "install", tarball, "--json"],
+    omp,
+    ["plugin", "install", ompPackage, "--json"],
     "omp-install.json",
   );
   assert.ok(
@@ -94,28 +105,22 @@ try {
   );
   const installed = await run(
     "omp-list",
-    "corepack",
-    ["pnpm", "exec", "omp", "plugin", "list", "--json"],
+    omp,
+    ["plugin", "list", "--json"],
     "omp-list.json",
   );
   assert.ok(
     installed.includes("voxellume"),
     "OMP plugin list does not contain voxellume",
   );
-  await run("omp-uninstall", "corepack", [
-    "pnpm",
-    "exec",
-    "omp",
+  await run("omp-uninstall", omp, [
     "plugin",
     "uninstall",
     "voxellume",
     "--json",
   ]);
 
-  await run("dsh-install", "corepack", [
-    "pnpm",
-    "exec",
-    "dsh",
+  await run("dsh-install", dsh, [
     "plugin",
     "--profile",
     "voxellume-test",
@@ -126,18 +131,15 @@ try {
   ]);
   const dump = await run(
     "dsh-dump-config",
-    "corepack",
-    ["pnpm", "exec", "dsh", "--profile", "voxellume-test", "--dump-config"],
+    dsh,
+    ["--profile", "voxellume-test", "--dump-config"],
     "dsh-config.yml",
   );
   assert.ok(
     dump.includes("voxellume"),
     "Harness dump-config does not contain voxellume",
   );
-  await run("dsh-remove", "corepack", [
-    "pnpm",
-    "exec",
-    "dsh",
+  await run("dsh-remove", dsh, [
     "plugin",
     "--profile",
     "voxellume-test",
