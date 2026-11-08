@@ -105,13 +105,6 @@ function runTrustedHost(fixture: Fixture, options: RunOptions = {}) {
   });
 }
 
-function errorCode(error: unknown): unknown {
-  if (error !== null && typeof error === "object" && "code" in error) {
-    return error.code;
-  }
-  return undefined;
-}
-
 function exists(path: string): boolean {
   return existsSync(path);
 }
