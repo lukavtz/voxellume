@@ -49,7 +49,10 @@ export function createJob(native: NativeBackend, state: NativeState): void {
     !native.SetInformationJobObject(
       state.job,
       JobObjectExtendedLimitInformation,
-      limits,
+      native.ffi.as(
+        limits,
+        native.ffi.pointer(native.JOBOBJECT_EXTENDED_LIMIT_INFORMATION),
+      ),
       native.ffi.sizeof(native.JOBOBJECT_EXTENDED_LIMIT_INFORMATION),
     )
   ) {
@@ -79,7 +82,10 @@ export function createJob(native: NativeBackend, state: NativeState): void {
     !native.SetInformationJobObject(
       state.job,
       JobObjectAssociateCompletionPortInformation,
-      association,
+      native.ffi.as(
+        association,
+        native.ffi.pointer(native.JOBOBJECT_ASSOCIATE_COMPLETION_PORT),
+      ),
       native.ffi.sizeof(native.JOBOBJECT_ASSOCIATE_COMPLETION_PORT),
     )
   ) {

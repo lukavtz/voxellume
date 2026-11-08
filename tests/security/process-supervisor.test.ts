@@ -53,9 +53,17 @@ async function setup(t: TestContext, script: string): Promise<Fixture> {
   const isolationRoot = join(root, "isolated");
   await mkdir(projectRoot);
   await mkdir(isolationRoot);
-  const wrapper = join(projectRoot, "gradlew");
-  await writeFile(wrapper, `#!${process.execPath}\n${script}`);
-  await chmod(wrapper, 0o755);
+  if (process.platform === "win32") {
+    await writeFile(join(projectRoot, "gradlew-fixture.cjs"), script);
+    await writeFile(
+      join(projectRoot, "gradlew.bat"),
+      `@"${process.execPath}" "%~dp0gradlew-fixture.cjs" %*\r\n`,
+    );
+  } else {
+    const wrapper = join(projectRoot, "gradlew");
+    await writeFile(wrapper, `#!${process.execPath}\n${script}`);
+    await chmod(wrapper, 0o755);
+  }
   return { root, projectRoot, isolationRoot };
 }
 
