@@ -562,7 +562,7 @@ test("whole verification holds one lock across stages, process execution, and ev
   assert.equal(
     result.status,
     "ok",
-    result.status === "error" ? result.error.detail : "",
+    result.status === "error" ? JSON.stringify(result) : "",
   );
   assert.ok("value" in result);
   assert.ok("evidence" in result.value);
