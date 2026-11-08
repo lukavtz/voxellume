@@ -23,9 +23,6 @@
     const hero = document.querySelector(".hero");
     if (!hero || motionPreference.matches) return;
 
-    const letters = Array.from(
-      hero.querySelectorAll(".wordmark [data-letter]"),
-    );
     const supportingCopy = [
       hero.querySelector(".hero-kicker"),
       hero.querySelector(".hero-summary"),
@@ -33,26 +30,6 @@
     ].filter(Boolean);
     const proof = hero.querySelector(".hero-proof");
     const animations = [];
-
-    letters.forEach((letter, index) => {
-      const animation = play(
-        letter,
-        [
-          {
-            opacity: 0,
-            transform: "translateY(0.35em)",
-            clipPath: "inset(0 0 100% 0)",
-          },
-          {
-            opacity: 1,
-            transform: "translateY(0)",
-            clipPath: "inset(0 0 0 0)",
-          },
-        ],
-        { duration: 720, delay: index * 55, easing: easeOut, fill: "both" },
-      );
-      if (animation) animations.push(animation);
-    });
 
     supportingCopy.forEach((element, index) => {
       const animation = play(
@@ -62,8 +39,8 @@
           { opacity: 1, transform: "translateY(0)" },
         ],
         {
-          duration: 560,
-          delay: 260 + index * 70,
+          duration: 400,
+          delay: index * 50,
           easing: easeOut,
           fill: "both",
         },
@@ -75,18 +52,10 @@
       const animation = play(
         proof,
         [
-          {
-            opacity: 0,
-            transform: "translateY(14px)",
-            clipPath: "inset(0 0 100% 0)",
-          },
-          {
-            opacity: 1,
-            transform: "translateY(0)",
-            clipPath: "inset(0 0 0 0)",
-          },
+          { opacity: 0, transform: "translateY(8px)" },
+          { opacity: 1, transform: "translateY(0)" },
         ],
-        { duration: 880, delay: 220, easing: easeOut, fill: "both" },
+        { duration: 500, delay: 100, easing: easeOut, fill: "both" },
       );
       if (animation) animations.push(animation);
     }
