@@ -31,7 +31,7 @@ export function loadWin32Native(): Win32Native {
   const ffi = require("koffi") as Koffi;
   const ntdll = ffi.load("ntdll.dll");
   const kernel32 = ffi.load("kernel32.dll");
-  const HANDLE = ffi.pointer("HANDLE", ffi.opaque());
+  const VOXELLUME_FS_HANDLE = ffi.pointer("VOXELLUME_FS_HANDLE", ffi.opaque());
   const UNICODE_STRING = ffi.struct("UNICODE_STRING", {
     Length: "uint16",
     MaximumLength: "uint16",
@@ -39,7 +39,7 @@ export function loadWin32Native(): Win32Native {
   });
   const OBJECT_ATTRIBUTES = ffi.struct("OBJECT_ATTRIBUTES", {
     Length: "uint32",
-    RootDirectory: HANDLE,
+    RootDirectory: VOXELLUME_FS_HANDLE,
     ObjectName: ffi.pointer(UNICODE_STRING),
     Attributes: "uint32",
     SecurityDescriptor: "void *",
@@ -84,7 +84,7 @@ export function loadWin32Native(): Win32Native {
     "FILE_RENAME_INFORMATION_HEAD",
     {
       Flags: "uint32",
-      RootDirectory: HANDLE,
+      RootDirectory: VOXELLUME_FS_HANDLE,
       FileNameLength: "uint32",
     },
   );
@@ -144,37 +144,37 @@ export function loadWin32Native(): Win32Native {
     ffi,
     types,
     NtCreateFile: ntdll.func(
-      "int32 __stdcall NtCreateFile(_Out_ HANDLE *FileHandle, uint32_t DesiredAccess, OBJECT_ATTRIBUTES *ObjectAttributes, _Out_ IO_STATUS_BLOCK *IoStatusBlock, int64_t *AllocationSize, uint32_t FileAttributes, uint32_t ShareAccess, uint32_t CreateDisposition, uint32_t CreateOptions, void *EaBuffer, uint32_t EaLength)",
+      "int32 __stdcall NtCreateFile(_Out_ VOXELLUME_FS_HANDLE *FileHandle, uint32_t DesiredAccess, OBJECT_ATTRIBUTES *ObjectAttributes, _Out_ IO_STATUS_BLOCK *IoStatusBlock, int64_t *AllocationSize, uint32_t FileAttributes, uint32_t ShareAccess, uint32_t CreateDisposition, uint32_t CreateOptions, void *EaBuffer, uint32_t EaLength)",
     ) as NtCreateFile,
     NtQueryInformationFile: ntdll.func(
-      "int32 __stdcall NtQueryInformationFile(HANDLE FileHandle, _Out_ IO_STATUS_BLOCK *IoStatusBlock, void *FileInformation, uint32_t Length, uint32_t FileInformationClass)",
+      "int32 __stdcall NtQueryInformationFile(VOXELLUME_FS_HANDLE FileHandle, _Out_ IO_STATUS_BLOCK *IoStatusBlock, void *FileInformation, uint32_t Length, uint32_t FileInformationClass)",
     ) as NtQueryInformationFile,
     NtSetInformationFile: ntdll.func(
-      "int32 __stdcall NtSetInformationFile(HANDLE FileHandle, _Out_ IO_STATUS_BLOCK *IoStatusBlock, void *FileInformation, uint32_t Length, uint32_t FileInformationClass)",
+      "int32 __stdcall NtSetInformationFile(VOXELLUME_FS_HANDLE FileHandle, _Out_ IO_STATUS_BLOCK *IoStatusBlock, void *FileInformation, uint32_t Length, uint32_t FileInformationClass)",
     ) as NtSetInformationFile,
     NtReadFile: ntdll.func(
-      "int32 __stdcall NtReadFile(HANDLE FileHandle, HANDLE Event, void *ApcRoutine, void *ApcContext, _Out_ IO_STATUS_BLOCK *IoStatusBlock, void *Buffer, uint32_t Length, int64_t *ByteOffset, uint32_t *Key)",
+      "int32 __stdcall NtReadFile(VOXELLUME_FS_HANDLE FileHandle, VOXELLUME_FS_HANDLE Event, void *ApcRoutine, void *ApcContext, _Out_ IO_STATUS_BLOCK *IoStatusBlock, void *Buffer, uint32_t Length, int64_t *ByteOffset, uint32_t *Key)",
     ) as NtReadFile,
     NtWriteFile: ntdll.func(
-      "int32 __stdcall NtWriteFile(HANDLE FileHandle, HANDLE Event, void *ApcRoutine, void *ApcContext, _Out_ IO_STATUS_BLOCK *IoStatusBlock, void *Buffer, uint32_t Length, int64_t *ByteOffset, uint32_t *Key)",
+      "int32 __stdcall NtWriteFile(VOXELLUME_FS_HANDLE FileHandle, VOXELLUME_FS_HANDLE Event, void *ApcRoutine, void *ApcContext, _Out_ IO_STATUS_BLOCK *IoStatusBlock, void *Buffer, uint32_t Length, int64_t *ByteOffset, uint32_t *Key)",
     ) as NtWriteFile,
     NtFlushBuffersFileEx: ntdll.func(
-      "int32 __stdcall NtFlushBuffersFileEx(HANDLE FileHandle, uint32_t Flags, void *Parameters, uint32_t ParametersSize, _Out_ IO_STATUS_BLOCK *IoStatusBlock)",
+      "int32 __stdcall NtFlushBuffersFileEx(VOXELLUME_FS_HANDLE FileHandle, uint32_t Flags, void *Parameters, uint32_t ParametersSize, _Out_ IO_STATUS_BLOCK *IoStatusBlock)",
     ) as NtFlushBuffersFileEx,
     CreateFileW: kernel32.func(
-      "HANDLE __stdcall CreateFileW(const char16_t *lpFileName, uint32_t dwDesiredAccess, uint32_t dwShareMode, void *lpSecurityAttributes, uint32_t dwCreationDisposition, uint32_t dwFlagsAndAttributes, HANDLE hTemplateFile)",
+      "VOXELLUME_FS_HANDLE __stdcall CreateFileW(const char16_t *lpFileName, uint32_t dwDesiredAccess, uint32_t dwShareMode, void *lpSecurityAttributes, uint32_t dwCreationDisposition, uint32_t dwFlagsAndAttributes, VOXELLUME_FS_HANDLE hTemplateFile)",
     ) as CreateFileW,
     CloseHandle: kernel32.func(
-      "bool __stdcall CloseHandle(HANDLE hObject)",
+      "bool __stdcall CloseHandle(VOXELLUME_FS_HANDLE hObject)",
     ) as CloseHandle,
     GetLastError: kernel32.func(
       "uint32 __stdcall GetLastError()",
     ) as GetLastError,
     LockFileEx: kernel32.func(
-      "bool __stdcall LockFileEx(HANDLE hFile, uint32 dwFlags, uint32 dwReserved, uint32 nNumberOfBytesToLockLow, uint32 nNumberOfBytesToLockHigh, void *lpOverlapped)",
+      "bool __stdcall LockFileEx(VOXELLUME_FS_HANDLE hFile, uint32 dwFlags, uint32 dwReserved, uint32 nNumberOfBytesToLockLow, uint32 nNumberOfBytesToLockHigh, void *lpOverlapped)",
     ) as LockFileEx,
     UnlockFileEx: kernel32.func(
-      "bool __stdcall UnlockFileEx(HANDLE hFile, uint32 dwReserved, uint32 nNumberOfBytesToUnlockLow, uint32 nNumberOfBytesToUnlockHigh, void *lpOverlapped)",
+      "bool __stdcall UnlockFileEx(VOXELLUME_FS_HANDLE hFile, uint32 dwReserved, uint32 nNumberOfBytesToUnlockLow, uint32 nNumberOfBytesToUnlockHigh, void *lpOverlapped)",
     ) as UnlockFileEx,
   };
 }
