@@ -92,6 +92,16 @@ function errorCode(error: unknown): unknown {
     : undefined;
 }
 
+function assertWindowsSandboxUnavailable(result: {
+  status: string;
+  error?: { code: string };
+}): boolean {
+  if (process.platform !== "win32") return false;
+  assert.equal(result.status, "unavailable");
+  assert.equal(result.error?.code, "network_sandbox_unavailable");
+  return true;
+}
+
 async function rejectsCode(
   operation: Promise<unknown> | (() => unknown),
   code: string,
@@ -777,6 +787,7 @@ test("executor requires an approved untampered adjacent package dist", async (t)
     recursive: true,
   });
   const result = await run(approvedTool);
+  if (assertWindowsSandboxUnavailable(result)) return;
   assert.equal(result.status, "passed", result.stderr);
   assert.equal(await exists(join(fixture.stagingPath, "checker.png")), true);
 });
@@ -803,6 +814,7 @@ test("reported argv is the exact sandbox wrapper, node, entry point, and spawned
     root: fixture.staging,
     operation: generate("checker.png"),
   });
+  if (assertWindowsSandboxUnavailable(result)) return;
   assert.equal(result.status, "passed", result.stderr);
   assert.ok(result.executed);
   const spawnedArgs = (JSON.parse(result.stdout) as { args: string[] }).args;
