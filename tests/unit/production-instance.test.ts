@@ -872,22 +872,22 @@ test("passes only with complete production evidence and exact owned-PID cleanup"
     [
       {
         projectId: "production-server",
-        projectRoot: input.profiles.server.projectRoot,
+        projectRoot: realpathSync(input.profiles.server.projectRoot),
         mode: "hidden",
       },
       {
         projectId: "production-server",
-        projectRoot: input.profiles.server.projectRoot,
+        projectRoot: realpathSync(input.profiles.server.projectRoot),
         mode: "hidden",
       },
       {
         projectId: "production-client",
-        projectRoot: input.profiles.client.projectRoot,
+        projectRoot: realpathSync(input.profiles.client.projectRoot),
         mode: "visible",
       },
       {
         projectId: "production-observer",
-        projectRoot: input.profiles.observer.projectRoot,
+        projectRoot: realpathSync(input.profiles.observer.projectRoot),
         mode: "visible",
       },
     ],
