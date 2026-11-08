@@ -33,6 +33,7 @@ trap cleanup EXIT HUP INT TERM
 command -v node >/dev/null 2>&1 || fail 'Node.js 24.9.0 or newer is required.'
 node -e 'const [major, minor] = process.versions.node.split(".").map(Number); if (major < 24 || (major === 24 && minor < 9)) process.exit(1)' || fail 'Node.js 24.9.0 or newer is required.'
 command -v corepack >/dev/null 2>&1 || fail 'Corepack is required.'
+corepack prepare pnpm@12.18.0 --activate >/dev/null 2>&1 || fail 'Could not activate pnpm 12.18.0 through Corepack.'
 corepack pnpm --version >/dev/null 2>&1 || fail 'pnpm is unavailable through Corepack.'
 
 if [ -n "${PNPM_HOME:-}" ]; then

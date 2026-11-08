@@ -32,6 +32,8 @@ try {
     if (-not (Get-Command corepack -ErrorAction SilentlyContinue)) {
         throw 'Voxellume install failed: Corepack is required.'
     }
+    & corepack prepare pnpm@12.18.0 --activate | Out-Null
+    Assert-NativeSuccess 'Could not activate pnpm 12.18.0 through Corepack.'
     & corepack pnpm --version | Out-Null
     Assert-NativeSuccess 'pnpm is unavailable through Corepack.'
 
