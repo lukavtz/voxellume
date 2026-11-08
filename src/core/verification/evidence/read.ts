@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { createReadStream } from "node:fs";
 import { lstat, readFile, readdir } from "node:fs/promises";
-import { join } from "node:path";
+import { join, relative, sep } from "node:path";
 
 import { authenticateCanonical } from "../../spec/transactions/journal-integrity.ts";
 import { transactionComponent } from "./paths.ts";
@@ -29,9 +29,7 @@ export async function walkFiles(
     const absolute = join(current, entry.name);
     if (entry.isDirectory()) files.push(...(await walkFiles(root, absolute)));
     else if (entry.isFile()) {
-      files.push(
-        `${current.slice(root.length + 1)}${current === root ? "" : "/"}${entry.name}`,
-      );
+      files.push(relative(root, absolute).split(sep).join("/"));
     } else fail("evidence_integrity", "Evidence contains a non-regular file.");
   }
   return files.sort();
