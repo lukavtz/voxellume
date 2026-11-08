@@ -47,6 +47,10 @@ minecraft_project_verify
 
 自然语言请求会转换为带版本号的 **ModSpec**：模组标识、精确目标修订、功能、可编辑资源、验收检查和交付设置。所有宿主调用同一个核心流水线，因此 OMP、Harness 和 MCP 返回等价结果，而不是维护不同实现。
 
+<p align="center">
+  <img src="./assets/readme/workflow-zh-CN.svg" width="100%" alt="Voxellume 流水线：从自然语言请求经过 ModSpec、受保护暂存和顺序验证，到证据驱动的交付">
+</p>
+
 1. **精确解析目标。** Resolver 匹配 Minecraft、loader、mappings、JDK、Gradle 和不可变的目标包哈希。只有完整通过验证的 `supported` 包才能创建新项目。`candidate`、`rejected` 和 `unsupported` 会在修改项目或 Git 之前停止；绝不用相近版本替代。
 2. **验证请求的更改。** 严格的 schema 将每个功能连接到 implementation units 和独立验收检查。操作使用稳定的功能 ID，而不是任意文件路径或 shell 命令。
 3. **在事务中工作。** 宿主授予 filesystem roots。智能体只编辑 staging 副本；项目锁、基础哈希、日志、取消和 last-good 回滚会保护正式项目与无关文件。

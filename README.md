@@ -47,6 +47,10 @@ Every host returns the same versioned `DomainResult<T>` with stable error codes,
 
 A natural-language request becomes a versioned **ModSpec**: mod identity, exact target revision, features, editable assets, acceptance checks, and delivery settings. Every host calls the same core pipeline, so OMP, Harness, and MCP return equivalent results rather than maintaining separate implementations.
 
+<p align="center">
+  <img src="./assets/readme/workflow-en.svg" width="100%" alt="Voxellume pipeline from a natural-language request through ModSpec, protected staging, ordered verification, and evidence-backed delivery">
+</p>
+
 1. **Resolve the exact target.** The resolver matches Minecraft, loader, mappings, JDK, Gradle, and an immutable pack hash. Only a fully qualified `supported` pack can scaffold a new project. `candidate`, `rejected`, and `unsupported` outcomes stop before any project or Git mutation; no nearby version is substituted.
 2. **Validate the requested change.** Strict schemas connect every feature to implementation units and independent acceptance checks. Operations address stable feature IDs, not arbitrary file paths or shell commands.
 3. **Work in a transaction.** The host grants filesystem roots. Agents edit only a staging copy while per-project locks, base hashes, journaling, cancellation, and last-good rollback protect unrelated files and the canonical project.
