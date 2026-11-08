@@ -79,7 +79,7 @@ function loadNativeBackend(): NativeBackend {
   koffiRequire.resolve(`@koromix/koffi-win32-${process.arch}`);
   const ffi = require("koffi") as Koffi;
   const kernel32 = ffi.load("kernel32.dll");
-  const HANDLE = ffi.pointer("HANDLE", ffi.opaque());
+  const HANDLE = "HANDLE" as const;
 
   const SECURITY_ATTRIBUTES = ffi.struct("SECURITY_ATTRIBUTES", {
     nLength: "uint32_t",

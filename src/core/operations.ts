@@ -407,7 +407,6 @@ function failure(error: unknown, signal?: AbortSignal) {
       retryable: false,
     });
   }
-  if (process.platform === "win32") console.error(error);
   return domainFailure({
     code: "internal_error",
     detail: "The operation could not be completed.",
