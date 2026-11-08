@@ -123,5 +123,9 @@ export function terminateFailedLaunch(
 }
 
 export function closeJob(native: NativeBackend, state: NativeState): void {
+  // Closing the parent's pipe ends unblocks ReadFile after process termination.
+  state.stdoutWrite = closeHandle(native, state.stdoutWrite);
+  state.stderrWrite = closeHandle(native, state.stderrWrite);
+  state.stdin = closeHandle(native, state.stdin);
   state.job = closeHandle(native, state.job);
 }

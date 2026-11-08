@@ -174,7 +174,7 @@ for (const key of ["HOME", "GRADLE_USER_HOME", "TMPDIR", "SSH_AUTH_SOCK", "GITHU
       }),
   );
   assert.equal(lines.argv, JSON.stringify(["--no-daemon", "build"]));
-  assert.equal(lines.cwd, childCwd);
+  assert.equal(await realpath(lines.cwd!), childCwd);
   assert.equal(lines.HOME, join(fixture.isolationRoot, "home"));
   assert.equal(
     lines.GRADLE_USER_HOME,
