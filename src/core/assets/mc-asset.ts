@@ -13,8 +13,18 @@ import {
   unlink,
 } from "node:fs/promises";
 import { createRequire } from "node:module";
-import { dirname, join, relative, sep } from "node:path";
+import {
+  basename,
+  dirname,
+  isAbsolute,
+  join,
+  relative,
+  resolve,
+  sep,
+} from "node:path";
 
+import { DOCKER_NODE_IMAGE } from "../execution/docker.ts";
+import { PROCESS_LIMITS } from "../execution/process.ts";
 import {
   readAuthorizedFile,
   resolveAuthorizedPath,
@@ -502,11 +512,24 @@ export async function publishStagedAssetSet(
     let journal = new Map<string, string>();
     if (options.hooks?.beforePublish !== undefined) {
       let common = options.publication.realPath;
-      while (
-        options.staging.realPath !== common &&
-        !options.staging.realPath.startsWith(`${common}/`)
-      ) {
-        common = dirname(common);
+      for (;;) {
+        const fromCommon = relative(common, options.staging.realPath);
+        if (
+          fromCommon === "" ||
+          (fromCommon !== ".." &&
+            !fromCommon.startsWith(`..${sep}`) &&
+            !isAbsolute(fromCommon))
+        ) {
+          break;
+        }
+        const parent = dirname(common);
+        if (parent === common) {
+          throw new AssetError(
+            "path_swap",
+            "Staging roots have no common publication ancestor",
+          );
+        }
+        common = parent;
       }
       journalRoot = dirname(common);
       journal = await directorySnapshot(journalRoot);
@@ -685,38 +708,114 @@ interface ProcessObservation {
   readonly error?: { readonly code: string; readonly detail: string };
 }
 
-interface ProcessCommand {
+export interface AssetProcessCommand {
   readonly executable: string;
   readonly argv: readonly string[];
+  readonly containerName?: string;
 }
 
-function mcAssetCommand(
-  tool: McAssetTool,
-  args: readonly string[],
-): ProcessCommand | null {
+export function createAssetSandboxCommand(options: {
+  readonly cwd: string;
+  readonly hostExecutable: string;
+  readonly entryPoint: string;
+  readonly args: readonly string[];
+  readonly environment?: Readonly<Record<string, string>>;
+}): AssetProcessCommand | null {
   if (process.platform === "darwin" && existsSync("/usr/bin/sandbox-exec")) {
     return {
       executable: "/usr/bin/sandbox-exec",
       argv: [
         "-p",
         "(version 1)(allow default)(deny network-outbound)",
-        process.execPath,
-        tool.entryPoint,
-        ...args,
+        options.hostExecutable,
+        options.entryPoint,
+        ...options.args,
       ],
     };
   }
-  if (process.platform === "linux" && existsSync("/usr/bin/unshare")) {
-    return {
-      executable: "/usr/bin/unshare",
-      argv: ["--net", "--", process.execPath, tool.entryPoint, ...args],
-    };
+  if (process.platform !== "linux") return null;
+
+  const entryPoint = resolve(options.entryPoint);
+  const entryDirectory = dirname(entryPoint);
+  let toolPackage =
+    basename(entryDirectory) === "bin"
+      ? dirname(entryDirectory)
+      : entryDirectory;
+  if (basename(entryDirectory) !== "bin") {
+    let candidate = entryDirectory;
+    while (
+      candidate !== dirname(candidate) &&
+      !existsSync(join(candidate, "package.json"))
+    ) {
+      candidate = dirname(candidate);
+    }
+    if (existsSync(join(candidate, "package.json"))) toolPackage = candidate;
   }
-  return null;
+  if (toolPackage === dirname(toolPackage)) return null;
+  if (
+    [options.cwd, toolPackage].some(
+      (path) => path.includes(",") || path.includes(":"),
+    )
+  ) {
+    return null;
+  }
+  const containerName = `voxellume-asset-${createHash("sha256").update(options.cwd).digest("hex").slice(0, 24)}`;
+  const user =
+    typeof process.getuid === "function" && typeof process.getgid === "function"
+      ? ["--user", `${process.getuid()}:${process.getgid()}`]
+      : [];
+  const environment = {
+    HOME: join(options.cwd, "home"),
+    TMPDIR: join(options.cwd, "tmp"),
+    NO_COLOR: "1",
+    ...options.environment,
+  };
+  return {
+    executable: "docker",
+    containerName,
+    argv: [
+      "run",
+      "--rm",
+      "--name",
+      containerName,
+      "--network",
+      "none",
+      "--cap-drop",
+      "ALL",
+      "--security-opt",
+      "no-new-privileges",
+      "--read-only",
+      "--tmpfs",
+      "/tmp:rw,noexec,nosuid,nodev,size=268435456,mode=1777",
+      "--cpus",
+      String(PROCESS_LIMITS.containerCpus),
+      "--memory",
+      String(PROCESS_LIMITS.containerMemoryBytes),
+      "--pids-limit",
+      String(PROCESS_LIMITS.containerPids),
+      ...user,
+      "--mount",
+      `type=bind,src=${options.cwd},dst=${options.cwd}`,
+      "--mount",
+      `type=bind,src=${toolPackage},dst=${toolPackage},readonly`,
+      "--workdir",
+      options.cwd,
+      "--env",
+      "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+      ...Object.entries(environment).flatMap(([key, value]) => [
+        "--env",
+        `${key}=${value}`,
+      ]),
+      DOCKER_NODE_IMAGE,
+      "node",
+      entryPoint,
+      ...options.args,
+    ],
+  };
 }
 
 async function executeMcAsset(
-  command: ProcessCommand | null,
+  command: AssetProcessCommand | null,
   cwd: string,
   limits: McAssetLimits,
   signal?: AbortSignal,
@@ -737,16 +836,23 @@ async function executeMcAsset(
     };
   }
   const { promise, resolve } = Promise.withResolvers<ProcessObservation>();
+  const environment =
+    command.containerName === undefined
+      ? {
+          PATH: process.env.PATH ?? "/usr/bin:/bin",
+          HOME: join(cwd, "home"),
+          TMPDIR: join(cwd, "tmp"),
+          NO_COLOR: "1",
+        }
+      : {
+          PATH: process.env.PATH ?? "/usr/bin:/bin",
+          DOCKER_CONFIG: join(cwd, "docker-config"),
+        };
   const child = spawn(command.executable, command.argv, {
     cwd,
     shell: false,
     detached: process.platform !== "win32",
-    env: {
-      PATH: process.env.PATH ?? "/usr/bin:/bin",
-      HOME: join(cwd, "home"),
-      TMPDIR: join(cwd, "tmp"),
-      NO_COLOR: "1",
-    },
+    env: environment,
     stdio: ["ignore", "pipe", "pipe"],
   });
   let stdout = "";
@@ -756,6 +862,26 @@ async function executeMcAsset(
   let cancelled = false;
   let flooded = false;
   let spawnError: Error | undefined;
+  let cleanup: Promise<void> | undefined;
+  const stopContainer = (): Promise<void> => {
+    if (command.containerName === undefined) return Promise.resolve();
+    if (cleanup !== undefined) return cleanup;
+    const stopped = Promise.withResolvers<void>();
+    cleanup = stopped.promise;
+    const remover = spawn("docker", ["rm", "--force", command.containerName], {
+      env: environment,
+      shell: false,
+      stdio: "ignore",
+    });
+    const timer = setTimeout(() => remover.kill("SIGKILL"), 10_000);
+    const done = () => {
+      clearTimeout(timer);
+      stopped.resolve();
+    };
+    remover.once("error", done);
+    remover.once("close", done);
+    return cleanup;
+  };
   const kill = () => {
     if (child.pid === undefined) return;
     if (process.platform === "win32") child.kill();
@@ -766,6 +892,7 @@ async function executeMcAsset(
         child.kill("SIGKILL");
       }
     }
+    void stopContainer();
   };
   const collect = (
     stream: NodeJS.ReadableStream,
@@ -799,46 +926,64 @@ async function executeMcAsset(
   child.once("close", (code) => {
     clearTimeout(timer);
     signal?.removeEventListener("abort", abort);
-    if (timedOut)
-      return resolve({ status: "timed_out", exitCode: code, stdout, stderr });
-    if (cancelled)
-      return resolve({ status: "cancelled", exitCode: code, stdout, stderr });
-    if (flooded)
-      return resolve({
-        status: "failed",
+    const finish = () => {
+      if (timedOut)
+        return resolve({ status: "timed_out", exitCode: code, stdout, stderr });
+      if (cancelled)
+        return resolve({ status: "cancelled", exitCode: code, stdout, stderr });
+      if (flooded)
+        return resolve({
+          status: "failed",
+          exitCode: code,
+          stdout,
+          stderr,
+          error: {
+            code: "output_limit_exceeded",
+            detail: "mc-asset logs exceeded the configured limit",
+          },
+        });
+      const diagnostic = stderr.toLowerCase();
+      const backendUnavailable =
+        command.containerName !== undefined &&
+        (code === 125 ||
+          diagnostic.includes("error during connect") ||
+          diagnostic.includes("failed to connect to the docker api") ||
+          diagnostic.includes("docker: error response from daemon") ||
+          diagnostic.includes("cannot connect to the docker daemon") ||
+          diagnostic.includes("docker daemon is not running") ||
+          diagnostic.includes("permission denied while trying to connect") ||
+          diagnostic.includes("mounts denied"));
+      if (spawnError !== undefined || backendUnavailable)
+        return resolve({
+          status: "unavailable",
+          exitCode: code,
+          stdout,
+          stderr,
+          error: {
+            code: "process_spawn_unavailable",
+            detail:
+              spawnError?.message ||
+              stderr ||
+              "Docker execution is unavailable",
+          },
+        });
+      resolve({
+        status: code === 0 ? "passed" : "failed",
         exitCode: code,
         stdout,
         stderr,
-        error: {
-          code: "output_limit_exceeded",
-          detail: "mc-asset logs exceeded the configured limit",
-        },
+        ...(code === 0
+          ? {}
+          : {
+              error: {
+                code: "mc_asset_failed",
+                detail: `mc-asset exited with ${code}`,
+              },
+            }),
       });
-    if (spawnError !== undefined)
-      return resolve({
-        status: "unavailable",
-        exitCode: code,
-        stdout,
-        stderr,
-        error: {
-          code: "process_spawn_unavailable",
-          detail: spawnError.message,
-        },
-      });
-    resolve({
-      status: code === 0 ? "passed" : "failed",
-      exitCode: code,
-      stdout,
-      stderr,
-      ...(code === 0
-        ? {}
-        : {
-            error: {
-              code: "mc_asset_failed",
-              detail: `mc-asset exited with ${code}`,
-            },
-          }),
-    });
+    };
+    if (command.containerName === undefined) finish();
+    else void stopContainer().then(finish);
   });
   return promise;
 }
@@ -905,6 +1050,9 @@ async function runMcAssetWithTool(
   await Promise.all([
     mkdir(join(stagePath, "home")),
     mkdir(join(stagePath, "tmp")),
+    ...(process.platform === "linux"
+      ? [mkdir(join(stagePath, "docker-config"))]
+      : []),
   ]);
   const staged = (name: string) => join(stagePath, name);
   const args: string[] = [];
@@ -1055,7 +1203,12 @@ async function runMcAssetWithTool(
               },
             ];
 
-    const command = mcAssetCommand(tool, args);
+    const command = createAssetSandboxCommand({
+      cwd: stagePath,
+      hostExecutable: process.execPath,
+      entryPoint: tool.entryPoint,
+      args,
+    });
     const observation = await executeMcAsset(
       command,
       stagePath,
@@ -1071,7 +1224,9 @@ async function runMcAssetWithTool(
       },
       operation: operation.kind,
       executed:
-        command === null
+        command === null ||
+        (command.containerName !== undefined &&
+          observation.status === "unavailable")
           ? null
           : {
               argv: [command.executable, ...command.argv],

@@ -1,0 +1,114 @@
+name: Target matrix
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "target-packs/**"
+      - "src/**"
+      - "tests/**"
+      - "scripts/**"
+      - "fixtures/**"
+      - "templates/**"
+      - package.json
+      - pnpm-lock.yaml
+      - support-manifest.json
+      - .github/workflows/target-matrix.yml
+  schedule:
+    - cron: "17 4 * * *"
+  workflow_dispatch:
+    inputs:
+      pack:
+        description: Exact target pack ID; empty selects every cell
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: target-matrix-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+      count: ${{ steps.plan.outputs.count }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24.9.0
+      - id: plan
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          REQUESTED_PACK: ${{ inputs.pack }}
+        run: |
+          args=()
+          if [[ -n "$BASE_SHA" ]]; then args+=(--base "$BASE_SHA"); fi
+          if [[ -n "$REQUESTED_PACK" ]]; then args+=(--pack "$REQUESTED_PACK"); fi
+          node scripts/ci/target-cell.mjs plan "${args[@]}"
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        if: always()
+        with:
+          name: target-matrix-plan
+          path: .artifacts/target-matrix/plan.json
+          if-no-files-found: error
+          retention-days: 30
+
+  catalog:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - run: corepack enable
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24.9.0
+          cache: pnpm
+      - run: corepack pnpm install --frozen-lockfile
+      - run: |
+          mkdir -p .artifacts/target-catalog
+          corepack pnpm test:targets 2>&1 | tee .artifacts/target-catalog/catalog.log
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        if: always()
+        with:
+          name: target-catalog-contract
+          path: .artifacts/target-catalog
+          if-no-files-found: error
+          retention-days: 30
+
+  cell:
+    needs: plan
+    if: needs.plan.outputs.count != '0'
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24.9.0
+      - uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4.8.0
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+      - run: |
+          mkdir -p ".artifacts/target-matrix/${{ matrix.id }}"
+          java -version 2>&1 | tee ".artifacts/target-matrix/${{ matrix.id }}/java.log"
+          node scripts/ci/target-cell.mjs cell --pack "${{ matrix.id }}"
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        if: always()
+        with:
+          name: target-cell-${{ matrix.id }}
+          path: .artifacts/target-matrix/${{ matrix.id }}
+          if-no-files-found: error
+          retention-days: 30

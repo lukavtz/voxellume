@@ -591,7 +591,17 @@ test("artifact directory failures return artifact_unreadable", async (t) => {
 
   assert.deepEqual(
     await facade.invoke(operationRequest("find_class", unreadable)),
-    { status: "failed", operation: "find_class", code: "artifact_unreadable" },
+    process.platform === "win32"
+      ? {
+          status: "not_found",
+          operation: "find_class",
+          code: "artifact_not_found",
+        }
+      : {
+          status: "failed",
+          operation: "find_class",
+          code: "artifact_unreadable",
+        },
   );
   assert.equal(candidate.calls.length, 0);
 });

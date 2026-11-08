@@ -13,7 +13,7 @@ import {
   writeFile,
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { basename, dirname, join } from "node:path";
 import test, { type TestContext } from "node:test";
 
 import {
@@ -84,7 +84,10 @@ test("only host-granted real roots are authorities; staging alone is writable", 
     kind: "transactionStaging",
     transactionId: "tx-1",
   });
-  assert.equal(aliased.realPath, await realpath(fixture.stagingPath));
+  assert.equal(
+    await realpath(aliased.realPath),
+    await realpath(fixture.stagingPath),
+  );
 
   await rejectsCode(
     writeAuthorizedFile(fixture.project, {
@@ -144,10 +147,15 @@ test("rejects traversal, absolute paths, NUL, and symlink escapes", async (t) =>
 test("missing outputs resolve lexically only beneath an existing real parent", async (t) => {
   const fixture = await setup(t);
   await mkdir(join(fixture.stagingPath, "real"));
-  assert.equal(
-    await resolveAuthorizedPath(fixture.staging, "real/output.txt"),
-    join(await realpath(fixture.stagingPath), "real", "output.txt"),
+  const output = await resolveAuthorizedPath(
+    fixture.staging,
+    "real/output.txt",
   );
+  assert.equal(
+    await realpath(dirname(output)),
+    join(await realpath(fixture.stagingPath), "real"),
+  );
+  assert.equal(basename(output), "output.txt");
   await rejectsCode(
     resolveAuthorizedPath(fixture.staging, "missing/output.txt"),
     "missing_parent",
@@ -190,6 +198,7 @@ test("a parent-directory swap during rename cannot redirect output outside stagi
   await mkdir(outsideParent);
   await writeFile(join(outsideParent, "sentinel.txt"), "outside\n");
 
+  let parentSwapped = false;
   const outcome = await writeAuthorizedFile(fixture.staging, {
     path: "parent/output.txt",
     contents: "candidate\n",
@@ -197,13 +206,23 @@ test("a parent-directory swap during rename cannot redirect output outside stagi
     hooks: {
       beforeRename: async () => {
         await rename(parent, retired);
-        await rename(outsideParent, parent);
+        try {
+          await rename(outsideParent, parent);
+          parentSwapped = true;
+        } catch (error) {
+          await rename(retired, parent);
+          throw error;
+        }
       },
     },
   }).then(
     () => "written",
     (error: unknown) => {
-      assert.equal(errorCode(error), "path_swap");
+      if (process.platform === "win32") {
+        assert.ok(["EPERM", "path_swap"].includes(String(errorCode(error))));
+      } else {
+        assert.equal(errorCode(error), "path_swap");
+      }
       return "rejected";
     },
   );
@@ -213,11 +232,12 @@ test("a parent-directory swap during rename cannot redirect output outside stagi
       "candidate\n",
     );
   }
+  const exposedParent = parentSwapped ? parent : outsideParent;
   assert.equal(
-    await readFile(join(parent, "sentinel.txt"), "utf8"),
+    await readFile(join(exposedParent, "sentinel.txt"), "utf8"),
     "outside\n",
   );
-  await assert.rejects(readFile(join(parent, "output.txt")), {
+  await assert.rejects(readFile(join(exposedParent, "output.txt")), {
     code: "ENOENT",
   });
 });

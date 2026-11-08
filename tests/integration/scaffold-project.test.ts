@@ -557,7 +557,10 @@ test("apply mode changes cannot follow a swapped symlink outside staging", async
       },
     }),
   );
-  assert.equal((await stat(outside)).mode & 0o777, 0o600);
+  assert.equal(
+    (await stat(outside)).mode & 0o777,
+    process.platform === "win32" ? 0o666 : 0o600,
+  );
 });
 
 test("rollback mode restoration cannot follow a swapped symlink outside staging", async (t) => {
@@ -593,7 +596,10 @@ test("rollback mode restoration cannot follow a swapped symlink outside staging"
       },
     }),
   );
-  assert.equal((await stat(outside)).mode & 0o777, 0o600);
+  assert.equal(
+    (await stat(outside)).mode & 0o777,
+    process.platform === "win32" ? 0o666 : 0o600,
+  );
 });
 
 test("uses Architectury common and loader modules only for explicit multi-loader selection", async (t) => {

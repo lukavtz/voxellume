@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import {
   chmod,
   mkdir,
@@ -53,9 +54,17 @@ async function setup(t: TestContext, script: string): Promise<Fixture> {
   const isolationRoot = join(root, "isolated");
   await mkdir(projectRoot);
   await mkdir(isolationRoot);
-  const wrapper = join(projectRoot, "gradlew");
-  await writeFile(wrapper, `#!${process.execPath}\n${script}`);
-  await chmod(wrapper, 0o755);
+  if (process.platform === "win32") {
+    await writeFile(join(projectRoot, "gradlew-fixture.cjs"), script);
+    await writeFile(
+      join(projectRoot, "gradlew.bat"),
+      `@"${process.execPath}" "%~dp0gradlew-fixture.cjs" %*\r\n`,
+    );
+  } else {
+    const wrapper = join(projectRoot, "gradlew");
+    await writeFile(wrapper, `#!${process.execPath}\n${script}`);
+    await chmod(wrapper, 0o755);
+  }
   return { root, projectRoot, isolationRoot };
 }
 
@@ -103,14 +112,8 @@ async function rejectsCode(
   });
 }
 
-async function exists(path: string): Promise<boolean> {
-  try {
-    await readFile(path);
-    return true;
-  } catch (error: unknown) {
-    if (errorCode(error) === "ENOENT") return false;
-    throw error;
-  }
+function exists(path: string): boolean {
+  return existsSync(path);
 }
 
 async function waitFor(path: string): Promise<void> {
@@ -171,7 +174,7 @@ for (const key of ["HOME", "GRADLE_USER_HOME", "TMPDIR", "SSH_AUTH_SOCK", "GITHU
       }),
   );
   assert.equal(lines.argv, JSON.stringify(["--no-daemon", "build"]));
-  assert.equal(lines.cwd, childCwd);
+  assert.equal(await realpath(lines.cwd!), childCwd);
   assert.equal(lines.HOME, join(fixture.isolationRoot, "home"));
   assert.equal(
     lines.GRADLE_USER_HOME,
@@ -328,8 +331,8 @@ const timer = setInterval(() => {
   await waitFor(starts);
   const second = run(fixture);
   await yieldToEventLoop();
-  assert.equal((await readFile(starts, "utf8")).trim().split("\n").length, 1);
-  await writeFile(release, "release\n");
+  assert.equal(readFileSync(starts, "utf8").trim().split("\n").length, 1);
+  writeFileSync(release, "release\n");
   const results = await Promise.all([first, second]);
   assert.deepEqual(
     results.map((result) => result.status),
@@ -416,7 +419,7 @@ setInterval(() => {}, 1000);
   const controller = new AbortController();
   const pending = run(fixture, { signal: controller.signal });
   await waitFor(pidPath);
-  const childPid = Number(await readFile(pidPath, "utf8"));
+  const childPid = Number(readFileSync(pidPath, "utf8"));
   t.after(() => {
     try {
       process.kill(childPid, "SIGKILL");

@@ -27,11 +27,21 @@ import {
 
 const MAX_EVIDENCE_BYTES = 2 * 1024 ** 3;
 
-async function makeReadOnly(root: string, current = root): Promise<void> {
+async function makeFilesReadOnly(root: string, current = root): Promise<void> {
   for (const entry of await readdir(current, { withFileTypes: true })) {
     const path = join(current, entry.name);
-    if (entry.isDirectory()) await makeReadOnly(root, path);
-    await chmod(path, entry.isDirectory() ? 0o555 : 0o444);
+    if (entry.isDirectory()) await makeFilesReadOnly(root, path);
+    else await chmod(path, 0o444);
+  }
+}
+
+async function makeDirectoriesReadOnly(
+  root: string,
+  current = root,
+): Promise<void> {
+  for (const entry of await readdir(current, { withFileTypes: true })) {
+    const path = join(current, entry.name);
+    if (entry.isDirectory()) await makeDirectoriesReadOnly(root, path);
   }
   await chmod(current, 0o555);
 }
@@ -179,10 +189,16 @@ async function publishEvidence(
       mode: 0o600,
     });
 
-    await makeReadOnly(staging);
+    await makeFilesReadOnly(staging);
     await assertAbsent(finalDirectory);
     await rename(staging, finalDirectory);
-    published = true;
+    try {
+      await makeDirectoriesReadOnly(finalDirectory);
+      published = true;
+    } catch (error) {
+      await removeStaging(finalDirectory);
+      throw error;
+    }
     return manifest;
   } finally {
     if (!published) await removeStaging(staging);

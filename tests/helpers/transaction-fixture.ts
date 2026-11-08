@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
 import {
   cp,
   mkdir,
@@ -10,7 +11,7 @@ import {
   writeFile,
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { dirname, join, posix } from "node:path";
 import { type TestContext } from "node:test";
 import { fileURLToPath } from "node:url";
 
@@ -25,8 +26,10 @@ import {
 const fixtureRoot = fileURLToPath(
   new URL("../../fixtures/transactions/base-project/", import.meta.url),
 );
-const userNotes =
-  "These user-owned bytes must survive every transaction outcome.\n";
+const userNotes = readFileSync(
+  join(fixtureRoot, "user-notes.txt"),
+  "utf8",
+).replaceAll("\r\n", "\n");
 const outsideNotes = "Outside bytes must survive every recovery outcome.\n";
 
 export const sourcePath =
@@ -112,7 +115,7 @@ export async function snapshotTree(root: string): Promise<TreeSnapshot | null> {
       const child = await snapshotTree(path);
       assert.ok(child);
       for (const [name, hash] of Object.entries(child)) {
-        snapshot[join(entry.name, name)] = hash;
+        snapshot[posix.join(entry.name, name)] = hash;
       }
     } else {
       assert.ok(entry.isFile(), `unexpected non-file fixture entry: ${path}`);
@@ -138,8 +141,21 @@ export async function setup(
   await mkdir(workspaceRoot, { recursive: true });
   await mkdir(outsideRoot, { recursive: true });
   await writeFile(join(outsideRoot, "sentinel.txt"), outsideNotes);
-  if (!options.newProject)
+  if (!options.newProject) {
     await cp(fixtureRoot, projectRoot, { recursive: true });
+    for (const path of ["user-notes.txt", sourcePath]) {
+      const normalized = (
+        await readFile(join(fixtureRoot, path), "utf8")
+      ).replaceAll("\r\n", "\n");
+      await writeFile(join(projectRoot, path), normalized);
+    }
+    // build/ is ignored, so every checkout must create its own last-good artifact.
+    await mkdir(join(projectRoot, dirname(artifactPath)), { recursive: true });
+    await writeFile(
+      join(projectRoot, artifactPath),
+      "last-good-production-artifact\n",
+    );
+  }
   const modSpec = JSON.parse(
     await readFile(join(fixtureRoot, "mod-spec.json"), "utf8"),
   ) as BuildOptions["modSpec"];

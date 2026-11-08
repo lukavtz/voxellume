@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { readFile, rm, writeFile } from "node:fs/promises";
-import { join, relative } from "node:path";
+import { join, relative, sep } from "node:path";
 import test from "node:test";
 
 import {
@@ -67,7 +67,9 @@ test("flows through proposed, validated, staged, verified, and committed with a 
   for (const file of manifest.files) {
     assert.equal(
       file.path,
-      relative(candidate.stagingRoot, join(candidate.stagingRoot, file.path)),
+      relative(candidate.stagingRoot, join(candidate.stagingRoot, file.path))
+        .split(sep)
+        .join("/"),
     );
     assert.ok(!file.path.startsWith("..") && !file.path.startsWith("/"));
     assert.equal(

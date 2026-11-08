@@ -275,7 +275,8 @@ function renameTemporary(
   );
   information.writeBigUInt64LE(targetParent, 8);
   information.writeUInt32LE(nameBytes, 16);
-  information.write(targetName, 24, nameBytes, "utf16le");
+  // x64 padding precedes RootDirectory; FileName immediately follows FileNameLength.
+  information.write(targetName, 20, nameBytes, "utf16le");
   const ioStatus: IoStatus = { Status: 0, Information: 0 };
   const status = nativeCall(
     "NtSetInformationFile(FileRenameInformationEx)",

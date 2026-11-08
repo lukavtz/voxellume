@@ -1,0 +1,40 @@
+rules:
+  - id: voxellume-child-process-shell
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: Child processes must use fixed argv with shell:false.
+    patterns:
+      - pattern-either:
+          - pattern: "spawn($CMD, $ARGS, {..., shell: true, ...})"
+          - pattern: "execFile($CMD, $ARGS, {..., shell: true, ...})"
+          - pattern: "fork($CMD, $ARGS, {..., shell: true, ...})"
+
+  - id: voxellume-dynamic-code-evaluation
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: Model-controlled or generated code must not be evaluated.
+    pattern-either:
+      - pattern: eval(...)
+      - pattern: new Function(...)
+
+  - id: voxellume-unrestricted-listener
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: Servers must not bind every interface; use loopback only.
+    pattern-either:
+      - pattern: '$SERVER.listen($PORT, "0.0.0.0", ...)'
+      - pattern: '$SERVER.listen({..., host: "0.0.0.0", ...})'
+
+  - id: voxellume-shell-command-string
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: Shell command strings are forbidden; use spawn with an argument array.
+    patterns:
+      - pattern: $CP.exec($COMMAND, ...)
+      - metavariable-pattern:
+          metavariable: $CP
+          patterns:
+            - pattern-either:
+                - pattern: child_process
+                - pattern: cp
+                - pattern: childProcess

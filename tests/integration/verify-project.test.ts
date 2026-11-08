@@ -43,7 +43,7 @@ async function makeWritableTree(path: string): Promise<void> {
   await chmod(path, 0o755);
 }
 
-async function readJson(path: string): Promise<Record<string, unknown>> {
+async function readJson(path: string | URL): Promise<Record<string, unknown>> {
   return JSON.parse(await readFile(path, "utf8")) as Record<string, unknown>;
 }
 
@@ -54,7 +54,7 @@ async function targetFixture(): Promise<TargetPack> {
   );
   const [pack, docs, verification] = await Promise.all(
     ["target.json", "docs.json", "verification.json"].map((name) =>
-      readJson(new URL(name, directory).pathname),
+      readJson(new URL(name, directory)),
     ),
   );
   return {
@@ -80,7 +80,7 @@ async function targetFixture(): Promise<TargetPack> {
 
 async function modSpecFixture(): Promise<ModSpec> {
   const document = await readJson(
-    new URL("../../fixtures/mod-spec/valid.json", import.meta.url).pathname,
+    new URL("../../fixtures/mod-spec/valid.json", import.meta.url),
   );
   const result = validateModSpec(document);
   assert.ok(result.status === "valid");
@@ -100,10 +100,26 @@ test("a real fake gradlew clean build persists exact logs and authenticated arti
     mkdir(projectRoot, { recursive: true }),
     mkdir(isolationRoot, { recursive: true }),
   ]);
-  const wrapper = join(projectRoot, "gradlew");
-  await writeFile(
-    wrapper,
-    `#!${process.execPath}
+  if (process.platform === "win32") {
+    await writeFile(
+      join(projectRoot, "gradlew.cjs"),
+      `const { mkdirSync, writeFileSync } = require("node:fs");
+console.log("clean build: ruby_tools");
+console.log("argv=" + JSON.stringify(process.argv.slice(2)));
+mkdirSync("build/libs", { recursive: true });
+writeFileSync(${JSON.stringify(productionJarRelative)}, ${JSON.stringify(productionJarBytes.toString("utf8"))});
+console.log("BUILD SUCCESSFUL");
+`,
+    );
+    await writeFile(
+      join(projectRoot, "gradlew.bat"),
+      `@echo off\r\n"${process.execPath}" "%~dp0gradlew.cjs" %*\r\n`,
+    );
+  } else {
+    const wrapper = join(projectRoot, "gradlew");
+    await writeFile(
+      wrapper,
+      `#!${process.execPath}
 import { mkdirSync, writeFileSync } from "node:fs";
 console.log("clean build: ruby_tools");
 console.log("argv=" + JSON.stringify(process.argv.slice(2)));
@@ -111,8 +127,9 @@ mkdirSync("build/libs", { recursive: true });
 writeFileSync(${JSON.stringify(productionJarRelative)}, ${JSON.stringify(productionJarBytes.toString("utf8"))});
 console.log("BUILD SUCCESSFUL");
 `,
-  );
-  await chmod(wrapper, 0o755);
+    );
+    await chmod(wrapper, 0o755);
+  }
 
   const target = await targetFixture();
   const modSpec = await modSpecFixture();
@@ -155,6 +172,11 @@ console.log("BUILD SUCCESSFUL");
       allowHostExecution: true,
       ...(signal === undefined ? {} : { signal }),
     });
+    assert.notEqual(
+      processResult.status,
+      "unavailable",
+      JSON.stringify(processResult),
+    );
     const checked = processResult.status !== "unavailable";
     const logs = [];
     if (checked) {

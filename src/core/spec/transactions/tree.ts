@@ -1,5 +1,5 @@
 import { copyFile, mkdir, readFile, readdir } from "node:fs/promises";
-import { join } from "node:path";
+import { join, posix } from "node:path";
 
 import { canonicalJson, sha256 } from "../../targets/canonical-json.ts";
 import type { TreeSnapshot } from "../transaction-types.ts";
@@ -21,7 +21,7 @@ export async function snapshotTree(root: string): Promise<TreeSnapshot | null> {
       if (child === null)
         throw new Error(`Directory disappeared while hashing: ${path}`);
       for (const [name, hash] of Object.entries(child)) {
-        snapshot[join(entry.name, name)] = hash;
+        snapshot[posix.join(entry.name, name)] = hash;
       }
     } else if (entry.isFile()) {
       snapshot[entry.name] = sha256(await readFile(path));

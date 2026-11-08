@@ -486,11 +486,22 @@ test("verification uses host roots, policy, executor, exact ModSpec, and pack id
 
 test("whole verification holds one lock across stages, process execution, and evidence finalization", async (t) => {
   const paths = await workspace(t);
-  await writeFile(
-    join(paths.projectRoot, "gradlew"),
-    `#!${process.execPath}\nrequire("node:fs").writeFileSync("process-ran", "yes");`,
-  );
-  await chmod(join(paths.projectRoot, "gradlew"), 0o755);
+  if (process.platform === "win32") {
+    await writeFile(
+      join(paths.projectRoot, "gradlew-fixture.cjs"),
+      'require("node:fs").writeFileSync("process-ran", "yes");',
+    );
+    await writeFile(
+      join(paths.projectRoot, "gradlew.bat"),
+      `@"${process.execPath}" "%~dp0gradlew-fixture.cjs" %*\r\n`,
+    );
+  } else {
+    await writeFile(
+      join(paths.projectRoot, "gradlew"),
+      `#!${process.execPath}\nrequire("node:fs").writeFileSync("process-ran", "yes");`,
+    );
+    await chmod(join(paths.projectRoot, "gradlew"), 0o755);
+  }
   const stages: string[] = [];
   const operations = createCoreOperations(
     options(paths, {
@@ -539,11 +550,20 @@ test("whole verification holds one lock across stages, process execution, and ev
     }),
   );
   const request = await staticVerificationRequest(paths, "held-verify");
-  const result = await operations.verifyProject({
-    ...request,
-    profile: "build",
-  });
-  assert.equal(result.status, "ok");
+  let result;
+  try {
+    result = await operations.verifyProject({
+      ...request,
+      profile: "build",
+    });
+  } catch (error) {
+    assert.fail(error instanceof Error ? error.stack : String(error));
+  }
+  assert.equal(
+    result.status,
+    "ok",
+    result.status === "error" ? JSON.stringify(result) : "",
+  );
   assert.ok("value" in result);
   assert.ok("evidence" in result.value);
   assert.equal(result.value.status, "passed", result.value.error.detail);

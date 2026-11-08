@@ -27,6 +27,7 @@ import {
   readEvidence,
   type EvidenceCheckSubject,
 } from "../../src/core/verification/evidence.ts";
+import { hasReadOnlyMode } from "../../src/core/verification/evidence/read.ts";
 
 const eulaUrl = "https://aka.ms/MinecraftEULA";
 const approvedAt = "2026-11-06T12:00:00.000Z";
@@ -125,7 +126,7 @@ test("approvals start empty and never silently accept the Minecraft EULA", async
   });
 });
 
-test("approval persistence is exact, survives reload, and stays mode 0600", async (t) => {
+test("approval persistence is exact and retains restricted platform modes", async (t) => {
   const { configRoot } = await setup(t);
   await recordEulaApproval({ configRoot, eulaUrl, approvedAt });
   await recordNetworkApproval({ configRoot, ...network, approvedAt });
@@ -137,7 +138,7 @@ test("approval persistence is exact, survives reload, and stays mode 0600", asyn
   });
   assert.equal(
     (await stat(join(configRoot, "approvals.json"))).mode & 0o777,
-    0o600,
+    process.platform === "win32" ? 0o666 : 0o600,
   );
   await assert.doesNotReject(assertEulaApproved({ configRoot, eulaUrl }));
   await assert.doesNotReject(assertNetworkApproved({ configRoot, ...network }));
@@ -489,8 +490,8 @@ test("finalized evidence is outside agent roots and recursively read-only", asyn
   ]) {
     const entry = await stat(join(directory, relative));
     assert.equal(
-      entry.mode & 0o777,
-      entry.isDirectory() ? 0o555 : 0o444,
+      hasReadOnlyMode(entry.mode, entry.isDirectory()),
+      true,
       relative || "evidence root",
     );
   }
@@ -500,6 +501,17 @@ test("finalized evidence is outside agent roots and recursively read-only", asyn
   await assert.rejects(finalizeEvidence(nested), {
     code: "unauthorized_evidence_root",
   });
+});
+
+test("read-only evidence modes match platform semantics", () => {
+  assert.equal(hasReadOnlyMode(0o40444, true, "win32"), true);
+  assert.equal(hasReadOnlyMode(0o40555, true, "win32"), false);
+  assert.equal(hasReadOnlyMode(0o40666, true, "win32"), false);
+  assert.equal(hasReadOnlyMode(0o100444, false, "win32"), true);
+  assert.equal(hasReadOnlyMode(0o100644, false, "win32"), false);
+  assert.equal(hasReadOnlyMode(0o40555, true, "linux"), true);
+  assert.equal(hasReadOnlyMode(0o40444, true, "linux"), false);
+  assert.equal(hasReadOnlyMode(0o100444, false, "linux"), true);
 });
 
 test("evidence larger than 2 GiB fails before publication", async (t) => {

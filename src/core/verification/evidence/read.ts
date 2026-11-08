@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { createReadStream } from "node:fs";
 import { lstat, readFile, readdir } from "node:fs/promises";
-import { join } from "node:path";
+import { join, relative, sep } from "node:path";
 
 import { authenticateCanonical } from "../../spec/transactions/journal-integrity.ts";
 import { transactionComponent } from "./paths.ts";
@@ -29,9 +29,7 @@ export async function walkFiles(
     const absolute = join(current, entry.name);
     if (entry.isDirectory()) files.push(...(await walkFiles(root, absolute)));
     else if (entry.isFile()) {
-      files.push(
-        `${current.slice(root.length + 1)}${current === root ? "" : "/"}${entry.name}`,
-      );
+      files.push(relative(root, absolute).split(sep).join("/"));
     } else fail("evidence_integrity", "Evidence contains a non-regular file.");
   }
   return files.sort();
@@ -45,6 +43,16 @@ function integrity(error: unknown): never {
   );
 }
 
+export function hasReadOnlyMode(
+  mode: number,
+  directory: boolean,
+  platform = process.platform,
+): boolean {
+  // Windows/libuv does not expose execute bits; read-only directories are 0444.
+  const expected = platform === "win32" ? 0o444 : directory ? 0o555 : 0o444;
+  return (mode & 0o777) === expected;
+}
+
 export async function readEvidence(options: {
   evidenceRoot: string;
   transactionId: string;
@@ -56,14 +64,14 @@ export async function readEvidence(options: {
     if (
       !root.isDirectory() ||
       root.isSymbolicLink() ||
-      (root.mode & 0o777) !== 0o555
+      !hasReadOnlyMode(root.mode, true)
     ) {
       fail("evidence_integrity", "Evidence root is invalid.");
     }
     const actual = await walkFiles(directory);
     for (const relative of actual) {
       const metadata = await lstat(join(directory, relative));
-      if ((metadata.mode & 0o777) !== 0o444) {
+      if (!hasReadOnlyMode(metadata.mode, metadata.isDirectory())) {
         fail("evidence_integrity", "Evidence file permissions are invalid.");
       }
     }

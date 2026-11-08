@@ -452,7 +452,7 @@ after(() => {
 function harness(overrides: readonly AdapterOverride[] = []) {
   const jar = productionJar();
   const calls: RecordedCall[] = [];
-  const root = realpathSync(
+  const root = realpathSync.native(
     mkdtempSync(join(tmpdir(), "voxellume-production-test-")),
   );
   fixtureRoots.push(root);
@@ -872,22 +872,22 @@ test("passes only with complete production evidence and exact owned-PID cleanup"
     [
       {
         projectId: "production-server",
-        projectRoot: input.profiles.server.projectRoot,
+        projectRoot: realpathSync.native(input.profiles.server.projectRoot),
         mode: "hidden",
       },
       {
         projectId: "production-server",
-        projectRoot: input.profiles.server.projectRoot,
+        projectRoot: realpathSync.native(input.profiles.server.projectRoot),
         mode: "hidden",
       },
       {
         projectId: "production-client",
-        projectRoot: input.profiles.client.projectRoot,
+        projectRoot: realpathSync.native(input.profiles.client.projectRoot),
         mode: "visible",
       },
       {
         projectId: "production-observer",
-        projectRoot: input.profiles.observer.projectRoot,
+        projectRoot: realpathSync.native(input.profiles.observer.projectRoot),
         mode: "visible",
       },
     ],

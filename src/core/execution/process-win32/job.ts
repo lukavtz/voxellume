@@ -49,7 +49,10 @@ export function createJob(native: NativeBackend, state: NativeState): void {
     !native.SetInformationJobObject(
       state.job,
       JobObjectExtendedLimitInformation,
-      limits,
+      native.ffi.as(
+        limits,
+        native.ffi.pointer(native.JOBOBJECT_EXTENDED_LIMIT_INFORMATION),
+      ),
       native.ffi.sizeof(native.JOBOBJECT_EXTENDED_LIMIT_INFORMATION),
     )
   ) {
@@ -79,7 +82,10 @@ export function createJob(native: NativeBackend, state: NativeState): void {
     !native.SetInformationJobObject(
       state.job,
       JobObjectAssociateCompletionPortInformation,
-      association,
+      native.ffi.as(
+        association,
+        native.ffi.pointer(native.JOBOBJECT_ASSOCIATE_COMPLETION_PORT),
+      ),
       native.ffi.sizeof(native.JOBOBJECT_ASSOCIATE_COMPLETION_PORT),
     )
   ) {
@@ -117,5 +123,10 @@ export function terminateFailedLaunch(
 }
 
 export function closeJob(native: NativeBackend, state: NativeState): void {
+  // Closing the parent's pipe ends unblocks ReadFile after process termination.
+  state.stdoutWrite = closeHandle(native, state.stdoutWrite);
+  state.stderrWrite = closeHandle(native, state.stderrWrite);
+  state.stdin = closeHandle(native, state.stdin);
+  state.completionPort = closeHandle(native, state.completionPort);
   state.job = closeHandle(native, state.job);
 }

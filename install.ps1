@@ -1,0 +1,206 @@
+[CmdletBinding()]
+param()
+
+Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
+$commit = '__VOXELLUME_COMMIT__'
+$archiveSha256 = '__VOXELLUME_ZIP_SHA256__'
+$tempDir = $null
+
+function Assert-NativeSuccess([string]$Message) {
+    if ($LASTEXITCODE -ne 0) {
+        throw "Voxellume install failed: $Message"
+    }
+}
+
+function Test-NodeVersion([string]$NodeExe) {
+    $versionText = & $NodeExe -p 'process.versions.node' 2>$null
+    if ($LASTEXITCODE -ne 0) {
+        return $false
+    }
+    try {
+        return [version]$versionText -ge [version]'24.9.0'
+    }
+    catch {
+        return $false
+    }
+}
+
+$nodeStage = $null
+try {
+    $nodeCommand = Get-Command node -ErrorAction SilentlyContinue
+    $nodeIsSupported = $false
+    if ($nodeCommand) {
+        $nodeIsSupported = Test-NodeVersion $nodeCommand.Source
+    }
+    if (-not $nodeIsSupported) {
+        $nodeInstallDir = Join-Path ([Environment]::GetFolderPath('LocalApplicationData')) 'Voxellume\node\24.9.0'
+        $installedNode = Join-Path $nodeInstallDir 'node.exe'
+        if ((Test-Path -LiteralPath $installedNode -PathType Leaf) -and (Test-NodeVersion $installedNode)) {
+            $env:PATH = "$nodeInstallDir;$env:PATH"
+        }
+        else {
+            if (Test-Path -LiteralPath $nodeInstallDir) {
+                throw 'Voxellume install failed: Existing Node.js 24.9.0 installation is unusable; refusing to overwrite it.'
+            }
+            if ([Environment]::OSVersion.Platform -ne [PlatformID]::Win32NT) {
+                throw 'Voxellume install failed: Unsupported operating system for automatic Node.js installation.'
+            }
+            $processorArchitecture = if ($env:PROCESSOR_ARCHITEW6432) { $env:PROCESSOR_ARCHITEW6432 } else { $env:PROCESSOR_ARCHITECTURE }
+            switch ($processorArchitecture) {
+                'AMD64' { $nodeArch = 'x64' }
+                'ARM64' { $nodeArch = 'arm64' }
+                default { throw 'Voxellume install failed: Unsupported CPU architecture for automatic Node.js installation.' }
+            }
+
+            $tempDir = Join-Path ([IO.Path]::GetTempPath()) ('voxellume-node-' + [guid]::NewGuid().ToString('N'))
+            New-Item -ItemType Directory -Path $tempDir | Out-Null
+            $nodeArchiveName = "node-v24.9.0-win-$nodeArch.zip"
+            $nodeBaseUrl = 'https://nodejs.org/dist/v24.9.0'
+            $nodeArchive = Join-Path $tempDir $nodeArchiveName
+            $nodeChecksums = Join-Path $tempDir 'SHASUMS256.txt'
+            Invoke-WebRequest -Uri "$nodeBaseUrl/SHASUMS256.txt" -OutFile $nodeChecksums -UseBasicParsing
+            Invoke-WebRequest -Uri "$nodeBaseUrl/$nodeArchiveName" -OutFile $nodeArchive -UseBasicParsing
+
+            $nodeExpected = $null
+            foreach ($line in Get-Content -LiteralPath $nodeChecksums) {
+                if ($line -match '^([0-9a-fA-F]{64})\s+(.+)$' -and $Matches[2] -eq $nodeArchiveName) {
+                    $nodeExpected = $Matches[1].ToLowerInvariant()
+                    break
+                }
+            }
+            if (-not $nodeExpected) {
+                throw 'Voxellume install failed: Node.js archive checksum was not listed.'
+            }
+            $nodeActual = (Get-FileHash -LiteralPath $nodeArchive -Algorithm SHA256).Hash.ToLowerInvariant()
+            if ($nodeActual -ne $nodeExpected) {
+                throw 'Voxellume install failed: Node.js archive SHA-256 mismatch.'
+            }
+
+            $nodeRoot = Split-Path -Parent $nodeInstallDir
+            New-Item -ItemType Directory -Path $nodeRoot -Force | Out-Null
+            $nodeStage = Join-Path $nodeRoot ('.24.9.0-' + [guid]::NewGuid().ToString('N'))
+            New-Item -ItemType Directory -Path $nodeStage | Out-Null
+            Expand-Archive -LiteralPath $nodeArchive -DestinationPath $nodeStage
+            $nodeRoots = @(Get-ChildItem -LiteralPath $nodeStage -Directory)
+            if ($nodeRoots.Count -ne 1 -or $nodeRoots[0].Name -ne "node-v24.9.0-win-$nodeArch") {
+                throw 'Voxellume install failed: The Node.js archive has an unexpected layout.'
+            }
+            $stagedNode = Join-Path $nodeRoots[0].FullName 'node.exe'
+            $stagedNpx = Join-Path $nodeRoots[0].FullName 'npx.cmd'
+            if (-not (Test-Path -LiteralPath $stagedNode -PathType Leaf) -or -not (Test-Path -LiteralPath $stagedNpx -PathType Leaf)) {
+                throw 'Voxellume install failed: The Node.js archive has an unexpected layout.'
+            }
+            if (Test-Path -LiteralPath $nodeInstallDir) {
+                throw 'Voxellume install failed: Node.js installation appeared during setup; refusing to overwrite it.'
+            }
+            Move-Item -LiteralPath $nodeRoots[0].FullName -Destination $nodeInstallDir
+            $env:PATH = "$nodeInstallDir;$env:PATH"
+        }
+    }
+    if (-not (Get-Command npx -ErrorAction SilentlyContinue)) {
+        throw 'Voxellume install failed: npx is required.'
+    }
+
+    if (-not $env:COREPACK_HOME) {
+        $cacheHome = if ($env:XDG_CACHE_HOME) { $env:XDG_CACHE_HOME } else { Join-Path ([Environment]::GetFolderPath('UserProfile')) '.cache' }
+        $env:COREPACK_HOME = Join-Path $cacheHome 'node/corepack'
+    }
+    if (-not $env:COREPACK_ENABLE_DOWNLOAD_PROMPT) {
+        $env:COREPACK_ENABLE_DOWNLOAD_PROMPT = '0'
+    }
+    & npx --yes corepack@0.34.5 prepare pnpm@12.18.0 --activate | Out-Null
+    Assert-NativeSuccess 'Could not activate pnpm 12.18.0 through Corepack.'
+    & npx --yes corepack@0.34.5 pnpm --version | Out-Null
+    Assert-NativeSuccess 'pnpm is unavailable through Corepack.'
+
+    if ($env:PNPM_HOME) {
+        $env:PATH = "$env:PNPM_HOME;$env:PNPM_HOME\bin;$env:PATH"
+    }
+
+    $commitPlaceholder = '__VOXELLUME_' + 'COMMIT__'
+    $archivePlaceholder = '__VOXELLUME_' + 'ZIP_SHA256__'
+    $localMode = $false
+    if ($commit -eq $commitPlaceholder -and $archiveSha256 -eq $archivePlaceholder) {
+        $localMode = $true
+    }
+    elseif ($commit -eq $commitPlaceholder -or $archiveSha256 -eq $archivePlaceholder) {
+        throw 'Voxellume install failed: Installer pins were not rendered consistently.'
+    }
+    elseif ($commit -notmatch '^[0-9a-f]{40}$' -or $archiveSha256 -notmatch '^[0-9a-f]{64}$') {
+        throw 'Voxellume install failed: Invalid installer pins.'
+    }
+
+    if (-not $tempDir) {
+        $tempDir = Join-Path ([IO.Path]::GetTempPath()) ('voxellume-install-' + [guid]::NewGuid().ToString('N'))
+    }
+    $packDir = Join-Path $tempDir 'package'
+    New-Item -ItemType Directory -Path $packDir -Force | Out-Null
+
+    if ($localMode) {
+        $sourceDir = $PSScriptRoot
+        if (-not (Test-Path -LiteralPath (Join-Path $sourceDir 'package.json') -PathType Leaf) -or
+            -not (Test-Path -LiteralPath (Join-Path $sourceDir 'pnpm-lock.yaml') -PathType Leaf)) {
+            throw 'Voxellume install failed: Local install must run from a Voxellume source checkout.'
+        }
+    }
+    else {
+        $archive = Join-Path $tempDir 'voxellume.zip'
+        $archiveUrl = 'https://codeload.github.com/lukavtz/voxellume/zip/__VOXELLUME_COMMIT__'
+        Invoke-WebRequest -Uri $archiveUrl -OutFile $archive -UseBasicParsing
+        $actual = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLowerInvariant()
+        if ($actual -ne $archiveSha256) {
+            throw 'Voxellume install failed: Source archive SHA-256 mismatch.'
+        }
+        $sourceRoot = Join-Path $tempDir 'source'
+        Expand-Archive -LiteralPath $archive -DestinationPath $sourceRoot
+        $roots = @(Get-ChildItem -LiteralPath $sourceRoot -Directory)
+        if ($roots.Count -ne 1) {
+            throw 'Voxellume install failed: Unexpected source archive layout.'
+        }
+        $sourceDir = $roots[0].FullName
+    }
+
+    Push-Location $sourceDir
+    try {
+        & npx --yes corepack@0.34.5 pnpm install --frozen-lockfile
+        Assert-NativeSuccess 'Dependency installation failed.'
+        & npx --yes corepack@0.34.5 pnpm pack --pack-destination $packDir
+        Assert-NativeSuccess 'Package build failed.'
+        $packages = @(Get-ChildItem -LiteralPath $packDir -Filter '*.tgz' -File)
+        if ($packages.Count -ne 1) {
+            throw 'Voxellume install failed: Expected exactly one packed artifact.'
+        }
+        & npx --yes corepack@0.34.5 pnpm add -g $packages[0].FullName
+        Assert-NativeSuccess 'Global package installation failed.'
+    }
+    finally {
+        Pop-Location
+    }
+
+    $globalBin = (& npx --yes corepack@0.34.5 pnpm bin -g | Select-Object -Last 1)
+    Assert-NativeSuccess 'Could not determine the global pnpm bin directory.'
+    Write-Output 'Installed. Run: voxellume-mcp'
+    if ($env:VOXELLUME_SKIP_SETUP -ne '1') {
+        Write-Output 'Installing desktop prerequisites and Blockbench MCP. Set VOXELLUME_SKIP_SETUP=1 to skip.'
+        $modelRoot = if ($env:VOXELLUME_MODEL_ROOT) { $env:VOXELLUME_MODEL_ROOT } else { Join-Path ([Environment]::GetFolderPath('UserProfile')) 'models' }
+        $language = if ($env:VOXELLUME_LANG) { $env:VOXELLUME_LANG } else { 'en' }
+        if ($env:VOXELLUME_SETUP_YES -eq '1') {
+            & voxellume setup --lang $language --yes --blockbench-mcp-root $modelRoot
+        } else {
+            Write-Output 'Desktop setup skipped. Set VOXELLUME_SETUP_YES=1 to install prerequisites and Blockbench MCP.'
+        }
+        Assert-NativeSuccess 'Desktop prerequisite or Blockbench MCP setup failed.'
+    }
+    if (($env:PATH -split [IO.Path]::PathSeparator) -notcontains $globalBin) {
+        Write-Output "Add the pnpm global bin directory to PATH: $globalBin"
+    }
+}
+finally {
+    if ($nodeStage -and (Test-Path -LiteralPath $nodeStage)) {
+        Remove-Item -LiteralPath $nodeStage -Recurse -Force
+    }
+    if ($tempDir -and (Test-Path -LiteralPath $tempDir)) {
+        Remove-Item -LiteralPath $tempDir -Recurse -Force
+    }
+}

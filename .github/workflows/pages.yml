@@ -1,0 +1,167 @@
+name: Pages
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "site/**"
+      - install.sh
+      - install.ps1
+      - scripts/ci/build-site.mjs
+      - scripts/ci/render-installers.mjs
+      - tests/host/site-contract.test.ts
+      - .github/workflows/pages.yml
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    outputs:
+      commit: ${{ github.sha }}
+      tar_sha256: ${{ steps.archives.outputs.tar_sha256 }}
+      zip_sha256: ${{ steps.archives.outputs.zip_sha256 }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24.9.0
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d
+      - id: archives
+        name: Hash immutable source archives
+        run: |
+          commit="${{ github.sha }}"
+          curl --fail --location --silent --show-error --proto '=https' --tlsv1.2 \
+            "https://codeload.github.com/lukavtz/voxellume/tar.gz/$commit" --output /tmp/voxellume.tar.gz
+          curl --fail --location --silent --show-error --proto '=https' --tlsv1.2 \
+            "https://codeload.github.com/lukavtz/voxellume/zip/$commit" --output /tmp/voxellume.zip
+          echo "tar_sha256=$(sha256sum /tmp/voxellume.tar.gz | cut -d ' ' -f 1)" >> "$GITHUB_OUTPUT"
+          echo "zip_sha256=$(sha256sum /tmp/voxellume.zip | cut -d ' ' -f 1)" >> "$GITHUB_OUTPUT"
+      - run: >-
+          node scripts/ci/build-site.mjs
+          --output .artifacts/pages
+          --commit "${{ github.sha }}"
+          --tar-sha256 "${{ steps.archives.outputs.tar_sha256 }}"
+          --zip-sha256 "${{ steps.archives.outputs.zip_sha256 }}"
+      - uses: actions/upload-pages-artifact@5f327015a708106f6f1b7c9a633901af30fe80cb
+        with:
+          path: .artifacts/pages
+
+  installers:
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - run: corepack enable
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24.9.0
+      - name: Render exact installers
+        shell: bash
+        run: |
+          node scripts/ci/render-installers.mjs .artifacts/installers \
+            "${{ needs.build.outputs.commit }}" \
+            "${{ needs.build.outputs.tar_sha256 }}" \
+            "${{ needs.build.outputs.zip_sha256 }}"
+      - name: Test POSIX installer and MCP stdio
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          export PNPM_HOME="$RUNNER_TEMP/pnpm-home"
+          export PATH="$PNPM_HOME:$PNPM_HOME/bin:$PATH"
+          sh .artifacts/installers/install.sh
+          printf '%s\n' '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"installer-smoke","version":"1.0.0"}}}' \
+            | voxellume-mcp | grep '"name":"voxellume"'
+      - name: Test Windows installer and MCP stdio
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $env:PNPM_HOME = "$env:RUNNER_TEMP\pnpm-home"
+          $env:PATH = "$env:PNPM_HOME;$env:PNPM_HOME\bin;$env:PATH"
+          & .artifacts/installers/install.ps1
+          $request = '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"installer-smoke","version":"1.0.0"}}}'
+          $response = $request | & voxellume-mcp
+          if ($LASTEXITCODE -ne 0 -or $response -notmatch '"name":"voxellume"') {
+            throw "Installed MCP server did not initialize correctly: $response"
+          }
+
+  setup:
+    needs: [build, installers]
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - run: corepack enable
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24.9.0
+      - name: Render exact installers
+        shell: bash
+        run: |
+          node scripts/ci/render-installers.mjs .artifacts/installers \
+            "${{ needs.build.outputs.commit }}" \
+            "${{ needs.build.outputs.tar_sha256 }}" \
+            "${{ needs.build.outputs.zip_sha256 }}"
+      - name: Run full POSIX setup and capture log
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          mkdir -p .artifacts/setup
+          export PNPM_HOME="$RUNNER_TEMP/pnpm-home"
+          export PATH="$PNPM_HOME:$PNPM_HOME/bin:$PATH"
+          export VOXELLUME_SETUP_YES=1
+          log="$RUNNER_TEMP/full-setup.log"
+          sh .artifacts/installers/install.sh 2>&1 | tee "$log"
+          cp "$log" .artifacts/setup/install.log
+      - name: Run full Windows setup and capture log
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $env:PNPM_HOME = "$env:RUNNER_TEMP\pnpm-home"
+          $env:PATH = "$env:PNPM_HOME;$env:PNPM_HOME\bin;$env:PATH"
+          $env:VOXELLUME_SETUP_YES = '1'
+          $setupDir = Join-Path (Get-Location) '.artifacts/setup'
+          New-Item -ItemType Directory -Path $setupDir -Force | Out-Null
+          $log = Join-Path $env:RUNNER_TEMP 'full-setup.log'
+          & .artifacts/installers/install.ps1 | Tee-Object -FilePath $log
+          Copy-Item -LiteralPath $log -Destination (Join-Path $setupDir 'install.log') -Force
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        if: always()
+        with:
+          name: full-setup-${{ matrix.os }}
+          path: .artifacts/setup
+          if-no-files-found: error
+          retention-days: 14
+
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: [build, installers, setup]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346

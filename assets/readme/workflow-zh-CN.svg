@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600" role="img" aria-labelledby="title desc">
+  <title id="title">Voxellume：从自然语言请求到证据驱动的交付</title>
+  <desc id="desc">OMP、DeepSeek Harness 和 MCP 调用同一个核心。请求转换为 ModSpec、受保护的暂存候选、按顺序执行的验证，以及包含证据的可编辑交付物。</desc>
+  <rect width="1200" height="600" rx="24" fill="#000000"/>
+  <g font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif">
+    <text x="60" y="68" fill="#ffffff" font-size="40" font-weight="650">从请求到证据</text>
+    <text x="60" y="104" fill="#a1a1aa" font-size="20">一个共享核心。三种原生宿主。</text>
+    <g font-size="20" text-anchor="middle">
+      <rect x="60" y="136" width="220" height="62" rx="10" fill="#181818" stroke="#525252"/><text x="170" y="176" fill="#ffffff">OMP</text>
+      <rect x="350" y="136" width="300" height="62" rx="10" fill="#181818" stroke="#525252"/><text x="500" y="176" fill="#ffffff">DeepSeek Harness</text>
+      <rect x="920" y="136" width="220" height="62" rx="10" fill="#181818" stroke="#525252"/><text x="1030" y="176" fill="#ffffff">MCP</text>
+    </g>
+    <path d="M170 198 V220 H1030 V198 M600 220 V244" fill="none" stroke="#a1a1aa" stroke-width="2"/>
+    <rect x="350" y="244" width="500" height="62" rx="10" fill="#ffffff"/>
+    <text x="600" y="284" fill="#000000" font-size="22" font-weight="650" text-anchor="middle">Voxellume 共享核心</text>
+    <path d="M260 386 H280 M480 386 H500 M700 386 H720 M920 386 H940" fill="none" stroke="#a1a1aa" stroke-width="2"/>
+    <path d="M270 380 L280 386 L270 392 M490 380 L500 386 L490 392 M710 380 L720 386 L710 392 M930 380 L940 386 L930 392" fill="none" stroke="#a1a1aa" stroke-width="2"/>
+    <path d="M600 306 V330 H160 V350" fill="none" stroke="#a1a1aa" stroke-width="2"/>
+    <g text-anchor="middle">
+      <rect x="60" y="350" width="200" height="150" rx="10" fill="#181818" stroke="#525252"/>
+      <text x="160" y="392" fill="#ffffff" font-size="24" font-weight="650">想法</text><text x="160" y="428" fill="#a1a1aa" font-size="18">自然语言</text><text x="160" y="454" fill="#a1a1aa" font-size="18">请求</text>
+      <rect x="280" y="350" width="200" height="150" rx="10" fill="#181818" stroke="#525252"/>
+      <text x="380" y="392" fill="#ffffff" font-size="24" font-weight="650">ModSpec</text><text x="380" y="428" fill="#a1a1aa" font-size="18">精确目标</text><text x="380" y="454" fill="#a1a1aa" font-size="18">和验收检查</text>
+      <rect x="500" y="350" width="200" height="150" rx="10" fill="#181818" stroke="#525252"/>
+      <text x="600" y="392" fill="#ffffff" font-size="24" font-weight="650">暂存</text><text x="600" y="428" fill="#a1a1aa" font-size="18">锁定和日志</text><text x="600" y="454" fill="#a1a1aa" font-size="18">安全回滚</text>
+      <rect x="720" y="350" width="200" height="150" rx="10" fill="#181818" stroke="#525252"/>
+      <text x="820" y="392" fill="#ffffff" font-size="24" font-weight="650">验证</text><text x="820" y="428" fill="#a1a1aa" font-size="18">构建 → 服务器</text><text x="820" y="454" fill="#a1a1aa" font-size="18">→ 客户端 → 视觉</text>
+      <rect x="940" y="350" width="200" height="150" rx="10" fill="#181818" stroke="#525252"/>
+      <text x="1040" y="392" fill="#ffffff" font-size="24" font-weight="650">交付</text><text x="1040" y="428" fill="#a1a1aa" font-size="18">源码 + JAR</text><text x="1040" y="454" fill="#a1a1aa" font-size="18">和证据</text>
+    </g>
+    <rect x="60" y="532" width="1080" height="42" rx="8" fill="#181818"/>
+    <text x="600" y="560" fill="#ffffff" font-size="18" text-anchor="middle">失败、不可用或未执行的检查绝不会被记为通过。</text>
+  </g>
+</svg>

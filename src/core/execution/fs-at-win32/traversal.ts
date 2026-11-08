@@ -181,7 +181,9 @@ export function openParent(
     FILE_READ_ATTRIBUTES |
     SYNCHRONIZE |
     (mutation ? FILE_READ_DATA | FILE_WRITE_DATA | FILE_APPEND_DATA : 0);
-  let current = openRequiredRelative(owner, openedRoot.handle, ".", {
+  // An empty NT-relative name reopens RootDirectory. NtCreateFile rejects the
+  // Win32-only "." component with STATUS_OBJECT_NAME_INVALID.
+  let current = openRequiredRelative(owner, openedRoot.handle, "", {
     access,
     disposition: FILE_OPEN,
     directory: true,
