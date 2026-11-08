@@ -127,5 +127,6 @@ export function closeJob(native: NativeBackend, state: NativeState): void {
   state.stdoutWrite = closeHandle(native, state.stdoutWrite);
   state.stderrWrite = closeHandle(native, state.stderrWrite);
   state.stdin = closeHandle(native, state.stdin);
+  state.completionPort = closeHandle(native, state.completionPort);
   state.job = closeHandle(native, state.job);
 }
