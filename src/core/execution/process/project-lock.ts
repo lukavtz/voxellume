@@ -59,6 +59,7 @@ export async function acquireHeldProjectLock(
   if (signal?.aborted) return null;
 
   const previous = projectLocks.get(key);
+  console.error("project-lock", key, previous !== undefined, signal?.aborted);
   const current = Promise.withResolvers<void>();
   const tail = previous?.then(() => current.promise) ?? current.promise;
   projectLocks.set(key, tail);
