@@ -580,9 +580,7 @@ test("staged growth after pre-stat cannot bypass total output bytes", async (t) 
 });
 
 test("staged publication is all-or-nothing and removes candidate files on failure", async (t) => {
-  console.error("staged-publication:setup");
   const fixture = await setup(t);
-  console.error("staged-publication:ready");
   await mkdir(join(fixture.stagingPath, "candidate"));
   await writeFile(
     join(fixture.stagingPath, "candidate", "one.png"),
@@ -612,7 +610,6 @@ test("staged publication is all-or-nothing and removes candidate files on failur
     }),
     "injected_failure",
   );
-  console.error("staged-publication:rejected");
   assert.deepEqual(await readdir(fixture.publicationPath), []);
   assert.equal(
     await exists(join(fixture.stagingPath, "candidate", "one.png")),
@@ -623,7 +620,6 @@ test("staged publication is all-or-nothing and removes candidate files on failur
     false,
   );
 
-  console.error("staged-publication:cleaned");
   await mkdir(join(fixture.stagingPath, "candidate"));
   await writeFile(
     join(fixture.stagingPath, "candidate", "one.png"),

@@ -13,7 +13,15 @@ import {
   unlink,
 } from "node:fs/promises";
 import { createRequire } from "node:module";
-import { basename, dirname, join, relative, resolve, sep } from "node:path";
+import {
+  basename,
+  dirname,
+  isAbsolute,
+  join,
+  relative,
+  resolve,
+  sep,
+} from "node:path";
 
 import { DOCKER_NODE_IMAGE } from "../execution/docker.ts";
 import { PROCESS_LIMITS } from "../execution/process.ts";
@@ -504,11 +512,24 @@ export async function publishStagedAssetSet(
     let journal = new Map<string, string>();
     if (options.hooks?.beforePublish !== undefined) {
       let common = options.publication.realPath;
-      while (
-        options.staging.realPath !== common &&
-        !options.staging.realPath.startsWith(`${common}/`)
-      ) {
-        common = dirname(common);
+      for (;;) {
+        const fromCommon = relative(common, options.staging.realPath);
+        if (
+          fromCommon === "" ||
+          (fromCommon !== ".." &&
+            !fromCommon.startsWith(`..${sep}`) &&
+            !isAbsolute(fromCommon))
+        ) {
+          break;
+        }
+        const parent = dirname(common);
+        if (parent === common) {
+          throw new AssetError(
+            "path_swap",
+            "Staging roots have no common publication ancestor",
+          );
+        }
+        common = parent;
       }
       journalRoot = dirname(common);
       journal = await directorySnapshot(journalRoot);
