@@ -206,10 +206,16 @@ test("real path and symlink alias share one canonical process lock", async (t) =
     `
 const fs = require("node:fs");
 // Real child-process integration: deterministic fake timers cannot cross processes.
+let releasePolls = 0;
 const releasePoll = setInterval(() => {
   if (fs.existsSync("release")) {
     clearInterval(releasePoll);
     process.exit(0);
+  }
+  releasePolls += 1;
+  if (releasePolls === 500) {
+    console.log(JSON.stringify({ cwd: process.cwd(), entries: fs.readdirSync(".") }));
+    process.exit(2);
   }
 }, 10);
 fs.appendFileSync("starts", process.pid + "\\n");
@@ -231,8 +237,8 @@ fs.appendFileSync("starts", process.pid + "\\n");
   await writeFile(release, "release\n");
   const [firstResult, secondResult] = await Promise.all([first, second]);
 
-  assert.equal(firstResult.status, "passed");
-  assert.equal(secondResult.status, "cancelled");
+  assert.equal(firstResult.status, "passed", JSON.stringify(firstResult));
+  assert.equal(secondResult.status, "cancelled", JSON.stringify(secondResult));
   assert.equal((await readFile(starts, "utf8")).trim().split("\n").length, 1);
 });
 
@@ -240,10 +246,16 @@ test("trusted lockRoot real path and symlink alias serialize distinct staging ro
   const script = `
 const fs = require("node:fs");
 // Real child-process integration: deterministic fake timers cannot cross processes.
+let releasePolls = 0;
 const releasePoll = setInterval(() => {
   if (fs.existsSync("release")) {
     clearInterval(releasePoll);
     process.exit(0);
+  }
+  releasePolls += 1;
+  if (releasePolls === 500) {
+    console.log(JSON.stringify({ cwd: process.cwd(), entries: fs.readdirSync(".") }));
+    process.exit(2);
   }
 }, 10);
 fs.writeFileSync("started", process.pid + "\\n");
@@ -272,8 +284,8 @@ fs.writeFileSync("started", process.pid + "\\n");
   await writeFile(join(secondFixture.projectRoot, "release"), "release\n");
   const secondResult = await second;
 
-  assert.equal(firstResult.status, "passed");
-  assert.equal(secondResult.status, "passed");
+  assert.equal(firstResult.status, "passed", JSON.stringify(firstResult));
+  assert.equal(secondResult.status, "passed", JSON.stringify(secondResult));
   assert.equal(secondStartedBeforeRelease, false);
 });
 
@@ -283,10 +295,16 @@ test("abort cancels a process waiting for the project lock", async (t) => {
     `
 const fs = require("node:fs");
 // Real child-process integration: deterministic fake timers cannot cross processes.
+let releasePolls = 0;
 const releasePoll = setInterval(() => {
   if (fs.existsSync("release")) {
     clearInterval(releasePoll);
     process.exit(0);
+  }
+  releasePolls += 1;
+  if (releasePolls === 500) {
+    console.log(JSON.stringify({ cwd: process.cwd(), entries: fs.readdirSync(".") }));
+    process.exit(2);
   }
 }, 10);
 fs.appendFileSync("starts", process.pid + "\\n");
@@ -315,8 +333,8 @@ fs.appendFileSync("starts", process.pid + "\\n");
   const [firstResult, secondResult] = await Promise.all([first, second]);
 
   assert.equal(settledBeforeRelease, true);
-  assert.equal(firstResult.status, "passed");
-  assert.equal(secondResult.status, "cancelled");
+  assert.equal(firstResult.status, "passed", JSON.stringify(firstResult));
+  assert.equal(secondResult.status, "cancelled", JSON.stringify(secondResult));
   assert.equal(secondResult.executed, null);
   assert.notEqual(secondResult.status, "passed");
   assert.equal((await readFile(starts, "utf8")).trim().split("\n").length, 1);
