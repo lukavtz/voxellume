@@ -1,13 +1,5 @@
 import { readlinkSync, realpathSync } from "node:fs";
-import {
-  basename,
-  dirname,
-  join,
-  parse,
-  relative,
-  resolve,
-  sep,
-} from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 
 declare const capabilityBrand: unique symbol;
 
@@ -33,27 +25,17 @@ const projectLocks = new Map<string, Promise<void>>();
 const capabilities = new WeakMap<ProjectLockCapability, CapabilityState>();
 
 function canonicalWindowsProjectKey(projectRoot: string): string {
-  let current = resolve(projectRoot);
+  let current = resolve(projectRoot).toLowerCase();
   for (let depth = 0; depth < 32; depth += 1) {
-    const root = parse(current).root;
-    const segments = relative(root, current).split(sep).filter(Boolean);
-    let candidate = root;
-    let restarted = false;
-    for (const segment of segments) {
-      candidate = join(candidate, segment);
-      try {
-        const target = readlinkSync(candidate);
-        current = resolve(dirname(candidate), target);
-        restarted = true;
-        break;
-      } catch (error) {
-        const code = (error as NodeJS.ErrnoException).code;
-        if (code !== "EINVAL" && code !== "ENOENT" && code !== "ENOTDIR") {
-          throw error;
-        }
+    try {
+      current = resolve(dirname(current), readlinkSync(current)).toLowerCase();
+    } catch (error) {
+      const code = (error as NodeJS.ErrnoException).code;
+      if (code === "EINVAL" || code === "ENOENT" || code === "ENOTDIR") {
+        return current;
       }
+      throw error;
     }
-    if (!restarted) return candidate.toLowerCase();
   }
   throw new Error("Too many symbolic links in project root");
 }
@@ -86,7 +68,12 @@ export async function acquireHeldProjectLock(
   signal?: AbortSignal,
 ): Promise<HeldProjectLock | null> {
   if (signal?.aborted) return null;
-  const key = await canonicalProjectKey(projectRoot);
+  const lexicalKey =
+    process.platform === "win32" ? resolve(projectRoot).toLowerCase() : null;
+  const key =
+    lexicalKey !== null && projectLocks.has(lexicalKey)
+      ? lexicalKey
+      : await canonicalProjectKey(projectRoot);
   if (signal?.aborted) return null;
 
   const previous = projectLocks.get(key);
