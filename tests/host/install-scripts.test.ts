@@ -121,7 +121,7 @@ test("installer shell syntax is valid", (t) => {
   const pwsh = spawnSync("pwsh", ["-NoProfile", "-Command", "exit 0"], {
     stdio: "ignore",
   });
-  if (pwsh.error?.code === "ENOENT") {
+  if ((pwsh.error as NodeJS.ErrnoException | undefined)?.code === "ENOENT") {
     t.skip("pwsh is not installed");
     return;
   }

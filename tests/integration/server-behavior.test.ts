@@ -55,7 +55,7 @@ async function makeWritableTree(path: string): Promise<void> {
   await chmod(path, 0o755);
 }
 
-async function readJson(path: string): Promise<Record<string, unknown>> {
+async function readJson(path: string | URL): Promise<Record<string, unknown>> {
   return JSON.parse(await readFile(path, "utf8")) as Record<string, unknown>;
 }
 
@@ -65,9 +65,9 @@ async function targetFixture(): Promise<TargetPack> {
     import.meta.url,
   );
   const [pack, docs, verification] = await Promise.all([
-    readJson(new URL("target.json", directory).pathname),
-    readJson(new URL("docs.json", directory).pathname),
-    readJson(new URL("verification.json", directory).pathname),
+    readJson(new URL("target.json", directory)),
+    readJson(new URL("docs.json", directory)),
+    readJson(new URL("verification.json", directory)),
   ]);
   return {
     ...pack,
@@ -103,7 +103,7 @@ async function modSpecFixture(
   mode: "valid" | "empty" | "unlinked" = "valid",
 ) {
   const document = await readJson(
-    new URL("../../fixtures/mod-spec/valid.json", import.meta.url).pathname,
+    new URL("../../fixtures/mod-spec/valid.json", import.meta.url),
   );
   const acceptance = [
     {
