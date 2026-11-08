@@ -55,7 +55,7 @@ test("only the game worker receives process-launching tools", async () => {
     readFile("agents/mod-game-worker.md", "utf8"),
   ]);
   for (const body of [orchestrator, offline, game]) {
-    assert.match(body, /^---\nname: mod-/);
+    assert.match(body, /^---\r?\nname: mod-/);
     assert.match(body, /^description: \S.+$/m);
   }
   assert.doesNotMatch(orchestrator, /^tools:.*\bbash\b/m);

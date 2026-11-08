@@ -148,8 +148,40 @@ public class Greeter {
   return { root, derivedCacheRoot, left, right };
 }
 
+async function assertWindowsCandidateUnavailable(fixture: {
+  left: FixtureArtifact;
+}): Promise<boolean> {
+  if (process.platform !== "win32") return false;
+  const facade = createSourceFacade({
+    candidates: [
+      {
+        id: "adhi",
+        revision: ADHI_CANDIDATE_REVISION,
+        async invoke() {
+          throw Object.assign(new Error("Windows cleanup is unqualified"), {
+            code: "unavailable",
+          });
+        },
+        async dispose() {},
+      },
+    ],
+    artifacts: [fixture.left],
+  });
+  const result = await facade.invoke(request("find_class", fixture.left), {
+    offline: true,
+  });
+  await facade.dispose();
+  assert.deepEqual(result, {
+    status: "unavailable",
+    operation: "find_class",
+    code: "candidate_unavailable",
+  });
+  return true;
+}
+
 test("real Adhi stdio candidate covers local compiled-JAR operations with exact identity", async (t) => {
   const fixture = await setup(t);
+  if (await assertWindowsCandidateUnavailable(fixture)) return;
   let candidate: AdhiCandidate | undefined;
   t.after(async () => {
     await candidate?.dispose();
@@ -427,6 +459,7 @@ test("real Adhi stdio candidate covers local compiled-JAR operations with exact 
 
 test("revision pin, in-flight cancellation, and idempotent cleanup fail closed", async (t) => {
   const fixture = await setup(t);
+  if (await assertWindowsCandidateUnavailable(fixture)) return;
   await assert.rejects(
     createCandidate({
       revision: "0".repeat(40),
@@ -474,6 +507,7 @@ test("revision pin, in-flight cancellation, and idempotent cleanup fail closed",
 
 test("tools/list obeys the same bounded response budget", async (t) => {
   const fixture = await setup(t);
+  if (await assertWindowsCandidateUnavailable(fixture)) return;
   await assert.rejects(
     (async () => {
       const candidate = await createCandidate({
@@ -491,6 +525,7 @@ test("tools/list obeys the same bounded response budget", async (t) => {
 
 test("a completed JSON-RPC header cannot exceed the header cap", async (t) => {
   const fixture = await setup(t);
+  if (await assertWindowsCandidateUnavailable(fixture)) return;
   const entryPoint = join(fixture.root, "oversized-header-upstream.mjs");
   await writeFile(
     entryPoint,
@@ -515,6 +550,7 @@ test("a completed JSON-RPC header cannot exceed the header cap", async (t) => {
 
 test("two bounded JSON-RPC frames may share one chunk above the aggregate cap", async (t) => {
   const fixture = await setup(t);
+  if (await assertWindowsCandidateUnavailable(fixture)) return;
   const entryPoint = join(fixture.root, "coalesced-upstream.mjs");
   await writeFile(
     entryPoint,
@@ -565,6 +601,7 @@ process.stdin.on("data", (chunk) => {
 
 test("offline requests and external manifests fail before upstream work", async (t) => {
   const fixture = await setup(t);
+  if (await assertWindowsCandidateUnavailable(fixture)) return;
   const candidate = await createCandidate({
     revision: ADHI_CANDIDATE_REVISION,
     artifactRoot: fixture.root,

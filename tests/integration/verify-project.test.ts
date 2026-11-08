@@ -100,10 +100,26 @@ test("a real fake gradlew clean build persists exact logs and authenticated arti
     mkdir(projectRoot, { recursive: true }),
     mkdir(isolationRoot, { recursive: true }),
   ]);
-  const wrapper = join(projectRoot, "gradlew");
-  await writeFile(
-    wrapper,
-    `#!${process.execPath}
+  if (process.platform === "win32") {
+    await writeFile(
+      join(projectRoot, "gradlew.cjs"),
+      `const { mkdirSync, writeFileSync } = require("node:fs");
+console.log("clean build: ruby_tools");
+console.log("argv=" + JSON.stringify(process.argv.slice(2)));
+mkdirSync("build/libs", { recursive: true });
+writeFileSync(${JSON.stringify(productionJarRelative)}, ${JSON.stringify(productionJarBytes.toString("utf8"))});
+console.log("BUILD SUCCESSFUL");
+`,
+    );
+    await writeFile(
+      join(projectRoot, "gradlew.bat"),
+      `@echo off\r\n"${process.execPath}" "%~dp0gradlew.cjs" %*\r\n`,
+    );
+  } else {
+    const wrapper = join(projectRoot, "gradlew");
+    await writeFile(
+      wrapper,
+      `#!${process.execPath}
 import { mkdirSync, writeFileSync } from "node:fs";
 console.log("clean build: ruby_tools");
 console.log("argv=" + JSON.stringify(process.argv.slice(2)));
@@ -111,8 +127,9 @@ mkdirSync("build/libs", { recursive: true });
 writeFileSync(${JSON.stringify(productionJarRelative)}, ${JSON.stringify(productionJarBytes.toString("utf8"))});
 console.log("BUILD SUCCESSFUL");
 `,
-  );
-  await chmod(wrapper, 0o755);
+    );
+    await chmod(wrapper, 0o755);
+  }
 
   const target = await targetFixture();
   const modSpec = await modSpecFixture();
