@@ -466,7 +466,10 @@ test("Blockbench child receives exact pinned argv, isolated loopback env, and pu
       (key) =>
         key !== "__CF_USER_TEXT_ENCODING" &&
         (process.platform !== "linux" ||
-          (key !== "NODE_VERSION" && key !== "YARN_VERSION")),
+          (key !== "NODE_VERSION" &&
+            key !== "YARN_VERSION" &&
+            key !== "HOSTNAME" &&
+            key !== "PWD")),
     ),
     [
       "BLOCKBENCH_MCP_HOST",

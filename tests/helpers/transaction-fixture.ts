@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
 import {
   cp,
   mkdir,
@@ -25,8 +26,7 @@ import {
 const fixtureRoot = fileURLToPath(
   new URL("../../fixtures/transactions/base-project/", import.meta.url),
 );
-const userNotes =
-  "These user-owned bytes must survive every transaction outcome.\n";
+const userNotes = readFileSync(join(fixtureRoot, "user-notes.txt"), "utf8");
 const outsideNotes = "Outside bytes must survive every recovery outcome.\n";
 
 export const sourcePath =
