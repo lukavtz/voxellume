@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import {
   chmod,
   mkdir,
@@ -111,14 +112,8 @@ async function rejectsCode(
   });
 }
 
-async function exists(path: string): Promise<boolean> {
-  try {
-    await readFile(path);
-    return true;
-  } catch (error: unknown) {
-    if (errorCode(error) === "ENOENT") return false;
-    throw error;
-  }
+function exists(path: string): boolean {
+  return existsSync(path);
 }
 
 async function waitFor(path: string): Promise<void> {
@@ -336,8 +331,8 @@ const timer = setInterval(() => {
   await waitFor(starts);
   const second = run(fixture);
   await yieldToEventLoop();
-  assert.equal((await readFile(starts, "utf8")).trim().split("\n").length, 1);
-  await writeFile(release, "release\n");
+  assert.equal(readFileSync(starts, "utf8").trim().split("\n").length, 1);
+  writeFileSync(release, "release\n");
   const results = await Promise.all([first, second]);
   assert.deepEqual(
     results.map((result) => result.status),
