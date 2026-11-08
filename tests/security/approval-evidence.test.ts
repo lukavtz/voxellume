@@ -126,7 +126,7 @@ test("approvals start empty and never silently accept the Minecraft EULA", async
   });
 });
 
-test("approval persistence is exact, survives reload, and stays mode 0600", async (t) => {
+test("approval persistence is exact and retains restricted platform modes", async (t) => {
   const { configRoot } = await setup(t);
   await recordEulaApproval({ configRoot, eulaUrl, approvedAt });
   await recordNetworkApproval({ configRoot, ...network, approvedAt });
@@ -138,7 +138,7 @@ test("approval persistence is exact, survives reload, and stays mode 0600", asyn
   });
   assert.equal(
     (await stat(join(configRoot, "approvals.json"))).mode & 0o777,
-    0o600,
+    process.platform === "win32" ? 0o666 : 0o600,
   );
   await assert.doesNotReject(assertEulaApproved({ configRoot, eulaUrl }));
   await assert.doesNotReject(assertNetworkApproved({ configRoot, ...network }));
