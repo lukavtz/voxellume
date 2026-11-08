@@ -554,7 +554,11 @@ test("whole verification holds one lock across stages, process execution, and ev
     ...request,
     profile: "build",
   });
-  assert.equal(result.status, "ok");
+  assert.equal(
+    result.status,
+    "ok",
+    result.status === "error" ? result.error.detail : "",
+  );
   assert.ok("value" in result);
   assert.ok("evidence" in result.value);
   assert.equal(result.value.status, "passed", result.value.error.detail);
