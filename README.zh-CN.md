@@ -129,7 +129,7 @@ corepack pnpm test:e2e
 node scripts/ci/validate-workflows.mjs
 ```
 
-最新本地结果：**1073/1073 项测试**和 **20/20 项端到端检查**，包括真实安装 OMP `18.17.0` 与 DeepSeek Harness `0.2.2-rc.1`。CI 在 Ubuntu、macOS 和 Windows x64 上运行核心与对抗性测试；目标单元和供应链扫描由独立检查执行。
+最新本地结果：**1080 项测试（1079 通过，1 项平台特定跳过）**和 **20/20 项端到端检查**，包括真实安装 OMP `18.17.0` 与 DeepSeek Harness `0.2.2-rc.1`。CI 在 Ubuntu、macOS 和 Windows x64 上运行核心与对抗性测试；目标单元和供应链扫描由独立检查执行。
 
 ## 当前边界
 

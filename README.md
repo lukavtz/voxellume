@@ -129,7 +129,7 @@ corepack pnpm test:e2e
 node scripts/ci/validate-workflows.mjs
 ```
 
-Latest local evidence: **1073/1073 tests** and **20/20 E2E checks**, including real OMP `18.17.0` and DeepSeek Harness `0.2.2-rc.1` installation. CI runs core and adversarial tests on Ubuntu, macOS, and Windows x64; target cells and supply-chain scans are separate gates.
+Latest local evidence: **1080 tests (1079 passed, 1 platform-specific skip)** and **20/20 E2E checks**, including real OMP `18.17.0` and DeepSeek Harness `0.2.2-rc.1` installation. CI runs core and adversarial tests on Ubuntu, macOS, and Windows x64; target cells and supply-chain scans are separate gates.
 
 ## Current boundaries
 
