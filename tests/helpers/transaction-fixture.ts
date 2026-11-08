@@ -138,8 +138,15 @@ export async function setup(
   await mkdir(workspaceRoot, { recursive: true });
   await mkdir(outsideRoot, { recursive: true });
   await writeFile(join(outsideRoot, "sentinel.txt"), outsideNotes);
-  if (!options.newProject)
+  if (!options.newProject) {
     await cp(fixtureRoot, projectRoot, { recursive: true });
+    // build/ is ignored, so every checkout must create its own last-good artifact.
+    await mkdir(join(projectRoot, dirname(artifactPath)), { recursive: true });
+    await writeFile(
+      join(projectRoot, artifactPath),
+      "last-good-production-artifact\n",
+    );
+  }
   const modSpec = JSON.parse(
     await readFile(join(fixtureRoot, "mod-spec.json"), "utf8"),
   ) as BuildOptions["modSpec"];
