@@ -45,8 +45,7 @@ export function safeRelativePath(value: string): string {
       `Invalid relative transaction path: ${JSON.stringify(value)}`,
     );
   }
-  const normalized = value.split("/").join(sep);
-  const parts = normalized.split(sep);
+  const parts = value.split("/");
   if (
     parts.some((part) => part.length === 0 || part === "." || part === "..")
   ) {
@@ -54,11 +53,11 @@ export function safeRelativePath(value: string): string {
       `Transaction path escapes its root: ${JSON.stringify(value)}`,
     );
   }
-  return normalized;
+  return value;
 }
 
 export function containedPath(root: string, value: string): string {
-  const relativePath = safeRelativePath(value);
+  const relativePath = safeRelativePath(value).split("/").join(sep);
   const rootPath = resolve(root);
   const destination = resolve(rootPath, relativePath);
   const relation = relative(rootPath, destination);
@@ -99,7 +98,7 @@ export async function assertSafePath(
 ): Promise<string> {
   const destination = containedPath(root, value);
   await assertSafeDirectory(root);
-  const parts = safeRelativePath(value).split(sep);
+  const parts = safeRelativePath(value).split("/");
   let current = root;
   for (const part of parts) {
     current = join(current, part);

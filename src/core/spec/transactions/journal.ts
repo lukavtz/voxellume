@@ -1,6 +1,6 @@
 import { constants } from "node:fs";
 import { lstat, mkdir, open, readFile, rename, rm } from "node:fs/promises";
-import { basename, dirname, relative, resolve } from "node:path";
+import { basename, dirname, relative, resolve, sep } from "node:path";
 
 import { sha256 } from "../../targets/canonical-json.ts";
 import type {
@@ -34,7 +34,9 @@ export async function atomicProjectWrite(
   await mkdir(dirname(destination), { recursive: true });
   await assertSafePath(candidate.realProjectRoot, path, true);
   const temporary = temporaryPath(destination);
-  const temporaryRelative = relative(candidate.realProjectRoot, temporary);
+  const temporaryRelative = relative(candidate.realProjectRoot, temporary)
+    .split(sep)
+    .join("/");
   if (!journal.temporaryFiles.includes(temporaryRelative)) {
     journal.temporaryFiles.push(temporaryRelative);
   }

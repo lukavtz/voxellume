@@ -1,5 +1,5 @@
 import { mkdir, realpath } from "node:fs/promises";
-import { join, resolve, sep } from "node:path";
+import { join, resolve } from "node:path";
 
 import { canonicalJson, sha256 } from "../../targets/canonical-json.ts";
 import type { OperationValidationResult } from "../operations.ts";
@@ -207,10 +207,7 @@ export async function stageCandidate(
       .productionJar;
     for (const artifactPath of generated.artifacts) {
       const normalized = safeRelativePath(artifactPath);
-      if (
-        normalized !== productionJar &&
-        !normalized.startsWith(`build${sep}`)
-      ) {
+      if (normalized !== productionJar && !normalized.startsWith("build/")) {
         throw new TransactionFault(
           "ownership_violation",
           `Artifact is outside the owned build tree: ${normalized}`,

@@ -10,7 +10,7 @@ import {
   writeFile,
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { dirname, join, posix } from "node:path";
 import { type TestContext } from "node:test";
 import { fileURLToPath } from "node:url";
 
@@ -112,7 +112,7 @@ export async function snapshotTree(root: string): Promise<TreeSnapshot | null> {
       const child = await snapshotTree(path);
       assert.ok(child);
       for (const [name, hash] of Object.entries(child)) {
-        snapshot[join(entry.name, name)] = hash;
+        snapshot[posix.join(entry.name, name)] = hash;
       }
     } else {
       assert.ok(entry.isFile(), `unexpected non-file fixture entry: ${path}`);
