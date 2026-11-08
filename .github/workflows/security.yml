@@ -17,7 +17,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, macos-15]
+        os: [ubuntu-24.04, macos-15, windows-latest]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 40
     steps:
@@ -31,6 +31,7 @@ jobs:
       - run: |
           mkdir -p .artifacts/security-${{ matrix.os }}
           corepack pnpm test:security 2>&1 | tee .artifacts/security-${{ matrix.os }}/adversarial.log
+        shell: bash
       - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         if: always()
         with:

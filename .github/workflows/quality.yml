@@ -59,7 +59,11 @@ jobs:
           retention-days: 14
 
   core-tests:
-    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15, windows-latest]
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
@@ -70,13 +74,15 @@ jobs:
           cache: pnpm
       - run: corepack pnpm install --frozen-lockfile
       - run: |
-          mkdir -p .artifacts/quality
-          corepack pnpm test:unit 2>&1 | tee .artifacts/quality/unit.log
-      - run: corepack pnpm test:integration 2>&1 | tee .artifacts/quality/integration.log
+          mkdir -p .artifacts/quality-${{ matrix.os }}
+          corepack pnpm test:unit 2>&1 | tee .artifacts/quality-${{ matrix.os }}/unit.log
+        shell: bash
+      - run: corepack pnpm test:integration 2>&1 | tee .artifacts/quality-${{ matrix.os }}/integration.log
+        shell: bash
       - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         if: always()
         with:
-          name: quality-core-tests
-          path: .artifacts/quality
+          name: quality-core-tests-${{ matrix.os }}
+          path: .artifacts/quality-${{ matrix.os }}
           if-no-files-found: error
           retention-days: 14
