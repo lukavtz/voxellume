@@ -6,11 +6,11 @@
   <img src="./assets/readme/hero.png" width="100%" alt="Voxellume 体素景观，以及真实 Fabric 客户端和确定性场景的截图">
 </p>
 
-Voxellume 是一个私有智能体能力，用于将 Minecraft Java 模组从想法转化为经过审查、可复现的交付物。它在 OMP、DeepSeek Harness 和 MCP 中统一提供精确目标包、可编辑源码与美术资源、安全执行和证据驱动的验证。
+Voxellume 是一个采用 MIT 许可证的公开智能体能力，用于将 Minecraft Java 模组从想法转化为经过审查、可复现的交付物。它在 OMP、DeepSeek Harness 和 MCP 中统一提供精确目标包、可编辑源码与美术资源、安全执行和证据驱动的验证。
 
 ## 证据，而非承诺
 
-当前基线已经能够生成真实工件和真实客户端证据。它不会宣称普遍兼容，也不会把未执行的检查算作通过。
+目录覆盖全部 68 个 Minecraft/loader 组合：**52 个候选、15 个已拒绝、1 个不支持、0 个 supported**。当前基线已经能够生成真实工件和真实客户端证据。它不会宣称普遍兼容，也不会把未执行的检查算作通过。
 
 | 基线                   | 已执行的证据                                                                                                   | 状态                                                                    |
 | ---------------------- | -------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
@@ -43,15 +43,21 @@ minecraft_project_verify
 
 ## 工作流程
 
-1. **精确解析。** 选择不可变的 Minecraft + loader + mappings + JDK + Gradle 包；否则返回 `unsupported`，绝不用相近版本替代。
-2. **安全暂存。** 在授权的事务工作区中操作，支持 last-good 恢复、按项目加锁、受限进程，以及分离的 project/scaffold roots。
-3. **保持创作可编辑。** 保留 ModSpec、`.bbmodel`、JSON、PNG、Java 和导出溯源，而不是交付不透明的生成文件。
-4. **按顺序验证。** `static → build → server → gameTest → client → productionJar → visual → package`。失败或不可用的阶段绝不会变成通过。
-5. **交付证据。** 生产 JAR、源码、可编辑资源、校验和、复现命令，以及独立的认证 evidence bundle。
+自然语言请求会转换为带版本号的 **ModSpec**：模组标识、精确目标修订、功能、可编辑资源、验收检查和交付设置。所有宿主调用同一个核心流水线，因此 OMP、Harness 和 MCP 返回等价结果，而不是维护不同实现。
+
+1. **精确解析目标。** Resolver 匹配 Minecraft、loader、mappings、JDK、Gradle 和不可变的目标包哈希。只有完整通过验证的 `supported` 包才能创建新项目。`candidate`、`rejected` 和 `unsupported` 会在修改项目或 Git 之前停止；绝不用相近版本替代。
+2. **验证请求的更改。** 严格的 schema 将每个功能连接到 implementation units 和独立验收检查。操作使用稳定的功能 ID，而不是任意文件路径或 shell 命令。
+3. **在事务中工作。** 宿主授予 filesystem roots。智能体只编辑 staging 副本；项目锁、基础哈希、日志、取消和 last-good 回滚会保护正式项目与无关文件。
+4. **生成可编辑源码和资源。** Java、JSON、PNG 和 `.bbmodel` 源文件始终与运行时导出关联。Manifest 记录源文件/导出哈希、生成设置、上游修订、许可证和声明。
+5. **按策略执行。** 验证使用目标包中固定的 argv、受限进程、隔离缓存和 build/runtime 沙箱。模型文本不能选择可执行文件、自行授予路径或继承仓库凭据。
+6. **按依赖顺序验证。** `static → build → server → gameTest → client → productionJar → visual → package`。失败、取消、超时或不可用的阶段会阻止后续成功声明并如实记录，绝不会变成 pass。
+7. **连同证据交付。** 合格结果包含生产 JAR、源码归档、可编辑资源、ModSpec、校验和、复现命令和独立 evidence bundle。Commit、push 和 PR 仍是受信任宿主的独立操作。
 
 ## 安装与验证
 
-要求：Node.js `>=24.9.0`、pnpm `12.18.0`，以及目标所需的 JDK。沙箱中的构建和运行时检查使用 Docker。
+### 1. 安装共享包
+
+要求：Node.js `>=24.9.0`、带 pnpm `12.18.0` 的 Corepack，以及用于 1.21.x 目标的 JDK 21 或用于 26.x 目标的 JDK 25。沙箱中的构建和运行时检查还需要 Docker。
 
 ```sh
 git clone https://github.com/lukavtz/voxellume.git
@@ -59,40 +65,59 @@ cd voxellume
 ./install.sh
 ```
 
-安装脚本会构建 `voxellume-0.1.0.tgz`，并通过 pnpm 全局安装 `voxellume-mcp`。
+安装脚本会按照 lockfile 安装依赖，构建精确的 `voxellume-0.1.0.tgz`，并全局安装使用标准输入输出的 `voxellume-mcp` 命令。如果 pnpm 全局可执行文件目录不在 `PATH` 中，脚本会显示其位置。
 
-**OMP**
+### 2. 连接所需宿主
+
+**OMP 18.17.0** — 需要 Bun `>=1.4.4`：
 
 ```sh
-omp plugin link /absolute/path/to/voxellume
+omp plugin link "$PWD" --scope project
+omp plugin list --json
 ```
 
-**DeepSeek Harness**
+**DeepSeek Harness 0.2.2-rc.1** — 将精确 tarball 安装到隔离配置中，并禁用包安装脚本：
 
 ```sh
-dsh plugin --profile voxellume-test add ./voxellume-0.1.0.tgz
+dsh plugin --profile voxellume-test add ./voxellume-0.1.0.tgz \
+  --ignore-scripts --config.auto-install-peers=false
 dsh --profile voxellume-test --dump-config
 ```
 
-**MCP stdio**
+**原生 MCP** — 运行 `voxellume-mcp`，或在 MCP 客户端中将其注册为标准输入输出服务器：
 
-```sh
-voxellume-mcp
+```json
+{
+  "mcpServers": {
+    "voxellume": {
+      "command": "voxellume-mcp"
+    }
+  }
+}
 ```
+
+本地核心操作不需要 TCP 监听器、模型凭据或托管服务。只有执行相应检查时，才需要 Docker、JDK 和可选资源提供程序。
+
+### 3. 验证安装
 
 交付前运行确定性检查：
 
 ```sh
 corepack pnpm verify
+corepack pnpm test
+corepack pnpm test:e2e
+node scripts/ci/validate-workflows.mjs
 ```
+
+最新本地结果：**1073/1073 项测试**和 **20/20 项端到端检查**，包括真实安装 OMP `18.17.0` 与 DeepSeek Harness `0.2.2-rc.1`。CI 在 Ubuntu、macOS 和 Windows x64 上运行核心与对抗性测试；目标单元和供应链扫描由独立检查执行。
 
 ## 当前边界
 
-- 目标包处于候选状态，或具有明确的 rejected/unsupported 结果；**不宣称完整的 1.21–26.3 支持矩阵**。
+- 全部 68 个目标单元都有明确结果，但目前 **0 个为 `supported`**；在目标完成完整资格矩阵之前，新项目脚手架保持禁用。
 - 完整的真实客户端、packaged JAR 和视觉验证尚未完成。必需的检查不可用时，将阻止 `supported`。
 - Source facade 已禁用，因为两个候选实现都未通过正确性和安全性基准测试。
 - 没有经过单独验证的工作流时，Quilt GameTest 仍不可用。
-- 本仓库为私有仓库。第三方修订、许可证、修改和声明记录在 `THIRD_PARTY/` 和 `support-manifest.json` 中。
+- 本仓库公开并采用 MIT 许可证。第三方修订、许可证、修改和声明记录在 `THIRD_PARTY/` 和 `support-manifest.json` 中。
 
 ## 深入阅读
 
@@ -100,6 +125,8 @@ corepack pnpm verify
 - [架构与信任边界](./docs/ARCHITECTURE.md)
 - [验证计划](./docs/TEST_PLAN.md)
 - [宿主契约](./docs/research/host-contracts.md)
+- [端到端场景与测量结果](./docs/research/e2e-benchmarks.md)
+- [CI 工作流与操作系统覆盖](./docs/research/ci-workflows.md)
 - [沙箱视觉运行时](./docs/research/visual-qualification-image.md)
 - [目标包哈希与验证链接](./support-manifest.json)
 
