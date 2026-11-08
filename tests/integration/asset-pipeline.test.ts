@@ -460,9 +460,14 @@ test("Blockbench child receives exact pinned argv, isolated loopback env, and pu
     file: "source.bbmodel",
     output: "export.json",
   });
-  // macOS's platform sandbox adds this locale variable outside spawn()'s env allowlist.
+  // The platform sandbox/image may add these fixed locale or Node runtime variables.
   assert.deepEqual(
-    observed.envKeys.filter((key) => key !== "__CF_USER_TEXT_ENCODING"),
+    observed.envKeys.filter(
+      (key) =>
+        key !== "__CF_USER_TEXT_ENCODING" &&
+        (process.platform !== "linux" ||
+          (key !== "NODE_VERSION" && key !== "YARN_VERSION")),
+    ),
     [
       "BLOCKBENCH_MCP_HOST",
       "BLOCKBENCH_MCP_RISKY_EVAL",

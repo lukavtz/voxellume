@@ -26,6 +26,7 @@ import {
   validateTexture,
 } from "../../src/core/assets/png.ts";
 import { compareVisualBaseline } from "../../src/core/assets/visual-diff.ts";
+import { DOCKER_NODE_IMAGE } from "../../src/core/execution/docker.ts";
 import {
   MC_ASSET_REVISION,
   MC_ASSET_DIST_SHA256,
@@ -783,7 +784,7 @@ test("executor requires an approved untampered adjacent package dist", async (t)
 test("reported argv is the exact sandbox wrapper, node, entry point, and spawned args", async (t) => {
   const fixture = await setup(t);
   const entryPoint = join(fixture.root, "fake-mc-asset.js");
-  const capturePath = join(fixture.root, "spawned-args.json");
+  const capturePath = join(fixture.stagingPath, "spawned-args.json");
   const outputPng = solid(16, 16).toString("hex");
   await writeFile(
     entryPoint,
@@ -809,20 +810,66 @@ test("reported argv is the exact sandbox wrapper, node, entry point, and spawned
   const spawnedArgs = JSON.parse(
     await readFile(capturePath, "utf8"),
   ) as string[];
-  const sandbox =
-    process.platform === "darwin"
-      ? [
-          "/usr/bin/sandbox-exec",
-          "-p",
-          "(version 1)(allow default)(deny network-outbound)",
-        ]
-      : ["/usr/bin/unshare", "-Urn", "--"];
-  assert.deepEqual(result.executed.argv, [
-    ...sandbox,
-    process.execPath,
-    entryPoint,
-    ...spawnedArgs,
-  ]);
+  if (process.platform === "darwin") {
+    assert.deepEqual(result.executed.argv, [
+      "/usr/bin/sandbox-exec",
+      "-p",
+      "(version 1)(allow default)(deny network-outbound)",
+      process.execPath,
+      entryPoint,
+      ...spawnedArgs,
+    ]);
+  } else {
+    const stagePath = dirname(
+      spawnedArgs[spawnedArgs.indexOf("--output") + 1]!,
+    );
+    const user =
+      typeof process.getuid === "function" &&
+      typeof process.getgid === "function"
+        ? ["--user", `${process.getuid()}:${process.getgid()}`]
+        : [];
+    assert.deepEqual(result.executed.argv, [
+      "docker",
+      "run",
+      "--rm",
+      "--name",
+      `voxellume-asset-${hash(Buffer.from(stagePath)).slice(0, 24)}`,
+      "--network",
+      "none",
+      "--cap-drop",
+      "ALL",
+      "--security-opt",
+      "no-new-privileges",
+      "--read-only",
+      "--tmpfs",
+      "/tmp:rw,noexec,nosuid,nodev,size=268435456,mode=1777",
+      "--cpus",
+      "2",
+      "--memory",
+      String(4 * 1024 ** 3),
+      "--pids-limit",
+      "512",
+      ...user,
+      "--mount",
+      `type=bind,src=${stagePath},dst=${stagePath}`,
+      "--mount",
+      `type=bind,src=${fixture.root},dst=${fixture.root},readonly`,
+      "--workdir",
+      stagePath,
+      "--env",
+      "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+      "--env",
+      `HOME=${join(stagePath, "home")}`,
+      "--env",
+      `TMPDIR=${join(stagePath, "tmp")}`,
+      "--env",
+      "NO_COLOR=1",
+      DOCKER_NODE_IMAGE,
+      "node",
+      entryPoint,
+      ...spawnedArgs,
+    ]);
+  }
   assert.deepEqual(spawnedArgs.slice(0, 8), [
     "generate",
     "checker",

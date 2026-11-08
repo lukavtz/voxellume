@@ -1,6 +1,5 @@
 import { spawn } from "node:child_process";
 import { createHash, randomUUID } from "node:crypto";
-import { existsSync } from "node:fs";
 import { mkdir, readFile, rm, stat } from "node:fs/promises";
 import { join } from "node:path";
 
@@ -10,7 +9,11 @@ import {
   writeAuthorizedFile,
   type AuthorizedRoot,
 } from "../execution/paths.ts";
-import { publishStagedAssetSet, type AssetOutput } from "./mc-asset.ts";
+import {
+  createAssetSandboxCommand,
+  publishStagedAssetSet,
+  type AssetOutput,
+} from "./mc-asset.ts";
 import { AssetError } from "./png.ts";
 
 export const BLOCKBENCH_MCP_REVISION =
@@ -89,12 +92,27 @@ async function callHeadless(options: {
 }): Promise<Observation> {
   if (options.signal?.aborted)
     return { status: "cancelled", stdout: "", stderr: "" };
-  const darwinSandbox =
-    process.platform === "darwin" && existsSync("/usr/bin/sandbox-exec");
-  // -Urn supplies namespace-local capability; --net alone requires host CAP_SYS_ADMIN.
-  const linuxSandbox =
-    process.platform === "linux" && existsSync("/usr/bin/unshare");
-  if (!darwinSandbox && !linuxSandbox) {
+  const output =
+    options.toolName === "bbmodel_export_java_block"
+      ? "export.json"
+      : "export.java";
+  const request = JSON.stringify({
+    ...options.exportSettings,
+    file: "source.bbmodel",
+    output,
+  });
+  const command = createAssetSandboxCommand({
+    cwd: options.cwd,
+    hostExecutable: options.tool.executable,
+    entryPoint: options.tool.entryPoint,
+    args: ["--root", options.cwd, options.toolName, request],
+    environment: {
+      BLOCKBENCH_MCP_HOST: "127.0.0.1",
+      BLOCKBENCH_MCP_RISKY_EVAL: "false",
+      blockbench_mcp_allow_scripts: "false",
+    },
+  });
+  if (command === null) {
     return {
       status: "unavailable",
       stdout: "",
@@ -105,47 +123,27 @@ async function callHeadless(options: {
       },
     };
   }
-  const executable = darwinSandbox
-    ? "/usr/bin/sandbox-exec"
-    : "/usr/bin/unshare";
-  const output =
-    options.toolName === "bbmodel_export_java_block"
-      ? "export.json"
-      : "export.java";
-  const request = JSON.stringify({
-    ...options.exportSettings,
-    file: "source.bbmodel",
-    output,
-  });
-  const args = [
-    options.tool.entryPoint,
-    "--root",
-    options.cwd,
-    options.toolName,
-    request,
-  ];
-  const argv = darwinSandbox
-    ? [
-        "-p",
-        "(version 1)(allow default)(deny network-outbound)",
-        options.tool.executable,
-        ...args,
-      ]
-    : ["-Urn", "--", options.tool.executable, ...args];
+  const environment =
+    command.containerName === undefined
+      ? {
+          PATH: process.env.PATH ?? "/usr/bin:/bin",
+          HOME: join(options.cwd, "home"),
+          TMPDIR: join(options.cwd, "tmp"),
+          BLOCKBENCH_MCP_HOST: "127.0.0.1",
+          BLOCKBENCH_MCP_RISKY_EVAL: "false",
+          blockbench_mcp_allow_scripts: "false",
+          NO_COLOR: "1",
+        }
+      : {
+          PATH: process.env.PATH ?? "/usr/bin:/bin",
+          DOCKER_CONFIG: join(options.cwd, "docker-config"),
+        };
   const { promise, resolve } = Promise.withResolvers<Observation>();
-  const child = spawn(executable, argv, {
+  const child = spawn(command.executable, command.argv, {
     cwd: options.cwd,
     shell: false,
     detached: process.platform !== "win32",
-    env: {
-      PATH: process.env.PATH ?? "/usr/bin:/bin",
-      HOME: join(options.cwd, "home"),
-      TMPDIR: join(options.cwd, "tmp"),
-      BLOCKBENCH_MCP_HOST: "127.0.0.1",
-      BLOCKBENCH_MCP_RISKY_EVAL: "false",
-      blockbench_mcp_allow_scripts: "false",
-      NO_COLOR: "1",
-    },
+    env: environment,
     stdio: ["ignore", "pipe", "pipe"],
   });
   let stdout = "";
@@ -155,6 +153,26 @@ async function callHeadless(options: {
   let cancelled = false;
   let flooded = false;
   let spawnError: Error | undefined;
+  let cleanup: Promise<void> | undefined;
+  const stopContainer = (): Promise<void> => {
+    if (command.containerName === undefined) return Promise.resolve();
+    if (cleanup !== undefined) return cleanup;
+    const stopped = Promise.withResolvers<void>();
+    cleanup = stopped.promise;
+    const remover = spawn("docker", ["rm", "--force", command.containerName], {
+      env: environment,
+      shell: false,
+      stdio: "ignore",
+    });
+    const timer = setTimeout(() => remover.kill("SIGKILL"), 10_000);
+    const done = () => {
+      clearTimeout(timer);
+      stopped.resolve();
+    };
+    remover.once("error", done);
+    remover.once("close", done);
+    return cleanup;
+  };
   const kill = () => {
     if (child.pid === undefined) return;
     if (process.platform === "win32") child.kill();
@@ -165,6 +183,7 @@ async function callHeadless(options: {
         child.kill("SIGKILL");
       }
     }
+    void stopContainer();
   };
   const collect = (
     stream: NodeJS.ReadableStream,
@@ -196,41 +215,59 @@ async function callHeadless(options: {
   child.once("close", (code) => {
     clearTimeout(timer);
     options.signal?.removeEventListener("abort", abort);
-    if (timedOut) return resolve({ status: "timed_out", stdout, stderr });
-    if (cancelled) return resolve({ status: "cancelled", stdout, stderr });
-    if (flooded)
-      return resolve({
-        status: "failed",
+    const finish = () => {
+      if (timedOut) return resolve({ status: "timed_out", stdout, stderr });
+      if (cancelled) return resolve({ status: "cancelled", stdout, stderr });
+      if (flooded)
+        return resolve({
+          status: "failed",
+          stdout,
+          stderr,
+          error: {
+            code: "output_limit_exceeded",
+            detail: "Blockbench logs exceeded 1 MiB",
+          },
+        });
+      const diagnostic = stderr.toLowerCase();
+      const backendUnavailable =
+        command.containerName !== undefined &&
+        (code === 125 ||
+          diagnostic.includes("error during connect") ||
+          diagnostic.includes("failed to connect to the docker api") ||
+          diagnostic.includes("docker: error response from daemon") ||
+          diagnostic.includes("cannot connect to the docker daemon") ||
+          diagnostic.includes("docker daemon is not running") ||
+          diagnostic.includes("permission denied while trying to connect") ||
+          diagnostic.includes("mounts denied"));
+      if (spawnError !== undefined || backendUnavailable)
+        return resolve({
+          status: "unavailable",
+          stdout,
+          stderr,
+          error: {
+            code: "process_spawn_unavailable",
+            detail:
+              spawnError?.message ||
+              stderr ||
+              "Docker execution is unavailable",
+          },
+        });
+      resolve({
+        status: code === 0 ? "passed" : "failed",
         stdout,
         stderr,
-        error: {
-          code: "output_limit_exceeded",
-          detail: "Blockbench logs exceeded 1 MiB",
-        },
+        ...(code === 0
+          ? {}
+          : {
+              error: {
+                code: "blockbench_export_failed",
+                detail: `Blockbench exited with ${code}`,
+              },
+            }),
       });
-    if (spawnError !== undefined)
-      return resolve({
-        status: "unavailable",
-        stdout,
-        stderr,
-        error: {
-          code: "process_spawn_unavailable",
-          detail: spawnError.message,
-        },
-      });
-    resolve({
-      status: code === 0 ? "passed" : "failed",
-      stdout,
-      stderr,
-      ...(code === 0
-        ? {}
-        : {
-            error: {
-              code: "blockbench_export_failed",
-              detail: `Blockbench exited with ${code}`,
-            },
-          }),
-    });
+    };
+    if (command.containerName === undefined) finish();
+    else void stopContainer().then(finish);
   });
   return promise;
 }
@@ -369,6 +406,9 @@ async function exportBlockbenchAssetWithTool(
   await Promise.all([
     mkdir(join(stagePath, "home")),
     mkdir(join(stagePath, "tmp")),
+    ...(process.platform === "linux"
+      ? [mkdir(join(stagePath, "docker-config"))]
+      : []),
   ]);
   try {
     await writeAuthorizedFile(options.root, {
