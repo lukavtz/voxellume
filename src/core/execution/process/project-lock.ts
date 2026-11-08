@@ -28,10 +28,16 @@ export async function canonicalProjectKey(
   projectRoot: string,
 ): Promise<string> {
   try {
-    return await realpath(projectRoot);
+    const resolved = await realpath(projectRoot);
+    // Windows symlink resolution can preserve 8.3 components; a second pass
+    // expands them so direct and aliased roots share one lock identity.
+    return process.platform === "win32" ? realpath(resolved) : resolved;
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
-    return join(await realpath(dirname(projectRoot)), basename(projectRoot));
+    const parent = await realpath(dirname(projectRoot));
+    const canonicalParent =
+      process.platform === "win32" ? await realpath(parent) : parent;
+    return join(canonicalParent, basename(projectRoot));
   }
 }
 

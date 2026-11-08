@@ -235,7 +235,6 @@ fs.appendFileSync("starts", process.pid + "\\n");
   );
   controller.abort();
   await writeFile(release, "release\n");
-  console.error("parent-release", Date.now(), release, await exists(release));
   const [firstResult, secondResult] = await Promise.all([first, second]);
 
   assert.equal(firstResult.status, "passed", JSON.stringify(firstResult));
@@ -280,19 +279,9 @@ fs.writeFileSync("started", process.pid + "\\n");
   }
 
   await writeFile(join(firstFixture.projectRoot, "release"), "release\n");
-  console.error(
-    "parent-release-first",
-    Date.now(),
-    await exists(join(firstFixture.projectRoot, "release")),
-  );
   const firstResult = await first;
   await waitFor(join(secondFixture.projectRoot, "started"));
   await writeFile(join(secondFixture.projectRoot, "release"), "release\n");
-  console.error(
-    "parent-release-second",
-    Date.now(),
-    await exists(join(secondFixture.projectRoot, "release")),
-  );
   const secondResult = await second;
 
   assert.equal(firstResult.status, "passed", JSON.stringify(firstResult));
@@ -341,7 +330,6 @@ fs.appendFileSync("starts", process.pid + "\\n");
   ]);
   const settledBeforeRelease = settled;
   await writeFile(release, "release\n");
-  console.error("parent-release", Date.now(), release, await exists(release));
   const [firstResult, secondResult] = await Promise.all([first, second]);
 
   assert.equal(settledBeforeRelease, true);
