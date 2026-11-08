@@ -1,4 +1,4 @@
-import { realpath } from "node:fs/promises";
+import { realpathSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 
 declare const capabilityBrand: unique symbol;
@@ -28,15 +28,16 @@ export async function canonicalProjectKey(
   projectRoot: string,
 ): Promise<string> {
   try {
-    const resolved = await realpath(projectRoot);
+    // Keep lock acquisition off the libuv pool used by native process waits.
+    const resolved = realpathSync(projectRoot);
     // Windows symlink resolution can preserve 8.3 components; a second pass
     // expands them so direct and aliased roots share one lock identity.
-    return process.platform === "win32" ? realpath(resolved) : resolved;
+    return process.platform === "win32" ? realpathSync(resolved) : resolved;
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
-    const parent = await realpath(dirname(projectRoot));
+    const parent = realpathSync(dirname(projectRoot));
     const canonicalParent =
-      process.platform === "win32" ? await realpath(parent) : parent;
+      process.platform === "win32" ? realpathSync(parent) : parent;
     return join(canonicalParent, basename(projectRoot));
   }
 }
@@ -58,7 +59,6 @@ export async function acquireHeldProjectLock(
   if (signal?.aborted) return null;
 
   const previous = projectLocks.get(key);
-  console.error("project-lock", key, previous !== undefined, signal?.aborted);
   const current = Promise.withResolvers<void>();
   const tail = previous?.then(() => current.promise) ?? current.promise;
   projectLocks.set(key, tail);
