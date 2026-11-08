@@ -271,8 +271,6 @@ const messages = {
   },
 } as const;
 
-type Message = (typeof messages)[SetupLanguage];
-
 function versionAtLeast(value: string, major: number, minor: number): boolean {
   const match = /v?(\d+)\.(\d+)\.(\d+)/.exec(value);
   if (match === null) return false;
