@@ -550,10 +550,15 @@ test("whole verification holds one lock across stages, process execution, and ev
     }),
   );
   const request = await staticVerificationRequest(paths, "held-verify");
-  const result = await operations.verifyProject({
-    ...request,
-    profile: "build",
-  });
+  let result;
+  try {
+    result = await operations.verifyProject({
+      ...request,
+      profile: "build",
+    });
+  } catch (error) {
+    assert.fail(error instanceof Error ? error.stack : String(error));
+  }
   assert.equal(
     result.status,
     "ok",
