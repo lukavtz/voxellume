@@ -14,6 +14,13 @@ function Assert-NativeSuccess([string]$Message) {
 }
 
 try {
+    if (-not $env:COREPACK_HOME) {
+        $cacheHome = if ($env:XDG_CACHE_HOME) { $env:XDG_CACHE_HOME } else { Join-Path ([Environment]::GetFolderPath('UserProfile')) '.cache' }
+        $env:COREPACK_HOME = Join-Path $cacheHome 'node/corepack'
+    }
+    if (-not $env:COREPACK_ENABLE_DOWNLOAD_PROMPT) {
+        $env:COREPACK_ENABLE_DOWNLOAD_PROMPT = '0'
+    }
     if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
         throw 'Voxellume install failed: Node.js 24.9.0 or newer is required.'
     }

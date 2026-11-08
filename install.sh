@@ -1,6 +1,19 @@
 #!/bin/sh
 set -eu
 
+if [ -z "${COREPACK_HOME:-}" ]; then
+  if [ -n "${XDG_CACHE_HOME:-}" ]; then
+    COREPACK_HOME="$XDG_CACHE_HOME/node/corepack"
+  else
+    COREPACK_HOME="$HOME/.cache/node/corepack"
+  fi
+  export COREPACK_HOME
+fi
+if [ -z "${COREPACK_ENABLE_DOWNLOAD_PROMPT:-}" ]; then
+  COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+  export COREPACK_ENABLE_DOWNLOAD_PROMPT
+fi
+
 commit="__VOXELLUME_COMMIT__"
 archive_sha256="__VOXELLUME_TAR_SHA256__"
 temp_dir=''
