@@ -128,7 +128,9 @@ jobs:
           export PNPM_HOME="$RUNNER_TEMP/pnpm-home"
           export PATH="$PNPM_HOME:$PNPM_HOME/bin:$PATH"
           export VOXELLUME_SETUP_YES=1
-          sh .artifacts/installers/install.sh 2>&1 | tee .artifacts/setup/install.log
+          log="$RUNNER_TEMP/full-setup.log"
+          sh .artifacts/installers/install.sh 2>&1 | tee "$log"
+          cp "$log" .artifacts/setup/install.log
       - name: Run full Windows setup and capture log
         if: runner.os == 'Windows'
         shell: pwsh
@@ -136,8 +138,10 @@ jobs:
           $env:PNPM_HOME = "$env:RUNNER_TEMP\pnpm-home"
           $env:PATH = "$env:PNPM_HOME;$env:PNPM_HOME\bin;$env:PATH"
           $env:VOXELLUME_SETUP_YES = '1'
+          $log = Join-Path $env:RUNNER_TEMP 'full-setup.log'
+          & .artifacts/installers/install.ps1 | Tee-Object -FilePath $log
           New-Item -ItemType Directory -Path .artifacts/setup -Force | Out-Null
-          & .artifacts/installers/install.ps1 | Tee-Object -FilePath .artifacts/setup/install.log
+          Copy-Item -LiteralPath $log -Destination .artifacts/setup/install.log -Force
       - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         if: always()
         with:
