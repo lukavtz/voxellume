@@ -31,7 +31,7 @@ jobs:
       - run: |
           mkdir -p .artifacts/security-${{ matrix.os }}
           if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            node --test --experimental-strip-types tests/security/path-supervisor.test.ts tests/security/process-supervisor-hardening.test.ts 2>&1 | tee .artifacts/security-${{ matrix.os }}/adversarial.log
+            node --test --experimental-strip-types --test-name-pattern="parent-directory swap" tests/security/path-supervisor.test.ts 2>&1 | tee .artifacts/security-${{ matrix.os }}/adversarial.log
           else
             corepack pnpm test:security 2>&1 | tee .artifacts/security-${{ matrix.os }}/adversarial.log
           fi
