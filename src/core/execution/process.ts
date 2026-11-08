@@ -1,4 +1,5 @@
-import { mkdir, realpath } from "node:fs/promises";
+import { realpathSync } from "node:fs";
+import { mkdir } from "node:fs/promises";
 import { join, resolve } from "node:path";
 
 import { runDockerVerification } from "./docker.ts";
@@ -147,7 +148,8 @@ export async function runVerificationProcess(
   let lockRoot: string;
   let releaseLock: ProjectLockRelease | undefined;
   try {
-    projectRoot = await realpath(resolve(options.projectRoot));
+    // Native process waits can occupy the libuv pool needed by async realpath.
+    projectRoot = realpathSync(resolve(options.projectRoot));
     if (options.projectLock === undefined) {
       const held = await acquireHeldProjectLock(
         resolve(options.lockRoot ?? projectRoot),
