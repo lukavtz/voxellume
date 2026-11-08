@@ -214,7 +214,7 @@ const releasePoll = setInterval(() => {
   }
   releasePolls += 1;
   if (releasePolls === 500) {
-    console.log(JSON.stringify({ cwd: process.cwd(), entries: fs.readdirSync(".") }));
+    console.log(JSON.stringify({ at: Date.now(), cwd: process.cwd(), entries: fs.readdirSync(".") }));
     process.exit(2);
   }
 }, 10);
@@ -235,7 +235,7 @@ fs.appendFileSync("starts", process.pid + "\\n");
   );
   controller.abort();
   await writeFile(release, "release\n");
-  console.error("parent-release", release, await exists(release));
+  console.error("parent-release", Date.now(), release, await exists(release));
   const [firstResult, secondResult] = await Promise.all([first, second]);
 
   assert.equal(firstResult.status, "passed", JSON.stringify(firstResult));
@@ -255,7 +255,7 @@ const releasePoll = setInterval(() => {
   }
   releasePolls += 1;
   if (releasePolls === 500) {
-    console.log(JSON.stringify({ cwd: process.cwd(), entries: fs.readdirSync(".") }));
+    console.log(JSON.stringify({ at: Date.now(), cwd: process.cwd(), entries: fs.readdirSync(".") }));
     process.exit(2);
   }
 }, 10);
@@ -282,6 +282,7 @@ fs.writeFileSync("started", process.pid + "\\n");
   await writeFile(join(firstFixture.projectRoot, "release"), "release\n");
   console.error(
     "parent-release-first",
+    Date.now(),
     await exists(join(firstFixture.projectRoot, "release")),
   );
   const firstResult = await first;
@@ -289,6 +290,7 @@ fs.writeFileSync("started", process.pid + "\\n");
   await writeFile(join(secondFixture.projectRoot, "release"), "release\n");
   console.error(
     "parent-release-second",
+    Date.now(),
     await exists(join(secondFixture.projectRoot, "release")),
   );
   const secondResult = await second;
@@ -312,7 +314,7 @@ const releasePoll = setInterval(() => {
   }
   releasePolls += 1;
   if (releasePolls === 500) {
-    console.log(JSON.stringify({ cwd: process.cwd(), entries: fs.readdirSync(".") }));
+    console.log(JSON.stringify({ at: Date.now(), cwd: process.cwd(), entries: fs.readdirSync(".") }));
     process.exit(2);
   }
 }, 10);
@@ -339,7 +341,7 @@ fs.appendFileSync("starts", process.pid + "\\n");
   ]);
   const settledBeforeRelease = settled;
   await writeFile(release, "release\n");
-  console.error("parent-release", release, await exists(release));
+  console.error("parent-release", Date.now(), release, await exists(release));
   const [firstResult, secondResult] = await Promise.all([first, second]);
 
   assert.equal(settledBeforeRelease, true);
