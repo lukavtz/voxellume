@@ -26,7 +26,10 @@ import {
 const fixtureRoot = fileURLToPath(
   new URL("../../fixtures/transactions/base-project/", import.meta.url),
 );
-const userNotes = readFileSync(join(fixtureRoot, "user-notes.txt"), "utf8");
+const userNotes = readFileSync(
+  join(fixtureRoot, "user-notes.txt"),
+  "utf8",
+).replaceAll("\r\n", "\n");
 const outsideNotes = "Outside bytes must survive every recovery outcome.\n";
 
 export const sourcePath =
@@ -140,6 +143,12 @@ export async function setup(
   await writeFile(join(outsideRoot, "sentinel.txt"), outsideNotes);
   if (!options.newProject) {
     await cp(fixtureRoot, projectRoot, { recursive: true });
+    for (const path of ["user-notes.txt", sourcePath]) {
+      const normalized = (
+        await readFile(join(fixtureRoot, path), "utf8")
+      ).replaceAll("\r\n", "\n");
+      await writeFile(join(projectRoot, path), normalized);
+    }
     // build/ is ignored, so every checkout must create its own last-good artifact.
     await mkdir(join(projectRoot, dirname(artifactPath)), { recursive: true });
     await writeFile(

@@ -99,9 +99,56 @@ jobs:
             throw "Installed MCP server did not initialize correctly: $response"
           }
 
+  setup:
+    needs: [build, installers]
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - run: corepack enable
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24.9.0
+      - name: Render exact installers
+        shell: bash
+        run: |
+          node scripts/ci/render-installers.mjs .artifacts/installers \
+            "${{ needs.build.outputs.commit }}" \
+            "${{ needs.build.outputs.tar_sha256 }}" \
+            "${{ needs.build.outputs.zip_sha256 }}"
+      - name: Run full POSIX setup and capture log
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          mkdir -p .artifacts/setup
+          export PNPM_HOME="$RUNNER_TEMP/pnpm-home"
+          export PATH="$PNPM_HOME:$PNPM_HOME/bin:$PATH"
+          export VOXELLUME_SETUP_YES=1
+          sh .artifacts/installers/install.sh 2>&1 | tee .artifacts/setup/install.log
+      - name: Run full Windows setup and capture log
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $env:PNPM_HOME = "$env:RUNNER_TEMP\pnpm-home"
+          $env:PATH = "$env:PNPM_HOME;$env:PNPM_HOME\bin;$env:PATH"
+          $env:VOXELLUME_SETUP_YES = '1'
+          New-Item -ItemType Directory -Path .artifacts/setup -Force | Out-Null
+          & .artifacts/installers/install.ps1 | Tee-Object -FilePath .artifacts/setup/install.log
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        if: always()
+        with:
+          name: full-setup-${{ matrix.os }}
+          path: .artifacts/setup
+          if-no-files-found: error
+          retention-days: 14
+
   deploy:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-    needs: [build, installers]
+    needs: [build, installers, setup]
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:

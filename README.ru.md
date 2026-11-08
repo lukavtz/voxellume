@@ -68,13 +68,13 @@ minecraft_project_verify
 **Linux и macOS**
 
 ```sh
-curl -fsSL https://lukavtz.github.io/voxellume/install.sh | sh
+VOXELLUME_SETUP_YES=1 sh -c 'curl -fsSL https://lukavtz.github.io/voxellume/install.sh | sh'
 ```
 
 **Windows PowerShell 5.1 и новее**
 
 ```powershell
-irm https://lukavtz.github.io/voxellume/install.ps1 | iex
+$env:VOXELLUME_SETUP_YES=1; irm https://lukavtz.github.io/voxellume/install.ps1 | iex
 ```
 
 Для разработки из исходного кода:
@@ -118,7 +118,16 @@ dsh --profile voxellume-test --dump-config
 
 Для локальных основных операций не нужны сетевой слушатель, учётные данные модели или внешняя служба. Docker, JDK и необязательные поставщики ресурсов требуются только для соответствующих проверок.
 
-### 3. Проверьте установку
+### 3. Проверьте или подготовьте компьютер
+
+```sh
+voxellume doctor --lang ru
+voxellume setup --lang ru --blockbench-mcp-root /absolute/path/to/models
+```
+
+`setup` использует системный менеджер пакетов на поддерживаемых платформах, устанавливает настольный Blockbench, Docker, Blender и ffmpeg, затем устанавливает закреплённую версию Blockbench MCP с отключёнными установочными сценариями. Он печатает конфигурацию для OMP, Harness и MCP. Перед изменением системы запрашивается подтверждение; `--yes` используется только как явное разрешение на автоматическую установку без вопросов. Действия менеджера пакетов и администратора остаются видимыми; на неподдерживаемых системах установка честно завершается с ошибкой, а не с ложным сообщением об успехе.
+
+### 4. Проверьте установку
 
 Перед передачей результата запустите детерминированные проверки:
 

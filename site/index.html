@@ -65,7 +65,7 @@
             <button
               class="install-command"
               type="button"
-              data-copy="curl -fsSL https://lukavtz.github.io/voxellume/install.sh | sh"
+              data-copy="VOXELLUME_SETUP_YES=1 sh -c 'curl -fsSL https://lukavtz.github.io/voxellume/install.sh | sh'"
               aria-label="Copy Linux and macOS install command"
             >
               <code
@@ -291,7 +291,7 @@
             <button
               class="install-command"
               type="button"
-              data-copy="curl -fsSL https://lukavtz.github.io/voxellume/install.sh | sh"
+              data-copy="VOXELLUME_SETUP_YES=1 sh -c 'curl -fsSL https://lukavtz.github.io/voxellume/install.sh | sh'"
               aria-label="Copy Linux and macOS install command"
             >
               <code
@@ -307,11 +307,12 @@
             <button
               class="install-command"
               type="button"
-              data-copy="irm https://lukavtz.github.io/voxellume/install.ps1 | iex"
+              data-copy="$env:VOXELLUME_SETUP_YES=1; irm https://lukavtz.github.io/voxellume/install.ps1 | iex"
               aria-label="Copy Windows install command"
             >
               <code
-                >irm https://lukavtz.github.io/voxellume/install.ps1 | iex</code
+                >$env:VOXELLUME_SETUP_YES=1; irm
+                https://lukavtz.github.io/voxellume/install.ps1 | iex</code
               >
               <span data-copy-label>Copy</span>
             </button>

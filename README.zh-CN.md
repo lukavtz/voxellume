@@ -68,13 +68,13 @@ minecraft_project_verify
 **Linux 和 macOS**
 
 ```sh
-curl -fsSL https://lukavtz.github.io/voxellume/install.sh | sh
+VOXELLUME_SETUP_YES=1 sh -c 'curl -fsSL https://lukavtz.github.io/voxellume/install.sh | sh'
 ```
 
 **Windows PowerShell 5.1 或更高版本**
 
 ```powershell
-irm https://lukavtz.github.io/voxellume/install.ps1 | iex
+$env:VOXELLUME_SETUP_YES=1; irm https://lukavtz.github.io/voxellume/install.ps1 | iex
 ```
 
 从源码进行开发：
@@ -118,7 +118,16 @@ dsh --profile voxellume-test --dump-config
 
 本地核心操作不需要 TCP 监听器、模型凭据或托管服务。只有执行相应检查时，才需要 Docker、JDK 和可选资源提供程序。
 
-### 3. 验证安装
+### 3. 检查或准备计算机
+
+```sh
+voxellume doctor --lang zh-CN
+voxellume setup --lang zh-CN --blockbench-mcp-root /absolute/path/to/models
+```
+
+`setup` 在支持的系统上使用系统包管理器安装桌面版 Blockbench、Docker、Blender 和 ffmpeg，然后在禁用包安装脚本的情况下安装固定版本的 Blockbench MCP。它会打印 OMP、Harness 和 MCP 客户端配置。更改系统前会请求确认；`--yes` 仅用于明确选择无人值守安装。包管理器和管理员操作始终可见；不支持的发行版会明确报错，不会声称安装成功。
+
+### 4. 验证安装
 
 交付前运行确定性检查：
 

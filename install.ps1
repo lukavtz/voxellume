@@ -181,6 +181,17 @@ try {
     $globalBin = (& npx --yes corepack@0.34.5 pnpm bin -g | Select-Object -Last 1)
     Assert-NativeSuccess 'Could not determine the global pnpm bin directory.'
     Write-Output 'Installed. Run: voxellume-mcp'
+    if ($env:VOXELLUME_SKIP_SETUP -ne '1') {
+        Write-Output 'Installing desktop prerequisites and Blockbench MCP. Set VOXELLUME_SKIP_SETUP=1 to skip.'
+        $modelRoot = if ($env:VOXELLUME_MODEL_ROOT) { $env:VOXELLUME_MODEL_ROOT } else { Join-Path ([Environment]::GetFolderPath('UserProfile')) 'models' }
+        $language = if ($env:VOXELLUME_LANG) { $env:VOXELLUME_LANG } else { 'en' }
+        if ($env:VOXELLUME_SETUP_YES -eq '1') {
+            & voxellume setup --lang $language --yes --blockbench-mcp-root $modelRoot
+        } else {
+            Write-Output 'Desktop setup skipped. Set VOXELLUME_SETUP_YES=1 to install prerequisites and Blockbench MCP.'
+        }
+        Assert-NativeSuccess 'Desktop prerequisite or Blockbench MCP setup failed.'
+    }
     if (($env:PATH -split [IO.Path]::PathSeparator) -notcontains $globalBin) {
         Write-Output "Add the pnpm global bin directory to PATH: $globalBin"
     }

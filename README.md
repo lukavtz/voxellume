@@ -68,13 +68,13 @@ Requirements: Node.js `>=24.9.0` with the bundled npm/npx. The remote installer 
 **Linux and macOS**
 
 ```sh
-curl -fsSL https://lukavtz.github.io/voxellume/install.sh | sh
+VOXELLUME_SETUP_YES=1 sh -c 'curl -fsSL https://lukavtz.github.io/voxellume/install.sh | sh'
 ```
 
 **Windows PowerShell 5.1+**
 
 ```powershell
-irm https://lukavtz.github.io/voxellume/install.ps1 | iex
+$env:VOXELLUME_SETUP_YES=1; irm https://lukavtz.github.io/voxellume/install.ps1 | iex
 ```
 
 For development from a source checkout:
@@ -118,7 +118,16 @@ dsh --profile voxellume-test --dump-config
 
 No TCP listener, model credential, or hosted service is required for local core operations. Docker, JDKs, and optional asset providers are needed only for their corresponding checks.
 
-### 3. Verify the installation
+### 3. Check or prepare the machine
+
+```sh
+voxellume doctor --lang en
+voxellume setup --lang en --blockbench-mcp-root /absolute/path/to/models
+```
+
+`setup` uses the host package manager where supported, installs desktop Blockbench, Docker, Blender, and ffmpeg, then installs the revision-pinned headless Blockbench MCP with package scripts disabled. It prints OMP, Harness, and MCP client configuration. It asks for confirmation before changing the system; `--yes` is only an explicit unattended opt-in. Package-manager and administrator actions remain visible; unsupported distributions fail explicitly instead of pretending a complete setup.
+
+### 4. Verify the installation
 
 Run the deterministic gates before delivery:
 

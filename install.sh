@@ -170,6 +170,14 @@ npx --yes corepack@0.34.5 pnpm add -g "$1"
 
 global_bin="$(npx --yes corepack@0.34.5 pnpm bin -g)" || fail 'Could not determine the global pnpm bin directory.'
 printf 'Installed. Run: voxellume-mcp\n'
+if [ "${VOXELLUME_SKIP_SETUP:-0}" != "1" ]; then
+  printf 'Installing desktop prerequisites and Blockbench MCP. Set VOXELLUME_SKIP_SETUP=1 to skip.\n'
+  if [ "${VOXELLUME_SETUP_YES:-0}" = "1" ]; then
+    voxellume setup --lang "${VOXELLUME_LANG:-en}" --yes --blockbench-mcp-root "${VOXELLUME_MODEL_ROOT:-$HOME/models}"
+  else
+    printf 'Desktop setup skipped. Set VOXELLUME_SETUP_YES=1 to install prerequisites and Blockbench MCP.\n'
+  fi
+fi
 case ":$PATH:" in
   *":$global_bin:"*) ;;
   *) printf 'Add the pnpm global bin directory to PATH: %s\n' "$global_bin" ;;
