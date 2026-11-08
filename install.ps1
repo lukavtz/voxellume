@@ -32,11 +32,13 @@ try {
         $env:PATH = "$env:PNPM_HOME;$env:PNPM_HOME\bin;$env:PATH"
     }
 
+    $commitPlaceholder = '__VOXELLUME_' + 'COMMIT__'
+    $archivePlaceholder = '__VOXELLUME_' + 'ZIP_SHA256__'
     $localMode = $false
-    if ($commit -eq '__VOXELLUME_COMMIT__' -and $archiveSha256 -eq '__VOXELLUME_ZIP_SHA256__') {
+    if ($commit -eq $commitPlaceholder -and $archiveSha256 -eq $archivePlaceholder) {
         $localMode = $true
     }
-    elseif ($commit -eq '__VOXELLUME_COMMIT__' -or $archiveSha256 -eq '__VOXELLUME_ZIP_SHA256__') {
+    elseif ($commit -eq $commitPlaceholder -or $archiveSha256 -eq $archivePlaceholder) {
         throw 'Voxellume install failed: Installer pins were not rendered consistently.'
     }
     elseif ($commit -notmatch '^[0-9a-f]{40}$' -or $archiveSha256 -notmatch '^[0-9a-f]{64}$') {

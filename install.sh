@@ -27,10 +27,12 @@ if [ -n "${PNPM_HOME:-}" ]; then
   export PATH
 fi
 
+commit_placeholder='__VOXELLUME_''COMMIT__'
+archive_placeholder='__VOXELLUME_''TAR_SHA256__'
 local_mode=false
-if [ "$commit" = '__VOXELLUME_COMMIT__' ] && [ "$archive_sha256" = '__VOXELLUME_TAR_SHA256__' ]; then
+if [ "$commit" = "$commit_placeholder" ] && [ "$archive_sha256" = "$archive_placeholder" ]; then
   local_mode=true
-elif [ "$commit" = '__VOXELLUME_COMMIT__' ] || [ "$archive_sha256" = '__VOXELLUME_TAR_SHA256__' ]; then
+elif [ "$commit" = "$commit_placeholder" ] || [ "$archive_sha256" = "$archive_placeholder" ]; then
   fail 'Installer pins were not rendered consistently.'
 else
   case "$commit" in

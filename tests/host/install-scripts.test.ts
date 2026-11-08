@@ -56,9 +56,13 @@ test("renderer deterministically emits exact immutable downloads", (t) => {
   assert.ok(first.ps1.includes(zipSha256));
   assert.ok(!first.ps1.includes(tarSha256));
   for (const script of [first.sh, first.ps1]) {
-    assert.ok(!script.includes("__VOXELLUME_"));
+    assert.ok(!script.includes("__VOXELLUME_COMMIT__"));
+    assert.ok(!script.includes("__VOXELLUME_TAR_SHA256__"));
+    assert.ok(!script.includes("__VOXELLUME_ZIP_SHA256__"));
     assert.ok(!/codeload[^\n]*(?:main|latest)/.test(script));
   }
+  assert.ok(first.sh.includes('"$commit" = "$commit_placeholder"'));
+  assert.ok(first.ps1.includes("$commit -eq $commitPlaceholder"));
   assert.ok(
     first.sh.indexOf('actual="$(') < first.sh.indexOf("tar -xzf"),
     "POSIX archive must be hashed before extraction",
