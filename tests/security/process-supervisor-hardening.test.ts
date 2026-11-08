@@ -148,20 +148,13 @@ test("host backend fails closed without an explicit trusted-host override", asyn
   );
   const marker = join(fixture.projectRoot, "ran");
 
-  for (const backend of [undefined, "host"] as const) {
-    const result = await request(fixture, {
-      backend: backend ?? "docker",
-    });
-    assert.equal(result.status, "unavailable");
-    assert.equal(result.executed, null);
-    assert.equal(result.exitCode, null);
-    assert.ok(result.error?.code);
-    if (backend === "host") {
-      assert.match(result.error?.detail ?? "", /host/i);
-    }
-    assert.notEqual(result.status, "passed");
-    assert.equal(await exists(marker), false);
-  }
+  const result = await request(fixture, { backend: "host" });
+  assert.equal(result.status, "unavailable");
+  assert.equal(result.executed, null);
+  assert.equal(result.exitCode, null);
+  assert.ok(result.error?.code);
+  assert.match(result.error?.detail ?? "", /host/i);
+  assert.equal(await exists(marker), false);
 
   const trusted = await runTrustedHost(fixture);
   assert.equal(

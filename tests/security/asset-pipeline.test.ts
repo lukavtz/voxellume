@@ -784,17 +784,15 @@ test("executor requires an approved untampered adjacent package dist", async (t)
 test("reported argv is the exact sandbox wrapper, node, entry point, and spawned args", async (t) => {
   const fixture = await setup(t);
   const entryPoint = join(fixture.root, "fake-mc-asset.js");
-  const capturePath = join(fixture.stagingPath, "spawned-args.json");
   const outputPng = solid(16, 16).toString("hex");
   await writeFile(
     entryPoint,
     `import { writeFileSync } from "node:fs";\n` +
       `const args = process.argv.slice(2);\n` +
-      `writeFileSync(${JSON.stringify(capturePath)}, JSON.stringify(args));\n` +
       `const value = (flag) => args[args.indexOf(flag) + 1];\n` +
       `writeFileSync(value("--output"), Buffer.from(${JSON.stringify(outputPng)}, "hex"));\n` +
       `writeFileSync(value("--source"), "mcpx 1\\n");\n` +
-      `console.log(JSON.stringify({ success: true }));\n`,
+      `console.log(JSON.stringify({ success: true, args }));\n`,
   );
   const execute = createMcAssetExecutor({
     entryPoint,
@@ -807,9 +805,7 @@ test("reported argv is the exact sandbox wrapper, node, entry point, and spawned
   });
   assert.equal(result.status, "passed", result.stderr);
   assert.ok(result.executed);
-  const spawnedArgs = JSON.parse(
-    await readFile(capturePath, "utf8"),
-  ) as string[];
+  const spawnedArgs = (JSON.parse(result.stdout) as { args: string[] }).args;
   if (process.platform === "darwin") {
     assert.deepEqual(result.executed.argv, [
       "/usr/bin/sandbox-exec",
