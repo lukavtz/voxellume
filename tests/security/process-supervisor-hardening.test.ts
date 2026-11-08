@@ -330,7 +330,12 @@ fs.appendFileSync("starts", process.pid + "\\n");
     }),
   ]);
   const settledBeforeRelease = settled;
+  void second.then((result) =>
+    console.error("same-path-second", Date.now(), result.status),
+  );
+  console.error("same-path-release-before", Date.now());
   writeFileSync(release, "release\n");
+  console.error("same-path-release-after", Date.now());
   const [firstResult, secondResult] = await Promise.all([first, second]);
 
   assert.equal(settledBeforeRelease, true);
