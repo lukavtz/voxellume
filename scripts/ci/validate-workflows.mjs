@@ -10,6 +10,7 @@ const required = new Set([
   "target-matrix.yml",
   "runtime-visual.yml",
   "release.yml",
+  "pages.yml",
 ]);
 const files = (await readdir(workflowRoot)).filter((name) =>
   name.endsWith(".yml"),
@@ -42,12 +43,26 @@ for (const name of required) {
   );
   assert.doesNotMatch(
     source,
-    /^\s+(?:contents|actions|checks|deployments|id-token|issues|packages|pull-requests|security-events|statuses|attestations):\s+write$/m,
+    /^\s+(?:contents|actions|checks|deployments|issues|packages|pull-requests|security-events|statuses|attestations):\s+write$/m,
     `${name}: write permission`,
   );
+  if (name === "pages.yml") {
+    assert.match(source, /^\s+pages:\s+write$/m, "pages:write required");
+    assert.match(
+      source,
+      /^\s+id-token:\s+write$/m,
+      "pages id-token:write required",
+    );
+  } else {
+    assert.doesNotMatch(
+      source,
+      /^\s+(?:pages|id-token):\s+write$/m,
+      `${name}: deployment permission`,
+    );
+  }
   assert.match(
     source,
-    /actions\/upload-artifact@[0-9a-f]{40}/,
+    /actions\/upload(?:-pages)?-artifact@[0-9a-f]{40}/,
     `${name}: evidence upload required`,
   );
 
@@ -84,7 +99,13 @@ assert.match(workflows.get("runtime-visual.yml"), /nvidia-smi/);
 assert.match(workflows.get("release.yml"), /release-artifact\.mjs/);
 assert.match(workflows.get("release.yml"), /--require-supported/);
 assert.match(workflows.get("release.yml"), /verify-host-install\.mjs/);
+assert.match(
+  workflows.get("pages.yml"),
+  /actions\/configure-pages@[0-9a-f]{40}/,
+);
+assert.match(workflows.get("pages.yml"), /actions\/deploy-pages@[0-9a-f]{40}/);
+assert.match(workflows.get("pages.yml"), /build-site\.mjs/);
 
 console.log(
-  "Validated six workflows: full-SHA actions, read-only permissions, forbidden triggers absent, required gates present.",
+  "Validated seven workflows: full-SHA actions, least-privilege permissions, forbidden triggers absent, required gates present.",
 );

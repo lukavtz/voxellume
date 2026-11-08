@@ -8,6 +8,8 @@
 
 Voxellume 是一个采用 MIT 许可证的公开智能体能力，用于将 Minecraft Java 模组从想法转化为经过审查、可复现的交付物。它在 OMP、DeepSeek Harness 和 MCP 中统一提供精确目标包、可编辑源码与美术资源、安全执行和证据驱动的验证。
 
+**网站：** [lukavtz.github.io/voxellume/zh-CN](https://lukavtz.github.io/voxellume/zh-CN/)
+
 ## 证据，而非承诺
 
 目录覆盖全部 68 个 Minecraft/loader 组合：**52 个候选、15 个已拒绝、1 个不支持、0 个 supported**。当前基线已经能够生成真实工件和真实客户端证据。它不会宣称普遍兼容，也不会把未执行的检查算作通过。
@@ -57,7 +59,21 @@ minecraft_project_verify
 
 ### 1. 安装共享包
 
-要求：Node.js `>=24.9.0`、带 pnpm `12.18.0` 的 Corepack，以及用于 1.21.x 目标的 JDK 21 或用于 26.x 目标的 JDK 25。沙箱中的构建和运行时检查还需要 Docker。
+要求：Node.js `>=24.9.0` 和 Corepack。远程安装程序使用不可变源码归档，并在构建前验证其 SHA-256。只有执行相应的构建和运行时检查时，才需要用于 1.21.x 的 JDK 21、用于 26.x 的 JDK 25 和 Docker。
+
+**Linux 和 macOS**
+
+```sh
+curl -fsSL https://lukavtz.github.io/voxellume/install.sh | sh
+```
+
+**Windows PowerShell 5.1 或更高版本**
+
+```powershell
+irm https://lukavtz.github.io/voxellume/install.ps1 | iex
+```
+
+从源码进行开发：
 
 ```sh
 git clone https://github.com/lukavtz/voxellume.git

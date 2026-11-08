@@ -4,7 +4,7 @@ Date: 2026-11-08.
 
 ## Trust and reproducibility contract
 
-All six workflows set only `permissions: contents: read`. No workflow uses `pull_request_target`, references repository secrets, publishes a release, or grants generated Gradle code credentials. Every third-party action is pinned to a 40-character commit SHA. `scripts/ci/validate-workflows.mjs` checks those invariants and the required gate commands; run it with:
+All seven workflows set `permissions: contents: read` at the top level. Only the Pages deployment job adds `pages: write` and `id-token: write`; it never receives `contents: write`. No workflow uses `pull_request_target`, references repository secrets, publishes a release, or grants generated Gradle code credentials. Every third-party action is pinned to a 40-character commit SHA. `scripts/ci/validate-workflows.mjs` checks those invariants and the required gate commands; run it with:
 
 ```sh
 node scripts/ci/validate-workflows.mjs
@@ -24,6 +24,7 @@ Fast static/package jobs use GitHub-hosted Ubuntu. Core unit/integration and adv
 | `target-matrix.yml`  | Affected target/shared paths, nightly, dispatch | `pnpm test:targets`; exact affected-cell selection; all 68 cells nightly; JDK 21/25 identity; per-cell status evidence                                                                                                                              | Plan, catalog log, per-cell result and `SHA256SUMS`, 30 days                                               |
 | `runtime-visual.yml` | `v*-rc.*` tags/dispatch                         | Supported-cell discovery; GitHub-hosted GPU and `nvidia-smi` preflight; JDK-specific runtime evidence boundary                                                                                                                                      | Plan, GPU identity, per-JDK result, 30 days                                                                |
 | `release.yml`        | Version tags/dispatch                           | `pnpm verify`; support-manifest and evidence validation; nonzero-supported release gate; two packs; byte or normalized reproducibility; exact tarball SHA-256; repeated security gate; clean OMP/DSH installation                                   | Readiness status, tarball, checksums, package inventory, provenance, security and install reports, 30 days |
+| `pages.yml`          | Site/installer changes, main, dispatch          | Deterministic three-language site build; exact tar.gz/ZIP hashing from the current commit; real POSIX/Windows installer and MCP stdio smoke tests on Ubuntu, macOS, and Windows; main-only Pages deployment                                         | Static Pages artifact, installer output, deployment URL                                                    |
 
 `release-artifact.mjs` first requires byte-identical tarballs. If gzip/tar metadata differs, it accepts the pack only when sorted relative paths, executable modes, and every file SHA-256 are identical. The result explicitly records `byteIdentical` and `normalizedIdentical`; it never calls reproduction instructions alone proof. `provenance.json` binds the package name/version, Git revision, artifact hash, package/lock/support-manifest hashes, target statuses, and tool versions. This is unsigned CI provenance, not an OIDC signature or independent attestation.
 

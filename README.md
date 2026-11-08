@@ -8,6 +8,8 @@
 
 Voxellume is a public, MIT-licensed agent capability for building Minecraft Java mods from an idea to a reviewed, reproducible delivery. It combines exact target packs, editable source and art, secure execution, and evidence-backed verification across OMP, DeepSeek Harness, and MCP.
 
+**Website:** [lukavtz.github.io/voxellume](https://lukavtz.github.io/voxellume/)
+
 ## Proof, not promises
 
 The catalog covers all 68 Minecraft/loader cells: **52 candidates, 15 rejected, 1 unsupported, 0 supported**. The current baseline already produces real artifacts and real client evidence. It does not claim blanket compatibility or unexecuted passes.
@@ -57,7 +59,21 @@ A natural-language request becomes a versioned **ModSpec**: mod identity, exact 
 
 ### 1. Install the shared package
 
-Requirements: Node.js `>=24.9.0`, Corepack with pnpm `12.18.0`, and JDK 21 for 1.21.x or JDK 25 for 26.x targets. Sandboxed build/runtime checks also require Docker.
+Requirements: Node.js `>=24.9.0` and Corepack. The remote installer uses an immutable source archive and verifies its SHA-256 before building. JDK 21 for 1.21.x, JDK 25 for 26.x, and Docker are needed only for their corresponding build/runtime checks.
+
+**Linux and macOS**
+
+```sh
+curl -fsSL https://lukavtz.github.io/voxellume/install.sh | sh
+```
+
+**Windows PowerShell 5.1+**
+
+```powershell
+irm https://lukavtz.github.io/voxellume/install.ps1 | iex
+```
+
+For development from a source checkout:
 
 ```sh
 git clone https://github.com/lukavtz/voxellume.git
