@@ -13,24 +13,101 @@ function Assert-NativeSuccess([string]$Message) {
     }
 }
 
+function Test-NodeVersion([string]$NodeExe) {
+    $versionText = & $NodeExe -p 'process.versions.node' 2>$null
+    if ($LASTEXITCODE -ne 0) {
+        return $false
+    }
+    try {
+        return [version]$versionText -ge [version]'24.9.0'
+    }
+    catch {
+        return $false
+    }
+}
+
+$nodeStage = $null
 try {
+    $nodeCommand = Get-Command node -ErrorAction SilentlyContinue
+    $nodeIsSupported = $false
+    if ($nodeCommand) {
+        $nodeIsSupported = Test-NodeVersion $nodeCommand.Source
+    }
+    if (-not $nodeIsSupported) {
+        $nodeInstallDir = Join-Path ([Environment]::GetFolderPath('LocalApplicationData')) 'Voxellume\node\24.9.0'
+        $installedNode = Join-Path $nodeInstallDir 'node.exe'
+        if ((Test-Path -LiteralPath $installedNode -PathType Leaf) -and (Test-NodeVersion $installedNode)) {
+            $env:PATH = "$nodeInstallDir;$env:PATH"
+        }
+        else {
+            if (Test-Path -LiteralPath $nodeInstallDir) {
+                throw 'Voxellume install failed: Existing Node.js 24.9.0 installation is unusable; refusing to overwrite it.'
+            }
+            if ([Environment]::OSVersion.Platform -ne [PlatformID]::Win32NT) {
+                throw 'Voxellume install failed: Unsupported operating system for automatic Node.js installation.'
+            }
+            $processorArchitecture = if ($env:PROCESSOR_ARCHITEW6432) { $env:PROCESSOR_ARCHITEW6432 } else { $env:PROCESSOR_ARCHITECTURE }
+            switch ($processorArchitecture) {
+                'AMD64' { $nodeArch = 'x64' }
+                'ARM64' { $nodeArch = 'arm64' }
+                default { throw 'Voxellume install failed: Unsupported CPU architecture for automatic Node.js installation.' }
+            }
+
+            $tempDir = Join-Path ([IO.Path]::GetTempPath()) ('voxellume-node-' + [guid]::NewGuid().ToString('N'))
+            New-Item -ItemType Directory -Path $tempDir | Out-Null
+            $nodeArchiveName = "node-v24.9.0-win-$nodeArch.zip"
+            $nodeBaseUrl = 'https://nodejs.org/dist/v24.9.0'
+            $nodeArchive = Join-Path $tempDir $nodeArchiveName
+            $nodeChecksums = Join-Path $tempDir 'SHASUMS256.txt'
+            Invoke-WebRequest -Uri "$nodeBaseUrl/SHASUMS256.txt" -OutFile $nodeChecksums -UseBasicParsing
+            Invoke-WebRequest -Uri "$nodeBaseUrl/$nodeArchiveName" -OutFile $nodeArchive -UseBasicParsing
+
+            $nodeExpected = $null
+            foreach ($line in Get-Content -LiteralPath $nodeChecksums) {
+                if ($line -match '^([0-9a-fA-F]{64})\s+(.+)$' -and $Matches[2] -eq $nodeArchiveName) {
+                    $nodeExpected = $Matches[1].ToLowerInvariant()
+                    break
+                }
+            }
+            if (-not $nodeExpected) {
+                throw 'Voxellume install failed: Node.js archive checksum was not listed.'
+            }
+            $nodeActual = (Get-FileHash -LiteralPath $nodeArchive -Algorithm SHA256).Hash.ToLowerInvariant()
+            if ($nodeActual -ne $nodeExpected) {
+                throw 'Voxellume install failed: Node.js archive SHA-256 mismatch.'
+            }
+
+            $nodeRoot = Split-Path -Parent $nodeInstallDir
+            New-Item -ItemType Directory -Path $nodeRoot -Force | Out-Null
+            $nodeStage = Join-Path $nodeRoot ('.24.9.0-' + [guid]::NewGuid().ToString('N'))
+            New-Item -ItemType Directory -Path $nodeStage | Out-Null
+            Expand-Archive -LiteralPath $nodeArchive -DestinationPath $nodeStage
+            $nodeRoots = @(Get-ChildItem -LiteralPath $nodeStage -Directory)
+            if ($nodeRoots.Count -ne 1 -or $nodeRoots[0].Name -ne "node-v24.9.0-win-$nodeArch") {
+                throw 'Voxellume install failed: The Node.js archive has an unexpected layout.'
+            }
+            $stagedNode = Join-Path $nodeRoots[0].FullName 'node.exe'
+            $stagedNpx = Join-Path $nodeRoots[0].FullName 'npx.cmd'
+            if (-not (Test-Path -LiteralPath $stagedNode -PathType Leaf) -or -not (Test-Path -LiteralPath $stagedNpx -PathType Leaf)) {
+                throw 'Voxellume install failed: The Node.js archive has an unexpected layout.'
+            }
+            if (Test-Path -LiteralPath $nodeInstallDir) {
+                throw 'Voxellume install failed: Node.js installation appeared during setup; refusing to overwrite it.'
+            }
+            Move-Item -LiteralPath $nodeRoots[0].FullName -Destination $nodeInstallDir
+            $env:PATH = "$nodeInstallDir;$env:PATH"
+        }
+    }
+    if (-not (Get-Command npx -ErrorAction SilentlyContinue)) {
+        throw 'Voxellume install failed: npx is required.'
+    }
+
     if (-not $env:COREPACK_HOME) {
         $cacheHome = if ($env:XDG_CACHE_HOME) { $env:XDG_CACHE_HOME } else { Join-Path ([Environment]::GetFolderPath('UserProfile')) '.cache' }
         $env:COREPACK_HOME = Join-Path $cacheHome 'node/corepack'
     }
     if (-not $env:COREPACK_ENABLE_DOWNLOAD_PROMPT) {
         $env:COREPACK_ENABLE_DOWNLOAD_PROMPT = '0'
-    }
-    if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
-        throw 'Voxellume install failed: Node.js 24.9.0 or newer is required.'
-    }
-    $nodeVersion = [version](& node -p 'process.versions.node')
-    Assert-NativeSuccess 'Could not determine the Node.js version.'
-    if ($nodeVersion -lt [version]'24.9.0') {
-        throw 'Voxellume install failed: Node.js 24.9.0 or newer is required.'
-    }
-    if (-not (Get-Command npx -ErrorAction SilentlyContinue)) {
-        throw 'Voxellume install failed: npx is required.'
     }
     & npx --yes corepack@0.34.5 prepare pnpm@12.18.0 --activate | Out-Null
     Assert-NativeSuccess 'Could not activate pnpm 12.18.0 through Corepack.'
@@ -54,7 +131,9 @@ try {
         throw 'Voxellume install failed: Invalid installer pins.'
     }
 
-    $tempDir = Join-Path ([IO.Path]::GetTempPath()) ('voxellume-install-' + [guid]::NewGuid().ToString('N'))
+    if (-not $tempDir) {
+        $tempDir = Join-Path ([IO.Path]::GetTempPath()) ('voxellume-install-' + [guid]::NewGuid().ToString('N'))
+    }
     $packDir = Join-Path $tempDir 'package'
     New-Item -ItemType Directory -Path $packDir -Force | Out-Null
 
@@ -107,6 +186,9 @@ try {
     }
 }
 finally {
+    if ($nodeStage -and (Test-Path -LiteralPath $nodeStage)) {
+        Remove-Item -LiteralPath $nodeStage -Recurse -Force
+    }
     if ($tempDir -and (Test-Path -LiteralPath $tempDir)) {
         Remove-Item -LiteralPath $tempDir -Recurse -Force
     }
