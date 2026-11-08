@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { writeFileSync } from "node:fs";
+import { existsSync, writeFileSync } from "node:fs";
 import {
   chmod,
   mkdir,
@@ -112,14 +112,8 @@ function errorCode(error: unknown): unknown {
   return undefined;
 }
 
-async function exists(path: string): Promise<boolean> {
-  try {
-    await readFile(path);
-    return true;
-  } catch (error: unknown) {
-    if (errorCode(error) === "ENOENT") return false;
-    throw error;
-  }
+function exists(path: string): boolean {
+  return existsSync(path);
 }
 
 async function waitFor(path: string): Promise<void> {
@@ -330,12 +324,7 @@ fs.appendFileSync("starts", process.pid + "\\n");
     }),
   ]);
   const settledBeforeRelease = settled;
-  void second.then((result) =>
-    console.error("same-path-second", Date.now(), result.status),
-  );
-  console.error("same-path-release-before", Date.now());
   writeFileSync(release, "release\n");
-  console.error("same-path-release-after", Date.now());
   const [firstResult, secondResult] = await Promise.all([first, second]);
 
   assert.equal(settledBeforeRelease, true);
