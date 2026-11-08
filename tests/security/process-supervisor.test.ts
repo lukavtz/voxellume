@@ -419,7 +419,7 @@ setInterval(() => {}, 1000);
   const controller = new AbortController();
   const pending = run(fixture, { signal: controller.signal });
   await waitFor(pidPath);
-  const childPid = Number(await readFile(pidPath, "utf8"));
+  const childPid = Number(readFileSync(pidPath, "utf8"));
   t.after(() => {
     try {
       process.kill(childPid, "SIGKILL");
