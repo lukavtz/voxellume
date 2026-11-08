@@ -205,12 +205,13 @@ test("real path and symlink alias share one canonical process lock", async (t) =
     t,
     `
 const fs = require("node:fs");
-const watcher = fs.watch(".", (_event, filename) => {
-  if (filename === "release") {
-    watcher.close();
+// Real child-process integration: deterministic fake timers cannot cross processes.
+const releasePoll = setInterval(() => {
+  if (fs.existsSync("release")) {
+    clearInterval(releasePoll);
     process.exit(0);
   }
-});
+}, 10);
 fs.appendFileSync("starts", process.pid + "\\n");
 `,
   );
@@ -238,12 +239,13 @@ fs.appendFileSync("starts", process.pid + "\\n");
 test("trusted lockRoot real path and symlink alias serialize distinct staging roots", async (t) => {
   const script = `
 const fs = require("node:fs");
-const watcher = fs.watch(".", (_event, filename) => {
-  if (filename === "release") {
-    watcher.close();
+// Real child-process integration: deterministic fake timers cannot cross processes.
+const releasePoll = setInterval(() => {
+  if (fs.existsSync("release")) {
+    clearInterval(releasePoll);
     process.exit(0);
   }
-});
+}, 10);
 fs.writeFileSync("started", process.pid + "\\n");
 `;
   const firstFixture = await setup(t, script);
@@ -280,12 +282,13 @@ test("abort cancels a process waiting for the project lock", async (t) => {
     t,
     `
 const fs = require("node:fs");
-const watcher = fs.watch(".", (_event, filename) => {
-  if (filename === "release") {
-    watcher.close();
+// Real child-process integration: deterministic fake timers cannot cross processes.
+const releasePoll = setInterval(() => {
+  if (fs.existsSync("release")) {
+    clearInterval(releasePoll);
     process.exit(0);
   }
-});
+}, 10);
 fs.appendFileSync("starts", process.pid + "\\n");
 `,
   );
