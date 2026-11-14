@@ -1,8 +1,10 @@
-node_modules/
-dist/
-coverage/
-.artifacts/
 pnpm-lock.yaml
-target-packs/
+dist/
+node_modules/
+.artifacts/
+.metrics/
 THIRD_PARTY/
-fixtures/target-packs/malformed-json/
+# The Fabric template is vendored byte-for-byte and rewritten by the scaffold tool.
+templates/
+# Blender QA scripts are Python; Prettier has no parser for them.
+scripts/blender/

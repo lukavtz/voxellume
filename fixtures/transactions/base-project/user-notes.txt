@@ -1,1 +1,0 @@
-These user-owned bytes must survive every transaction outcome.

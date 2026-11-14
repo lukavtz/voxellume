@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "voxellume-pins-1.0.0",
+  "pins": [
+    {
+      "id": "java-fabric-1.21.1",
+      "minecraft": "1.21.1",
+      "loader": "fabric",
+      "loaderVersion": "0.20.1",
+      "apiVersion": "0.102.0+1.21.1",
+      "gradlePlugin": "net.fabricmc.fabric-loom-remap",
+      "gradlePluginVersion": "1.17.21",
+      "jdk": 21,
+      "gradle": "9.8.2",
+      "mappings": "mojang",
+      "template": "fabric-1.21.1"
+    },
+    {
+      "id": "java-fabric-1.20.1",
+      "minecraft": "1.20.1",
+      "loader": "fabric",
+      "loaderVersion": "0.16.9",
+      "apiVersion": null,
+      "gradlePlugin": "net.fabricmc.fabric-loom-remap",
+      "gradlePluginVersion": "1.17.21",
+      "jdk": 21,
+      "gradle": "9.8.2",
+      "mappings": "mojang",
+      "template": null
+    },
+    {
+      "id": "java-forge-1.21.1",
+      "minecraft": "1.21.1",
+      "loader": "forge",
+      "loaderVersion": "52.0.28",
+      "apiVersion": null,
+      "gradlePlugin": "net.minecraftforge.gradle",
+      "gradlePluginVersion": "7.0.40",
+      "jdk": 25,
+      "gradle": null,
+      "mappings": "none",
+      "template": null
+    }
+  ]
+}

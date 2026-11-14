@@ -1,11 +1,19 @@
 ---
-description: Verify a Minecraft mod and return the core evidence report
-argument-hint: "<project> [verification profile]"
+description: Prove a mod project with observed build and runtime results
+argument-hint: "<project directory>"
 ---
 
 Verify: $ARGUMENTS
 
-1. Inspect with `minecraft_project_inspect` and resolve with `minecraft_target_resolve`. Collect the validated ModSpec, exact pack `verification.json`, staged candidate hashes, requested profile, fixtures, visual rubric, approvals, and authorized project/evidence roots.
-2. Dispatch `minecraft_project_verify` to `mod-game-worker` with the requested profile and host `AbortSignal`. `mod-offline-worker` may diagnose source/resource findings but cannot run red/green, Gradle, asset-engine, or game processes.
-3. Preserve core stage order `static → build → server → gameTest → client → productionJar → visual → package` as selected by the profile. Return requested/executed checks, statuses, diagnostics, exact commands, artifacts, environment, repair history, and trusted human visual-rubric record. Treat unexecuted checks as not passed.
-4. Limit repair to three one-change attempts; never weaken a check or substitute a target.
+1. Confirm the project's pin with `minecraft_target_info`, and read `gradle.properties`
+   for its declared versions.
+2. Dispatch `minecraft_run` through `mod-game-worker`, one claim at a time: `build` for
+   the JAR, `runServer` with `stopOnLog: "Done \\("` for a booting server, `runGametest`
+   for in-game tests, `runClient` for a client.
+3. Validate assets with `minecraft_assets_check` when the claim involves models,
+   textures, language files, or a screenshot diff.
+4. Report per claim: task, `argv`, `status`, `exitCode`, `durationMs`, `logPath`, and
+   the artifact or marker line observed.
+5. Treat `timed_out`, `cancelled`, `output_limit_reached`, `spawn_failed`, and
+   `exitCode: null` as not passed. Never accept the server EULA for the user.
+6. Limit repair to three one-change attempts per claim, and never weaken a check.

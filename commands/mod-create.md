@@ -1,14 +1,22 @@
 ---
-description: Create or extend a Minecraft mod through Voxellume core operations
+description: Create a Minecraft mod project and prove it builds
 argument-hint: "<mod idea and exact target, or existing project>"
 ---
 
 Create the requested mod: $ARGUMENTS
 
-1. Use `minecraft-design` to produce a validated ModSpec, requirement/feature/acceptance traceability, exact target request, reviewed style board, required `TextureSpec`/`AnimationSpec` contracts, and visual rubric. Resolve behavior-changing questions first.
-2. For an existing project, call `minecraft_project_inspect`. Call `minecraft_target_resolve` and stop on `unsupported` or `ambiguous`; record capability preflight without treating it as runtime proof.
-3. Scaffold new work only through `minecraft_project_scaffold` after ModSpec validation. Implement through `minecraft-implementation` in transaction staging. Generate/export assets through `minecraft-assets` and call `minecraft_assets_validate`.
-4. Keep simple work single-agent. The orchestrator dispatches every red/green or process-backed check and approved asset engine to `mod-game-worker`; `mod-offline-worker` only edits and performs non-process core operations.
-5. Call `minecraft_project_verify` with the ModSpec, exact pack, staged candidate, requested profile, fixtures/rubric, approvals, authorized roots, and host `AbortSignal`. Return its structured evidence report and human visual-rubric result. Never claim unexecuted checks passed.
+1. Call `minecraft_target_info` with the requested Minecraft version and loader. Report
+   the pin id and whether it has a template. An empty `pins` list means no pinned
+   target; stop there rather than choosing a nearby version.
+2. Use `minecraft-design` to turn the idea into ordered slices, each with the check that
+   proves it.
+3. Create the project with `minecraft_project_scaffold`, passing the pin id and the mod
+   identity. Then build it once with a `build` task through `mod-game-worker` before
+   editing anything.
+4. Implement slices through `minecraft-implementation`, loader guidance through
+   `minecraft-fabric` or `minecraft-neoforge`, and assets through `minecraft-assets`,
+   `minecraft-blockbench`, or `minecraft-blender`.
+5. Prove each claim with `minecraft_run`. Report the task, `status`, `exitCode`, and the
+   artifact or log marker observed.
 
-Do not reimplement target resolution, scaffolding, validation, verification, or reporting in this command.
+Do not claim a build, a server start, or a rendered item without a run result.

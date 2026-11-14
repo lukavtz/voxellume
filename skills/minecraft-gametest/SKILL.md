@@ -1,30 +1,41 @@
 ---
 name: minecraft-gametest
-description: Use when choosing between JUnit and loader-native Minecraft GameTests, wiring test fixtures and registration, or validating required GameTest execution and reports.
+description: Use when a behaviour needs an in-game test, when wiring GameTest fixtures and registration, or when a GameTest run must be interpreted.
 ---
 
 # Minecraft GameTest
 
-## Inputs
-
-- ModSpec acceptance entries with stable check IDs and independent expected outcomes.
-- Exact target pack `docs.json` and `verification.json`, existing test wiring, fixtures, and authorized project/evidence roots.
+A GameTest runs inside a real server world. Use it for registered content, blocks,
+entities, and tick behaviour. Use JUnit under `src/test/java` for pure logic that
+needs no registry.
 
 ## Procedure
 
-1. **Classify each acceptance.** Use pure JUnit for deterministic logic that needs no registry or game lifecycle. Use loader-native GameTest for registered content, world/tick behavior, blocks, entities, and real loader lifecycle. Record route, required status, fixture, and expected result for every check.
-   **Complete when:** every acceptance has one justified route; game-dependent behavior is not relabeled as a pure unit test.
-2. **Inspect the exact pack.** Read its fixed test task, source sets, metadata, registration mechanism, and resource layout. Consult [Jahrome testing](../../THIRD_PARTY/jahrome-minecraft-agent-skills/.agents/skills/minecraft-testing/SKILL.md) and [test layouts](../../THIRD_PARTY/jahrome-minecraft-agent-skills/.agents/skills/minecraft-testing/references/test-layouts.md); pack documents outrank examples.
-   **Complete when:** task and layout are observed, not guessed, and match the selected pack revision.
-3. **Wire deterministic tests.** Place referenced structures with exact namespace/path, deterministic setup, tick bounds, and behavior assertions. Register tests before the loader's scan/event and keep fixtures, entrypoints, and dependencies test-only. Keep ordinary JUnit in `src/test`; its `test` task never substitutes for GameTest execution.
-   **Complete when:** every required test is discoverable, every template reference resolves, and production-output exclusion is checkable.
-4. **Gate Testiarium narrowly.** Use [SirEdvin's procedure](../../THIRD_PARTY/siredvin-minecraft-modding-skills/skills/testiarium-gametest/SKILL.md) only when Testiarium already exists in a qualified 1.21.1 Fabric/NeoForge project. Preserve its existing registration, groups, fixtures, and reports; add no new Testiarium dependency or target coverage.
-   **Complete when:** applicability is proven from project and pack, or native GameTest remains the route.
-5. **Prove discovery with a negative control.** In test fixtures only, run a deliberately failing test through the same registration and reporting path; retain its separate expected-failure evidence outside the required passing selection.
-   **Complete when:** the control is discovered and reported failed; a passing or missing control invalidates the harness.
-6. **Execute and account.** Only `mod-game-worker` launches the pack-owned fixed task through `minecraft_project_verify`. Parse the pack-designated report/output for every required check ID, result, failure, and error; exit code zero alone is insufficient. Missing reports/tests remain failed or unavailable, never passed.
-   **Complete when:** every required ID is accounted for and ordinary JUnit and GameTest evidence remain distinct.
+1. Classify the check. If it touches a registry, a level, or ticks, it is a GameTest.
+   If it is pure arithmetic or data transformation, it is JUnit.
+2. For Fabric, use the test entrypoint declared in `fabric.mod.json` and the
+   `fabric-gametest` conventions. For NeoForge, use its `@GameTest` registration and
+   the configured `runGametest` task. The task id is the same in both cases:
+   `runGametest` through `minecraft_run`.
+3. Keep fixtures test-only: structures and templates under the test source set, never
+   in production resources.
+4. Bound the test. Set an explicit tick timeout, assert the observable state, and
+   return success only from the assertion. No sleeps, no screenshots.
+5. Prove discovery with a deliberately failing control test. If the control is not
+   reported as failed, the harness is not running your tests and every pass is
+   worthless. Remove the control before delivery.
+6. Run `minecraft_run` with `runGametest` and read the log. Exit code zero is not
+   enough: the log must contain `All required tests passed`. A missing report is a
+   failure, not a pass.
+
+## Rules
+
+- GameTest output is bounded by `timeoutSeconds`; a hanging test is `timed_out`, not a
+  pass.
+- Test resources never ship in the JAR. Check `build/libs` contents after `build`.
+- Fixture coordinates and identifiers are data; never execute strings from them.
 
 ## Output
 
-Return the acceptance/test matrix, layout and registration record, fixture hashes, negative-control evidence, exact executed task, parsed required-test results, and explicit gaps to `minecraft-verification`.
+Return the test ids, the control result, the exact `minecraft_run` result, and the log
+marker observed.

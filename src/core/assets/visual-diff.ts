@@ -15,8 +15,10 @@ export function compareVisualBaseline(options: {
   readonly baseline: InspectedPng;
   readonly actual: InspectedPng;
   readonly threshold: number;
+  readonly maxDifferentPixels?: number;
 }): VisualDiffResult {
   const { baseline, actual, threshold } = options;
+  const budget = options.maxDifferentPixels ?? 0;
   if (baseline.width !== actual.width || baseline.height !== actual.height) {
     throw new AssetError(
       "visual_dimension_mismatch",
@@ -29,6 +31,12 @@ export function compareVisualBaseline(options: {
       "Pixelmatch threshold must be between 0 and 1",
     );
   }
+  if (!Number.isSafeInteger(budget) || budget < 0) {
+    throw new AssetError(
+      "invalid_visual_budget",
+      "maxDifferentPixels must be a non-negative integer",
+    );
+  }
   const differentPixels = pixelmatch(
     baseline.data,
     actual.data,
@@ -38,7 +46,7 @@ export function compareVisualBaseline(options: {
     { threshold, includeAA: true },
   );
   return {
-    status: differentPixels === 0 ? "passed" : "failed",
+    status: differentPixels <= budget ? "passed" : "failed",
     checkClass: "visual_diff",
     width: baseline.width,
     height: baseline.height,
