@@ -1,4 +1,5 @@
 import {
+  chmod,
   copyFile,
   mkdir,
   readdir,
@@ -6,7 +7,7 @@ import {
   stat,
   writeFile,
 } from "node:fs/promises";
-import { dirname, isAbsolute, join, relative } from "node:path";
+import { basename, dirname, isAbsolute, join, relative } from "node:path";
 
 import { CodedError } from "../errors.ts";
 import { resolveInsideRoot } from "../fs-guard.ts";
@@ -188,6 +189,9 @@ async function copyTemplate(
       await writeFile(target, rewritten, "utf8");
     } else {
       await copyFile(source, target);
+    }
+    if (basename(targetRelative) === "gradlew") {
+      await chmod(target, 0o755);
     }
     created.push(targetRelative);
   }

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, readdir, readFile, rm } from "node:fs/promises";
+import { mkdtemp, readdir, readFile, rm, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
@@ -129,6 +129,30 @@ test("scaffold produces a coherent project from templates/fabric-1.21.1", async 
     await rm(work, { recursive: true, force: true });
   }
 });
+
+test(
+  "scaffold marks gradlew executable so POSIX can run it",
+  {
+    skip:
+      process.platform === "win32"
+        ? "exec bits are not modeled on win32"
+        : false,
+  },
+  async () => {
+    const work = await mkdtemp(join(tmpdir(), "voxellume-mode-"));
+    try {
+      const result = await scaffold(
+        { destination: "ruby", pinId: "java-fabric-1.21.1", mod },
+        { packageRoot: packageRoot(), cwd: work },
+      );
+      assert.equal(result.status, "ok");
+      const info = await stat(join(work, "ruby", "gradlew"));
+      assert.notEqual(info.mode & 0o111, 0);
+    } finally {
+      await rm(work, { recursive: true, force: true });
+    }
+  },
+);
 
 async function listRecursive(root: string, prefix = ""): Promise<string[]> {
   const entries = await readdir(join(root, prefix), { withFileTypes: true });

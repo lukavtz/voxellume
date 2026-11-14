@@ -21,6 +21,14 @@
     },
     "./package.json": "./package.json"
   },
+  "pi": {
+    "extensions": [
+      "./dist/adapters/omp/index.js"
+    ],
+    "skills": [
+      "./skills"
+    ]
+  },
   "files": [
     "dist",
     "cordis.patch.yml",

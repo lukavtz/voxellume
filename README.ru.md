@@ -10,8 +10,9 @@
 ## Установка
 
 ```sh
+pnpm install && pnpm build
 omp plugin link "$PWD"
-pnpm build && pnpm pack
+pnpm pack
 dsh plugin --profile voxellume-test add ./voxellume-0.2.0.tgz --ignore-scripts
 ```
 
