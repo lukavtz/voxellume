@@ -1,200 +1,120 @@
-import { join } from "node:path";
-import { fileURLToPath } from "node:url";
-
 import type { ExtensionAPI } from "@oh-my-pi/pi-coding-agent";
 
-import type { CoreOperations } from "../../core/operations.ts";
-import {
-  serializeDomainResult,
-  type DomainResult,
-} from "../../core/results.ts";
-import { createHostCoreOperations } from "../shared.ts";
+import { serializeToolResult } from "../../core/results.ts";
+import type { AssetsCheckRequest } from "../../core/tools/assets-check.ts";
+import { TASK_IDS, type RunRequest } from "../../core/tools/run.ts";
+import type { ScaffoldRequest } from "../../core/tools/scaffold.ts";
+import type { TargetInfoRequest } from "../../core/tools/target-info.ts";
+import { createVoxellumeTools } from "../shared.ts";
 
-function operationOptions(signal: AbortSignal | undefined): {
-  signal?: AbortSignal;
-} {
-  return signal === undefined ? {} : { signal };
-}
+const EXTRA_ARGS = ["--offline", "--info", "--stacktrace"] as const;
 
-function toolResult(result: DomainResult<unknown>) {
-  return {
-    content: [{ type: "text" as const, text: serializeDomainResult(result) }],
-    details: result,
-  };
-}
-
-export function registerOmpTools(
-  pi: ExtensionAPI,
-  operations: CoreOperations,
-): void {
+/** Register the four Voxellume tools on an OMP extension API. */
+export function registerOmpTools(pi: ExtensionAPI): void {
   const z = pi.zod;
-  const targetSchema = () =>
-    z
-      .object({
-        edition: z.literal("java"),
-        minecraftVersion: z.string(),
-        loader: z.string(),
-        targetPackId: z.string().optional(),
-      })
-      .strict();
+  const tools = createVoxellumeTools(process.cwd());
 
-  pi.registerTool({
-    name: "minecraft_target_resolve",
-    label: "Resolve Minecraft Target",
-    description: "Resolve an exact Minecraft Java target pack.",
-    approval: "read",
-    parameters: targetSchema(),
-    async execute(_toolCallId, params, signal) {
-      return toolResult(
-        await operations.resolveTarget(params, operationOptions(signal)),
-      );
-    },
+  const modSchema = z.object({
+    modId: z.string(),
+    javaPackage: z.string(),
+    name: z.string(),
+    version: z.string(),
+    description: z.string(),
+    authors: z.array(z.string()).min(1),
+    license: z.string(),
   });
 
   pi.registerTool({
-    name: "minecraft_project_inspect",
-    label: "Inspect Minecraft Project",
-    description: "Inspect a Minecraft mod project without changing it.",
+    name: "minecraft_target_info",
+    label: "Minecraft target info",
+    description:
+      "List pinned Minecraft Java targets (loader, versions, JDK, template) and the plugin's tools.",
     approval: "read",
-    parameters: z.object({ projectRoot: z.string() }).strict(),
-    async execute(_toolCallId, params, signal) {
-      return toolResult(
-        await operations.inspectProject(params, operationOptions(signal)),
-      );
+    parameters: z.object({
+      id: z.string().optional(),
+      minecraft: z.string().optional(),
+      loader: z.string().optional(),
+    }),
+    async execute(_callId, params) {
+      // The host validated `parameters` against the schema above.
+      const result = await tools.targetInfo(params as TargetInfoRequest);
+      return { content: [{ type: "text", text: serializeToolResult(result) }] };
     },
   });
 
   pi.registerTool({
     name: "minecraft_project_scaffold",
-    label: "Scaffold Minecraft Project",
-    description: "Scaffold a supported target into transaction staging.",
-    approval: "write",
-    parameters: z
-      .object({
-        destination: z.string(),
-        target: targetSchema(),
-        mod: z
-          .object({
-            modId: z.string(),
-            namespace: z.string(),
-            javaPackage: z.string(),
-            name: z.string(),
-            version: z.string(),
-            description: z.string(),
-            authors: z.array(z.string()),
-            license: z.string(),
-          })
-          .strict(),
-        loaders: z
-          .array(z.enum(["fabric", "neoforge", "forge", "quilt"]))
-          .optional(),
-      })
-      .strict(),
-    async execute(_toolCallId, params, signal) {
-      const { loaders, ...request } = params;
-      return toolResult(
-        await operations.scaffoldProject(
-          {
-            ...request,
-            ...(loaders === undefined ? {} : { loaders }),
-          },
-          operationOptions(signal),
-        ),
-      );
-    },
-  });
-
-  pi.registerTool({
-    name: "minecraft_assets_validate",
-    label: "Validate Minecraft Assets",
+    label: "Minecraft project scaffold",
     description:
-      "Validate Minecraft resources and their cross-file references.",
-    approval: "read",
-    parameters: z
-      .object({
-        modId: z.string(),
-        namespace: z.string(),
-        metadataFile: z.string(),
-        target: targetSchema(),
-        files: z.record(z.string(), z.string()),
-        registry: z.array(
-          z
-            .object({
-              kind: z.enum([
-                "item",
-                "block",
-                "sound_event",
-                "configured_feature",
-                "placed_feature",
-              ]),
-              id: z.string(),
-            })
-            .strict(),
-        ),
-        animations: z.array(
-          z.object({ texture: z.string(), frameCount: z.number() }).strict(),
-        ),
-        requiredLangKeys: z.array(z.string()),
-        datagen: z.array(
-          z.object({ path: z.string(), expectedSha256: z.string() }).strict(),
-        ),
-      })
-      .strict(),
-    async execute(_toolCallId, params, signal) {
-      return toolResult(
-        await operations.validateAssets(params, operationOptions(signal)),
-      );
+      "Copy the pinned Fabric template into a new project and rewrite its package, mod id, name, version, and license.",
+    approval: "exec",
+    parameters: z.object({
+      destination: z.string(),
+      pinId: z.string().optional(),
+      mod: modSchema,
+    }),
+    async execute(_callId, params) {
+      // The host validated `parameters` against the schema above.
+      const result = await tools.scaffold(params as ScaffoldRequest);
+      return { content: [{ type: "text", text: serializeToolResult(result) }] };
     },
   });
 
   pi.registerTool({
-    name: "minecraft_project_verify",
-    label: "Verify Minecraft Project",
-    description: "Run the requested staged Minecraft verification profile.",
+    name: "minecraft_run",
+    label: "Minecraft run",
+    description:
+      "Run one allowlisted Gradle task (build, runServer, runClient, runGametest, …) in a scaffolded project and report the observed exit code, log path, and log tail.",
     approval: "exec",
-    parameters: z
-      .object({
-        projectRoot: z.string(),
-        target: targetSchema(),
-        modSpec: z.unknown(),
-        profile: z.enum([
-          "static",
-          "build",
-          "server",
-          "gameTest",
-          "client",
-          "visual",
-          "release",
-          "full",
-        ]),
-        identity: z
-          .object({
-            transactionId: z.string(),
-            baseProjectSha256: z.string(),
-            modSpecSha256: z.string(),
-            targetPackSha256: z.string(),
-            finalTreeSha256: z.string(),
-          })
-          .strict(),
-      })
-      .strict(),
-    async execute(_toolCallId, params, signal) {
-      return toolResult(
-        await operations.verifyProject(params, operationOptions(signal)),
-      );
+    parameters: z.object({
+      projectRoot: z.string(),
+      task: z.enum(TASK_IDS),
+      extraArgs: z.array(z.enum(EXTRA_ARGS)).optional(),
+      timeoutSeconds: z.number().int().min(1).max(3600).optional(),
+      stopOnLog: z.string().max(200).optional(),
+    }),
+    async execute(_callId, params, signal) {
+      // The host validated `parameters` against the schema above.
+      const result = await tools.run(params as RunRequest, signal);
+      return { content: [{ type: "text", text: serializeToolResult(result) }] };
+    },
+  });
+
+  pi.registerTool({
+    name: "minecraft_assets_check",
+    label: "Minecraft assets check",
+    description:
+      "Validate textures, model texture references, lang key/placeholder parity, and screenshot diffs inside a project.",
+    approval: "read",
+    parameters: z.object({
+      projectRoot: z.string(),
+      textures: z.array(z.string()).optional(),
+      models: z.array(z.string()).optional(),
+      lang: z
+        .object({
+          baseline: z.string(),
+          compare: z.array(z.string()),
+          requiredKeys: z.array(z.string()).optional(),
+        })
+        .optional(),
+      diff: z
+        .object({
+          baseline: z.string(),
+          baselineSha256: z.string(),
+          capture: z.string(),
+          threshold: z.number().min(0).max(1),
+          maxDifferentPixels: z.number().int().min(0),
+        })
+        .optional(),
+    }),
+    async execute(_callId, params) {
+      // The host validated `parameters` against the schema above.
+      const result = await tools.checkAssets(params as AssetsCheckRequest);
+      return { content: [{ type: "text", text: serializeToolResult(result) }] };
     },
   });
 }
 
 export default function registerOmpExtension(pi: ExtensionAPI): void {
-  // OMP exposes cwd on ConcreteExtensionAPI but omits it from ExtensionAPI.
-  const cwd = (pi as ExtensionAPI & { readonly cwd: string }).cwd;
-  const operations = createHostCoreOperations({
-    catalogRoot: fileURLToPath(
-      new URL("../../../target-packs/", import.meta.url),
-    ),
-    authorizedProjectRoot: cwd,
-    transactionStagingRoot: join(cwd, ".voxellume", "staging"),
-  });
-  registerOmpTools(pi, operations);
+  registerOmpTools(pi);
 }

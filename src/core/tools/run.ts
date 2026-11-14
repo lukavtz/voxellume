@@ -5,6 +5,18 @@ import { executeProcess } from "../exec/run-process.ts";
 import { PathEscapeError, resolveInsideRoot } from "../fs-guard.ts";
 import { fail, ok, type ToolResult } from "../results.ts";
 
+export const TASK_IDS = [
+  "build",
+  "clean",
+  "test",
+  "runServer",
+  "runClient",
+  "runGametest",
+  "genSources",
+] as const;
+
+export type TaskId = (typeof TASK_IDS)[number];
+
 export const TASK_ARGS = {
   build: ["build"],
   clean: ["clean"],
@@ -13,9 +25,7 @@ export const TASK_ARGS = {
   runClient: ["runClient"],
   runGametest: ["runGametest"],
   genSources: ["genSources"],
-} as const satisfies Record<string, readonly string[]>;
-
-export type TaskId = keyof typeof TASK_ARGS;
+} as const satisfies Record<TaskId, readonly string[]>;
 
 export const EXTRA_ARG_ALLOWLIST = ["--offline", "--info", "--stacktrace"] as const;
 
