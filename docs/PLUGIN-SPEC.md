@@ -181,9 +181,10 @@ Value:
   "tail": ["BUILD SUCCESSFUL in 41s"] }
 ```
 
-`status` ∈ `exited | stopped_by_log | timed_out | cancelled | spawn_failed`.
+`status` ∈ `exited | stopped_by_log | timed_out | cancelled | output_limit_reached | spawn_failed`.
 `exitCode` is `null` unless a real exit status was observed. `tail` holds the last
-200 lines.
+200 lines. `output_limit_reached` means the 16 MiB cap was hit, the process tree was
+killed, and the log holds only the bytes read before the cap.
 
 ## 7. `minecraft_assets_check`
 

@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "stamp": "2026-11-14T22:53:48.898Z",
+  "stamp": "2026-11-14T22:55:32.188Z",
   "cwd": "D:\\Development\\projects\\AI\\Plugins\\voxellume\\voxellume",
   "threshold": 10,
   "coverage": "skip",
@@ -24,8 +24,8 @@
     }
   },
   "worst": {
-    "name": "resolveTemplate",
-    "complexity": 7,
+    "name": "executeProcess",
+    "complexity": 9,
     "crap": null
   },
   "duplicates": 0
