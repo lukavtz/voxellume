@@ -1,290 +1,103 @@
 # Voxellume — Architecture
 
-Status: approved
-Specification: [SPEC.md](SPEC.md)
+Normative contracts: [PLUGIN-SPEC.md](PLUGIN-SPEC.md). Tool reference:
+[TOOLS.md](TOOLS.md).
 
-## 1. Architectural drivers
+## 1. Shape
 
-- One installable product must serve OMP and DeepSeek Harness.
-- Creative agent behavior must be separated from deterministic verification.
-- Minecraft and loader differences must be localized in target packs.
-- Build and game execution cross a trust boundary.
-- OMP and Harness have different tool schemas, result contracts, lifecycles, and prompt mechanisms.
-- The same core must remain usable through optional MCP without duplicating behavior.
+One package, two host adapters, four tools, no server, no evidence pipeline.
 
-## 2. Decisions
-
-### ADR-001: One package, two native adapters, one shared core
-
-Use one TypeScript package with an OMP extension entry and a DeepSeek Harness Cordis bundle entry. Keep domain operations independent of both hosts.
-
-Reason: two real host adapters justify the shared-core seam. Separate repositories would duplicate contracts, skills, target packs, fixtures, and verification logic.
-
-### ADR-002: Skills guide; tools execute and verify
-
-Skills contain ordered agent procedures and links to versioned references. Tools own filesystem, process, validation, and evidence-producing behavior.
-
-OMP discovers conventional `skills/`, `agents/`, `commands/`, and extension modules. Harness exposes the same procedures through its prompt/tool mechanisms and native bundle lifecycle. The Markdown skill bodies remain the single source of workflow truth.
-
-### ADR-003: Versioned target packs replace a universal template
-
-Every target pack owns its exact toolchain contract, templates, docs pointers, fixtures, and verification support. Core rejects an unresolved or unsupported target.
-
-Reason: registries, mappings, Java, Gradle, data formats, and test APIs vary by Minecraft and loader. A generic scaffold would silently generate incompatible mods.
-
-### ADR-004: Few deep model-facing operations
-
-Prefer a small set of operations with structured results:
-
-- `minecraft_target_resolve`
-- `minecraft_project_scaffold`
-- `minecraft_assets_validate`
-- `minecraft_project_verify`
-- `minecraft_project_inspect`
-
-Each operation hides target-specific details behind one contract. Ordinary source editing remains the host agent's existing file-tool responsibility.
-
-### ADR-005: Verification is a staged evidence pipeline
-
-Verification returns a structured report containing requested checks, executed checks, outcomes, diagnostics, artifact paths, and explicit unsupported/unavailable states. A check that did not run cannot be reported as passed.
-
-The pipeline is deterministic and target-pack driven. The agent may diagnose and repair failures, but cannot edit the evidence.
-
-### ADR-006: Native execution first, optional MCP transport second
-
-OMP and Harness adapters call core operations directly. MCP, when enabled, is another adapter over the same operations for other MCP clients and isolated process execution.
-
-MCP is not used for prompt text, static skills, or ordinary source editing already provided by the host.
-
-### ADR-007: Generated projects are untrusted executable input
-
-All project operations run inside an authorized root. Process execution uses argument arrays, explicit working directories, cancellation, deadlines, bounded output, and host policy. Network-enabled build steps and game launches are visible in the verification report.
-
-### ADR-008: Typed editable assets behind one execution facade
-
-`TextureSpec` and `AnimationSpec` are versioned, target-bound inputs to asset generation, not free-form tool requests. They link stable asset/clip/state IDs, editable sources, runtime exports, deterministic settings, provenance, and acceptance rules. Texture sources are `.grid` or layered `.mcpx`; models and bone animations use `.bbmodel`. Animated-texture delivery is a vertical PNG strip plus sibling `.png.mcmeta`. An atlas is only an editable or diagnostic sheet.
-
-Pinned `smile-minecraft/mc-asset` `v0.5.0` (`bedf67229ab0fdf304f6d40bc0000a27bd05e880`) requires both entry-point SHA-256 `2a82e605666ee0200dd63b1b3fa6e7774b4c69bd446e2f84cb311dbefc21b86f` and deterministic full-`dist` SHA-256 `7bd753bc61d47d7317d17356366f6deae9b9bd48eee69a3899c8580a676844c3` (exact value from implementation constant). It runs as an external process for deterministic pixel cleanup, seeded generation, tiling, frame strips, and style/pack checks. The model sees allowlisted core operations only, never raw CLI paths or raw mc-asset MCP tools. The shared execution supervisor supplies fixed executable/argument arrays with `shell:false`, authorized-root and realpath checks, mutation-time symlink/path-swap and hardlink protection, pre-read/decode/output/log quotas, staging and journaled publication of the complete output set, process-group cancellation, offline/scrubbed environments, and hash evidence. This facade is required because the completed pilot demonstrated parent/absolute/symlink-parent output escapes, no effective general pre-read byte cap, and non-transactional multi-artifact writes.
-
-`jasonjgardner/blockbench-mcp-plugin` `1.10.1` (`97a8a80d3a37bf95c5e136d93d2c7da399fff753`) remains the sole external Blockbench engine, with restricted roots, revisions/atomic writes, `risky_eval=off`, and loopback-only desktop service. Reuse only the MIT rig/template, cycle-generator, evaluated-animation analyzer, orientation, model-check, and deterministic paint/UV methods from `sosadly/blockbench-mcp` `0.3.1` (`028cdd76589de2e2cea51bfd79495b50a3c7d1d2`) behind Voxellume's typed API and notices. Replace every random path with versioned seeded RNG. Do not install its server, MCP bridge, `execute_script`, or plugin installer.
-
-Blender uses reviewed fixed scripts only for optional loop/QA/contact-sheet analysis; it is not a Minecraft exporter. Mosaicary `0.1.4` (`08bdba5252a378cf8e2111b0c2cb27cec4ea15ba`) is a conditional, pinned, local, network-denied glTF/Blender ingress pending conversion and runtime pilots. Java Block/Item models never acquire bone animation through this route.
-
-### ADR-009: Decompose transactions behind two public entry points
-
-`src/core/spec/transactions.ts` exposes only `buildCandidate` and `commitCandidate`. `transaction-types.ts` owns their shared contracts; `transactions/` contains focused staging, commit, apply, recovery, journal, ownership, lock, path, tree, and state modules. Dependencies flow from the public facade to stage/commit orchestration, then to apply/recovery and journal/ownership helpers, down to path/tree/lock/state primitives. Internal modules are not a second public API.
-
-A private `WeakMap` binds the verified candidate object to a deep-frozen snapshot and its complete staging-tree hash. Commit requires that binding, rejects candidate digest changes, restores the snapshot, and rechecks both canonical base and complete staging trees. New-project commit revalidates the complete staging tree after `beforeDirectorySwap` and immediately before rename. Ownership covers declared implementation, asset, artifact, and ModSpec paths, including staged deletions; unrelated user files are not apply targets. A lock keyed by the canonical project path serializes staging and commit. Journals are authenticated with HMAC-SHA256 before recovery, then strictly validated for identity, base hash, owned apply prefix, matching backups, and owned temporary files. Recovery restores backups in reverse order and reports conflicts as `recovery_required`. Cancellation observed after the committed transition enters recovery instead of returning false success.
-
-Journals remain in the transaction workspace at `<workspaceRoot>/<transactionId>/journal.json`; no external journal location is implemented. Their persistent random 32-byte HMAC key is stored at `~/.config/voxellume/journal-secret`, with a `0700` parent directory and a `0600`, single-link regular file owned by the current UID. Pathname validation catches observed symlink and identity changes, but does not eliminate parent-directory swap TOCTOU between checks and mutation. The §3 directory-handle path supervisor must anchor operations to opened parent directories before complete race resistance can be claimed.
-
-### ADR-010: Native directory handles and supervised execution fail closed
-
-Only the trusted host grants an authorized root; copying its public fields cannot mint authority. Project roots are read-only through this API, and only transaction-staging roots permit writes. On macOS and Linux, `fs-at.ts` pins the root and every parent with per-component libc `openat`/`O_NOFOLLOW` traversal and uses `mkdirat`, `unlinkat`, and no-replace `renameat2`/`renameatx_np` for mutation. On Windows, `fs-at-win32.ts` uses NTDLL `NtCreateFile` relative to `RootDirectory`, one component per call, `FILE_OPEN_REPARSE_POINT` plus post-open reparse/type checks, and `FileRenameInformationEx`/`FileDispositionInformationEx`. Hard-linked mutation targets and unsupported filesystem semantics are rejected. File modes are applied to the securely opened temporary file before rename: POSIX uses `fchmod` on its descriptor and Windows uses `NtSetInformationFile(FileBasicInformation)` on its handle, so no pathname-based chmod sink follows a swapped link. Windows has no documented directory-handle flush, so file flush is not reported as directory durability.
-
-Koffi is pinned to `3.3.7` as an optional host peer and development dependency; its installer is blocked through workspace `allowBuilds`. Tarball installation therefore requires no native install-script approval. Only the matching `@koromix/koffi-<os>-<arch>` prebuilt may load when the host supplies Koffi. Missing host packages, prebuilts, symbols, or ABI layout checks return `execution.native_dirfd_unavailable`; there is no source-build or pathname-based `fs` mutation fallback. The Windows x64/ARM64 NTDLL and process implementations are present but have not been runtime-verified, so Windows is not yet a qualified platform.
-
-Verification accepts only fixed `./gradlew --no-daemon <allowlisted-task>` argv with `shell:false`. POSIX runs use a detached process group and signal the negative PID; Windows creates the process suspended, assigns a Job Object before `ResumeThread`, and uses `TerminateJobObject` plus `KILL_ON_JOB_CLOSE`, never `taskkill /T`. Job setup failure is `unavailable`, never a pass. Limits are 15-minute builds, 10-minute server/client runs, 16 MiB captured output, 2 GiB evidence, one Gradle process per project, and container budgets of 2 CPUs, 4 GiB memory, and 512 PIDs. The environment is rebuilt from an allowlist with isolated home, Gradle cache, and temporary directories. Docker currently returns `backend_unavailable`; host execution must not be described as container or network isolation. EULA and network approvals are exact, persisted separately in mode-`0600` `approvals.json`, and never silently granted.
-
-Transaction journals and evidence bundles use domain-separated HMAC-SHA256 over canonical JSON with the persistent mode-`0600` secret. Evidence `SHA256SUMS` separately covers every stored log, artifact, and manifest byte; `readEvidence` verifies both the checksums and manifest MAC. Typed review subjects bind source/export, production-JAR/client-scenario, and human design-review evidence. Stand-in or rejected reviewers cannot pass the human gate. Authentication does not replace immutable external evidence custody.
-
-### ADR-011: Optional services stay outside the local mod pipeline
-
-`src/core/integrations/mcreator.ts` accepts only literal loopback HTTP endpoints, negotiates the pinned MCreator protocol, and gates every mutating element operation on fresh runtime schemas. Its allowlist omits arbitrary project-file edits and game launch. `src/core/integrations/player-games.ts` fixes the Player Games HTTPS origins, discovers OAuth metadata, registers a loopback redirect client, and uses authorization-code PKCE S256. Access, refresh, and client secrets remain private client state; runtime AJV schemas gate tool arguments, and paid generation requires an approval callback per call. Both clients cap response bytes, reject redirects and malformed identities, sanitize failures, and propagate cancellation. Neither adapter shares authority with target packs, transaction staging, or the evidence supervisor.
-
-### ADR-012: One core operation facade behind three host projections
-
-`src/core/operations.ts` owns lazy catalog loading, exact target selection, model-input revalidation, ModSpec/identity checks, cancellation, and normalized `DomainResult` outcomes. Model requests never supply target-pack objects, verification roots/policy, or stage executors. `src/adapters/shared.ts` confines project and scaffold paths to separate host-granted real roots, creates missing staging roots component-by-component without following links and one real destination child only during scaffold, and keeps verification configuration host-owned. Scaffolding, complete verification, transactions, and process execution share one canonical per-project lock. Whole verification holds a WeakMap-authenticated lock capability through evidence finalization; nested process calls validate that capability instead of acquiring a second lock. OMP, DSH, and MCP adapters only translate schemas, cancellation, jobs, and result representations. DSH verification runs as an awaited managed job rather than a detached promise. MCP uses official server v2 over stdio and caps serialized results at 256 KiB. Package output is prebuilt JavaScript and declarations; target-pack qualification evidence remains external and explicit in `support-manifest.json`.
-
-## 3. Repository layout
-
-```text
-.
-├── package.json
-├── cordis.patch.yml
-├── tsconfig.json
-├── src/
-│   ├── core/
-│   │   ├── targets/
-│   │   ├── projects/
-│   │   ├── assets/
-│   │   ├── execution/
-│   │   ├── verification/
-│   │   └── spec/
-│   │       ├── transactions.ts
-│   │       ├── transaction-types.ts
-│   │       └── transactions/
-│   │           ├── state.ts
-│   │           ├── stage.ts
-│   │           ├── ownership.ts
-│   │           ├── paths.ts
-│   │           ├── lock.ts
-│   │           ├── tree.ts
-│   │           ├── journal.ts
-│   │           ├── apply.ts
-│   │           ├── commit.ts
-│   │           └── recovery.ts
-│   ├── adapters/
-│   │   ├── omp/
-│   │   ├── dsh/
-│   │   └── mcp/
-│   └── shared/
-├── skills/
-│   ├── minecraft-design/
-│   ├── minecraft-implementation/
-│   ├── minecraft-assets/
-│   ├── minecraft-verification/
-│   └── minecraft-release/
-├── agents/
-├── commands/
-├── target-packs/
-│   └── <edition>/<loader>/<minecraft-version>/
-├── fixtures/
-│   ├── target-resolution/
-│   ├── projects/
-│   └── verification/
-├── tests/
-│   ├── helpers/
-│   │   └── transaction-fixture.ts
-│   ├── unit/
-│   │   ├── transactions.test.ts
-│   │   ├── transaction-commit.test.ts
-│   │   ├── transaction-recovery.test.ts
-│   │   └── transaction-security.test.ts
-│   ├── integration/
-│   └── host-contract/
-├── docs/
-│   ├── research/
-│   ├── SPEC.md
-│   └── ARCHITECTURE.md
-└── .github/
-    └── workflows/
+```
+skills/ agents/ commands/          procedures read by both hosts
+targets/pins.json                  version data (68 pins)
+templates/fabric-1.21.1/           the one project template
+        │
+src/adapters/omp, dsh              registration + serialization
+        │
+src/core/tools/*                   targetInfo, scaffold, run, checkAssets
+        │
+src/core/{exec,assets,pins}        process control, image validation, data load
+src/core/{results,root}.ts         envelope + package root
 ```
 
-`src/core/execution/paths.ts` uses opened root and parent-directory handles for lookup, open, rename, and unlink operations. The transaction implementation still has separate pathname checks with a parent-swap TOCTOU window; the execution supervisor's race resistance must not be attributed to those legacy transaction paths. Windows directory-handle behavior remains unverified until the required native CI probes pass.
+## 2. Layers
 
-`src/shared` is limited to types used by more than one module. It must not become a dumping ground for unrelated helpers.
+**Procedures.** Markdown only. Skills carry ordered agent procedure; they never
+execute anything and never restate tool parameters that live in `docs/TOOLS.md`.
+The Harness adapter concatenates `skills/*/SKILL.md` into one prompt section; OMP
+discovers the same directory natively.
 
-## 4. Core interfaces
+**Adapters.** The only host-specific code. `src/adapters/shared.ts` builds the four
+tool closures once; `omp/index.ts` registers them with `approval` classes;
+`dsh/index.ts` wraps them with `defineTool` (its `output.render` is mandatory) and
+registers the prompt section. Adapters translate host arguments, nothing else.
 
-These are proposed test seams, not implementation commitments. Their exact signatures are fixed before the first TDD cycle.
+**Tools.** `src/core/tools/*` holds the real logic. Each tool is a pure-ish async
+function: parameters in, `ToolResult<T>` out, no host types, no globals, no logging
+side effects beyond the run log. Tools validate before they act and report only what
+they observed.
 
-### Target resolution
+**Execution.** `src/core/exec/run-process.ts` is the single place a process is
+spawned. It owns argv construction, environment scrubbing, output caps, log files,
+timeouts, abort handling, and process-tree termination. Nothing else in the tree may
+call `spawn`, `exec`, or `execFile` for a build.
 
-Input: requested edition, Minecraft version, loader, and optional existing project root.
+**Assets.** `src/core/assets/{png,visual-diff,validate-assets}.ts` are pure decoders
+and comparators. They never read from disk; `assets-check.ts` does the bounded reads.
 
-Output: a fully resolved target or a structured unsupported/ambiguous result. No filesystem mutation.
+**Data.** `targets/pins.json` is generated once from the retired target packs by
+`scripts/extract-pins.mjs` and then maintained by hand.
 
-### Project inspection
+## 3. Invariants
 
-Input: authorized project root.
+1. No process runs without an allowlisted argv array and `shell: false`.
+2. No path is used before `realpath` + containment check against its declared root.
+3. No tool reports `ok` for a fact it did not observe.
+4. No host-specific type reaches `src/core/**`.
+5. No module under `src/core/**` imports a host package.
+6. `dist/` is a build artifact; the shipped package contains no TypeScript source.
+7. `scripts/check-structure.mjs` fails the build when a retired directory returns.
 
-Output: detected target, source layout, declared dependencies, available verification tasks, and target mismatches. No project mutation.
-
-### Scaffolding
-
-Input: authorized destination, resolved target, validated mod metadata, and feature selection.
-
-Output: created files and detected conflicts. Existing files are never overwritten implicitly.
-
-### Asset validation
-
-Input: authorized project root, selected target, `TextureSpec`/`AnimationSpec` revisions, and their source/export manifests.
-
-Output: structured findings with asset path, stable rule ID, `checkClass=source|browser|design_review`, severity, and source location where available. `browser` explicitly names the rendered surface; only `surface=minecraft_client` closes an in-game gate. Blockbench and Blender results remain source/preview evidence and cannot substitute for the production-JAR client or independent design review.
-
-Asset provenance links each runtime hash to its spec, editable-source hash, immutable concept/reference, provider and cleanup parameters, seeded-RNG algorithm/seed derivation, tool revisions, conversion reports, target revision, scenario IDs, and approval revision. Any source, palette, workflow, export, or converter change invalidates the previous approval.
-
-### Verification
-
-Input: authorized project root, resolved target, requested verification profile, cancellation signal, and execution policy.
-
-Output: ordered check results and artifact references. Profiles compose `static → build → server → gameTest → client → productionJar → visual → package`; `release` omits visual, while `full` requires every stage and returns `verified` only after all required checks pass. A non-pass stops downstream claims and leaves skipped checks unexecuted. Runtime evidence binds server/client surface and scenario; production-JAR visual checks additionally require authenticated human design approval. Bounded repair makes one vertical change, restores last-good after each failed attempt, and never exceeds three attempts. ModLens, mcp-rogal, and Arclight are exact-target alternatives, never simultaneous integrations; every third-party adapter and the Voxellume verification-mod fallback must pass launch, isolated-world, input, assertion, screenshot, cancellation, and cleanup qualification before production use. Domain failures are data; infrastructure failures use explicit errors.
-
-## 5. Target-pack contract
-
-A target pack contains:
-
-```text
-target.json
-README.md
-docs.json
-templates/
-fixtures/
-verification.json
-```
-
-`target.json` identifies exact versions and supported capabilities. `docs.json` points to first-party documentation and its revision. `verification.json` selects allowed build/test scenarios; it does not contain arbitrary shell strings supplied by the model.
-
-Templates are reviewed source, not runtime-generated string concatenation. Dependencies and wrapper artifacts use locked versions and integrity metadata where supported.
-
-## 6. Runtime flow
+## 4. Data flow
 
 ```mermaid
-flowchart TD
-    A[User request] --> B[Resolve target]
-    B -->|unsupported| X[Report exact gap]
-    B -->|resolved| C[Design and acceptance criteria]
-    C --> D[Vertical implementation slice]
-    D --> E[Assets and deterministic validation]
-    E --> F[Build and test]
-    F -->|failure| G[Structured diagnosis]
-    G --> D
-    F -->|passed| H[Runtime and visual verification]
-    H -->|failure| G
-    H -->|passed| I[Package and evidence report]
+flowchart LR
+  A[agent] --> B[skill procedure]
+  B --> C{minecraft_target_info}
+  C --> D[minecraft_project_scaffold]
+  D --> E[agent edits sources]
+  E --> F[minecraft_run build]
+  F --> G[gradlew -> JAR]
+  B --> H[Blockbench MCP over loopback]
+  B --> I[Blender CLI scripts]
+  H --> J[minecraft_assets_check]
+  I --> J
 ```
 
-## 7. Host adaptation
+Verification is a procedure, not a subsystem: a change is proven when
+`minecraft_run` returns an observed exit code and the expected artifact exists in the
+log or on disk.
 
-### OMP
+## 5. Non-goals
 
-- `package.json#omp.extensions` declares the native extension.
-- `ExtensionAPI.registerTool` exposes core operations with host schemas.
-- Conventional directories provide skills, agents, and commands.
-- Host cancellation and approval policy reach core execution.
-- Tool results use OMP content and structured details contracts.
+- No evidence manifests, transaction journals, staging roots, or rollback.
+- No target qualification matrix or status catalog.
+- No bundled MCP server, no site, no installer, no release automation beyond CI.
+- No runtime dependency on Blockbench or Blender; both are optional and documented.
 
-### DeepSeek Harness
+## 6. Testing
 
-- `package.json#dsh.bundle.patch` declares the bundle layer.
-- `cordis.patch.yml` mounts the native plugin.
-- `defineTool` exposes typed operations and canonical JSON outputs.
-- Registrations follow Cordis effect disposal.
-- `exec.signal` reaches every long-running operation.
-- Renderers translate structured results without changing domain values.
+| Layer | Test kind | Location |
+| --- | --- | --- |
+| envelope, pins | unit | `tests/unit/{results,pins}.test.ts` |
+| scaffold substitution | unit on a minimal fixture | `tests/unit/scaffold.test.ts` |
+| scaffold on the real template | integration | `tests/integration/scaffold-template.test.ts` |
+| run process control | unit with stub wrappers | `tests/unit/run.test.ts` |
+| assets | unit with generated PNGs | `tests/unit/{assets-check,png-visual}.test.ts` |
+| host adapters | integration with fake hosts | `tests/integration/{omp,dsh}-adapter.test.ts` |
+| docs links | integration | `tests/integration/capability-docs.test.ts` |
+| real Fabric build + server | live, opt-in | `tests/live/fabric-build.test.ts` |
 
-### MCP
-
-- Stdio only by default.
-- No authentication assumption for arbitrary remote exposure.
-- Same input validation and execution policy as native adapters.
-- No duplicate domain implementation.
-
-## 8. Verification levels
-
-| Level              | Runs                       | Required evidence                                                                                                 |
-| ------------------ | -------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Static             | Every change               | Format, lint, types, dependency/security checks                                                                   |
-| Unit               | Every TDD slice            | Public-interface behavior and failure cases                                                                       |
-| Host contract      | Adapter changes            | OMP and Harness calls, results, cancellation                                                                      |
-| Target integration | Target or template changes | Real clean Gradle build and resource validation                                                                   |
-| Runtime            | Supported target changes   | Server/client/game-test scenarios                                                                                 |
-| Visual             | Asset or UI changes        | Source gates, production-JAR Minecraft states/captures, and independent design review; previews are supplementary |
-| Release            | Every PR                   | Clean checkout, full required matrix, package inspection                                                          |
-
-CI separates fast deterministic checks from long Java/game jobs. Required support status depends on the real integration matrix, not mocked success.
-
-## 9. Security invariants
-
-- A model-supplied path cannot escape the authorized project root.
-- A model cannot supply an executable or arbitrary command line to core verification.
-- Cancellation terminates child processes and waits for cleanup.
-- Output and artifact collection have explicit size limits.
-- Secrets are neither inherited unnecessarily nor included in reports.
-- Unsupported operations fail closed.
-- Generated evidence is read-only to the agent workflow.
-
-## 10. Open decisions
-
-The specification's open product decisions determine the first release matrix. No target is marked supported until its real toolchain and verification fixtures pass.
+`pnpm verify` runs format, lint, typecheck, structure, unit, and integration. The
+live suite runs in CI with JDK 21 and network access, and locally with
+`VOXELLUME_LIVE=1`.

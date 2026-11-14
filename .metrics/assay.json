@@ -1,0 +1,32 @@
+{
+  "ok": true,
+  "stamp": "2026-11-14T22:51:52.999Z",
+  "cwd": "D:\\Development\\projects\\AI\\Plugins\\voxellume\\voxellume",
+  "threshold": 10,
+  "coverage": "skip",
+  "files": 4,
+  "reason": "",
+  "checks": {
+    "crap": {
+      "ok": true,
+      "exit": 0,
+      "note": ""
+    },
+    "duplication": {
+      "ok": true,
+      "exit": 0,
+      "note": "no candidate"
+    },
+    "mutation": {
+      "ok": true,
+      "exit": 0,
+      "note": "skipped"
+    }
+  },
+  "worst": {
+    "name": "loadPins",
+    "complexity": 8,
+    "crap": null
+  },
+  "duplicates": 0
+}
