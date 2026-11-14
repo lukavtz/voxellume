@@ -1,44 +1,48 @@
 ---
 name: minecraft-targets
-description: Resolve exact Minecraft Java release and loader targets, decide requested capabilities, inspect existing-project coordinates, and select version-local official documentation.
+description: Pick an exact Minecraft Java and loader version from the pinned data, and read the exact toolchain versions that pin implies.
 ---
 
 # Minecraft targets
 
-## Use when
-
-Use to select an exact target pack, choose among pack revisions, determine build/server/client/GameTest/visual capability, infer coordinates from an existing project, or obtain documentation for downstream work.
-
-References: [target-pack contract](../../docs/research/minecraft-targets.md), [support rules](../../docs/SPEC.md#6-target-packs), and [source-facade decision](../../docs/research/source-mcp-benchmark.md).
-
-## Inputs
-
-- Minecraft edition, exact case-sensitive release, loader, and required capabilities.
-- Optional explicit target-pack ID, whose identifier includes its immutable revision.
-- Authorized project root when coordinates must come from an existing project.
-- Installed target-pack catalog; runtime resolution never uses `latest` or live discovery.
+`targets/pins.json` is plain data: 68 Java pins with exact Minecraft, loader,
+loader version, API version, Gradle plugin, JDK, Gradle, and mappings. There are no
+statuses, no qualification labels, and no support catalogue. A pin either carries a
+template or it does not.
 
 ## Procedure
 
-1. **Establish exact coordinates.** For a direct request, preserve the supplied release and loader exactly; whitespace, malformed values, unknown editions, and unknown loaders are invalid. For an existing project, call `minecraft_project_inspect` read-only and use its reported coordinates, source sets, dependencies, and mismatches. Inspection may describe a non-supported pack; malformed or missing build metadata remains a diagnostic.
-   **Complete when:** exact coordinates and requested capabilities are known, or an inspection/validation diagnostic identifies what is missing.
+1. Call `minecraft_target_info` with the requested coordinates.
 
-2. **Resolve through the shared operation.** Call `minecraft_target_resolve` with the coordinates and optional explicit target-pack ID. The ID and its embedded revision must match the requested coordinates. Only `supported` packs are candidates; make no project mutation.
+   ```json
+   { "minecraft": "1.21.1", "loader": "fabric" }
+   ```
 
-   | Resolver result                                                | Action                                                                                   |
-   | -------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-   | Exactly one matching `supported` pack                          | Continue with its immutable pack record.                                                 |
-   | `ambiguous`                                                    | Return the lexically sorted candidate IDs and require an explicit ID/revision selection. |
-   | `unsupported_target`, `target_not_found`, or `target_mismatch` | Return the structured reason and evidence; stop without substitution.                    |
+   Filters are exact strings and combine with AND. An empty `pins` array is a
+   normal answer meaning "no pinned target", not an error.
 
-   **Complete when:** one immutable pack is selected or the exact ambiguity/unsupported diagnostic is returned. Never substitute a nearby release, loader, mappings kind, case variant, or revision; an empty catalog is unsupported.
+2. Read the pin. Do not restate versions from memory or from a tutorial: the pin is
+   the authority for `loaderVersion`, `apiVersion`, `gradlePlugin`,
+   `gradlePluginVersion`, `jdk`, `gradle`, and `mappings`.
+3. Check `template`. Only `java-fabric-1.21.1` has one
+   (`templates/fabric-1.21.1`). A pin with `template: null` cannot be scaffolded by
+   `minecraft_project_scaffold`; scaffolding it returns `template_missing`.
+4. For a pin without a template, build the project from the loader's own
+   documentation using the exact versions the pin lists. Never substitute a nearby
+   Minecraft release, loader, or mappings kind.
+5. Pass the chosen pin id to `minecraft_project_scaffold` as `pinId`, and to
+   `minecraft_run` only through the project it produced.
 
-3. **Record capability preflight.** Compare requested build/server/client/GameTest/visual capabilities with the selected pack's `verification.capabilities` and immutable evidence reference. Resolution alone does not execute the core capability assertion. `minecraft_project_verify` performs that assertion before execution and returns `capability_unavailable` or `missing_qualification_evidence` when its gate fails.
-   **Complete when:** every requested capability and any missing flag/evidence are recorded without claiming verification success. A non-supported target remains `unsupported_target` or its explicit-ID mismatch diagnostic.
+## Rules
 
-4. **Load version-local references.** Read only the selected pack's official `docs.json` entries and revisions, `verification.json`, mappings, and known limitations. For Fabric only, consult the conditional [Fabric version contract](../../THIRD_PARTY/siredvin-minecraft-modding-skills/skills/fabric-modding/references/version-contracts.md); for NeoForge only, consult the [NeoForge version contract](../../THIRD_PARTY/siredvin-minecraft-modding-skills/skills/neoforge-modding/references/version-contracts.md). Exact pack documents outrank examples. These references do not qualify packs or establish Forge/Quilt support; those loaders use their own pack documentation. The disabled source facade is not a documentation substitute.
-   **Complete when:** downstream work receives the selected pack ID, revision, immutable hash, applicable documentation revisions, verification contract, and limitations.
+- One pin per project. Record its `id` in the project notes.
+- The JDK in the pin is the JDK the build needs. `jdk: 21` with JDK 25 installed
+  means the build is unsupported until JDK 21 is present.
+- Gradle tasks come from `minecraft_run`'s allowlist only. Never widen it.
+- Parameter details: [docs/TOOLS.md](../../docs/TOOLS.md). Version data semantics:
+  [PLUGIN-SPEC.md section 4](../../docs/PLUGIN-SPEC.md#4-minecraft_target_info).
 
 ## Output
 
-Return requested coordinates, resolution status, selected pack ID/revision/hash or sorted ambiguity candidates, per-capability preflight with evidence references, version-local documentation references, known limitations, and any inspection diagnostics. Non-resolved outcomes produce no success artifacts or project changes.
+Return the chosen pin object, its `template` value, and the exact toolchain versions
+downstream steps must use.

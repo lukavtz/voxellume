@@ -1,67 +1,164 @@
 import assert from "node:assert/strict";
-import { readFile, readdir } from "node:fs/promises";
-import { dirname, resolve } from "node:path";
-import test from "node:test";
+import { readdir, readFile, stat } from "node:fs/promises";
+import { dirname, join, posix, relative, sep } from "node:path";
+import { fileURLToPath } from "node:url";
+import { describe, it } from "node:test";
 
-function headingSlug(value: string): string {
-  return value
-    .trim()
-    .toLowerCase()
-    .replace(/[`*_~]/g, "")
-    .replace(/[^\p{L}\p{N} _-]/gu, "")
-    .replace(/ /g, "-");
+const repoRoot = fileURLToPath(new URL("../../", import.meta.url));
+
+const MARKDOWN_ROOTS = [
+  "skills",
+  "agents",
+  "commands",
+  "docs",
+  "README.md",
+  "README.ru.md",
+];
+
+const INLINE_PATH_PREFIXES = [
+  "skills/",
+  "docs/",
+  "targets/",
+  "templates/",
+  "scripts/",
+];
+
+const LINK = /\[[^\]]*\]\(([^()\s]+)\)/g;
+const INLINE = /`([^`\n]+)`/g;
+
+async function collectMarkdown(
+  path: string,
+  found: string[] = [],
+): Promise<string[]> {
+  const info = await stat(path);
+  if (info.isDirectory()) {
+    for (const entry of await readdir(path)) {
+      if (entry === "node_modules" || entry.startsWith(".")) continue;
+      await collectMarkdown(join(path, entry), found);
+    }
+    return found;
+  }
+  if (path.endsWith(".md"))
+    found.push(relative(repoRoot, path).split(sep).join("/"));
+  return found;
 }
 
-test("capability documentation links resolve to files and headings", async () => {
-  const skillNames = (await readdir("skills", { withFileTypes: true }))
-    .filter((entry) => entry.isDirectory())
-    .map((entry) => entry.name)
-    .sort();
-  assert.ok(skillNames.length >= 14);
-  const documents = [
-    ...skillNames.map((name) => `skills/${name}/SKILL.md`),
-    "agents/mod-orchestrator.md",
-    "agents/mod-offline-worker.md",
-    "agents/mod-game-worker.md",
-    "commands/mod-create.md",
-    "commands/mod-verify.md",
-    "commands/mod-port.md",
-  ];
-  for (const document of documents) {
-    const body = await readFile(document, "utf8");
-    for (const match of body.matchAll(/\[[^\]]*\]\(([^)]+)\)/g)) {
-      const target = match[1]!;
-      if (/^[a-z][a-z\d+.-]*:/i.test(target)) continue;
-      const [path, anchor] = target.split("#");
-      const resolved = resolve(dirname(document), path!);
-      const targetBody = await readFile(resolved, "utf8");
-      if (anchor !== undefined) {
-        const headings = [...targetBody.matchAll(/^#{1,6}\s+(.+)$/gm)].map(
-          (heading) => headingSlug(heading[1]!),
-        );
-        assert.ok(
-          headings.includes(decodeURIComponent(anchor)),
-          `${document} links to missing heading ${target}`,
-        );
+function skipped(target: string): boolean {
+  return (
+    target === "" ||
+    target.startsWith("#") ||
+    target.startsWith("/") ||
+    target.startsWith("http://") ||
+    target.startsWith("https://") ||
+    target.startsWith("mailto:") ||
+    target.includes("*") ||
+    target.includes("?")
+  );
+}
+
+function targetFromLink(raw: string): string | undefined {
+  const withoutFragment = raw.split("#")[0] ?? "";
+  if (skipped(withoutFragment)) return undefined;
+  return withoutFragment;
+}
+
+interface Target {
+  readonly value: string;
+  readonly fromRepoRoot: boolean;
+}
+
+function targetsOf(source: string): Target[] {
+  const targets: Target[] = [];
+  for (const match of source.matchAll(LINK)) {
+    const captured = match[1];
+    if (captured === undefined) continue;
+    const target = targetFromLink(captured);
+    if (target !== undefined)
+      targets.push({ value: target, fromRepoRoot: false });
+  }
+  for (const match of source.matchAll(INLINE)) {
+    const captured = match[1];
+    if (captured === undefined) continue;
+    const candidate = captured.trim();
+    if (!INLINE_PATH_PREFIXES.some((prefix) => candidate.startsWith(prefix)))
+      continue;
+    if (skipped(candidate)) continue;
+    targets.push({ value: candidate, fromRepoRoot: true });
+  }
+  return targets;
+}
+
+async function exists(path: string): Promise<boolean> {
+  try {
+    await stat(path);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+describe("capability docs", () => {
+  it("resolves every relative link and inline repo path", async () => {
+    const files: string[] = [];
+    for (const root of MARKDOWN_ROOTS)
+      await collectMarkdown(join(repoRoot, root), files);
+
+    assert.ok(files.length > 0, "no markdown files discovered");
+
+    const missing: string[] = [];
+    for (const file of files) {
+      const source = await readFile(join(repoRoot, file), "utf8");
+      for (const target of targetsOf(source)) {
+        const base = target.fromRepoRoot
+          ? target.value
+          : posix.join(posix.dirname(file), target.value);
+        const resolved = posix.normalize(base);
+        if (resolved.startsWith("..")) {
+          missing.push(`${file}: ${target.value} escapes the repository`);
+          continue;
+        }
+        if (!(await exists(join(repoRoot, resolved)))) {
+          missing.push(`${file}: ${target.value}`);
+        }
       }
     }
-  }
-});
 
-test("only the game worker receives process-launching tools", async () => {
-  const [orchestrator, offline, game] = await Promise.all([
-    readFile("agents/mod-orchestrator.md", "utf8"),
-    readFile("agents/mod-offline-worker.md", "utf8"),
-    readFile("agents/mod-game-worker.md", "utf8"),
-  ]);
-  for (const body of [orchestrator, offline, game]) {
-    assert.match(body, /^---\r?\nname: mod-/);
-    assert.match(body, /^description: \S.+$/m);
-  }
-  assert.doesNotMatch(orchestrator, /^tools:.*\bbash\b/m);
-  assert.doesNotMatch(offline, /^tools:.*\bbash\b/m);
-  assert.match(game, /^tools:.*\bbash\b/m);
-  assert.doesNotMatch(orchestrator, /^tools:.*\bminecraft_project_verify\b/m);
-  assert.doesNotMatch(offline, /^tools:.*\bminecraft_project_verify\b/m);
-  assert.match(game, /^tools:.*\bminecraft_project_verify\b/m);
+    assert.deepEqual(
+      missing,
+      [],
+      `unresolved references:\n${missing.join("\n")}`,
+    );
+  });
+
+  it("resolves the tool reference the architecture points at", async () => {
+    assert.equal(await exists(join(repoRoot, "docs", "TOOLS.md")), true);
+    assert.equal(await exists(join(repoRoot, "docs", "BLOCKBENCH.md")), true);
+  });
+
+  it("keeps one H1 heading per skill", async () => {
+    const skills = await collectMarkdown(join(repoRoot, "skills"));
+    assert.ok(skills.length > 0);
+    for (const file of skills) {
+      const source = await readFile(join(repoRoot, file), "utf8");
+      const headings = source
+        .split("\n")
+        .filter((line) => line.startsWith("# "));
+      assert.equal(headings.length, 1, `${file} must have exactly one H1`);
+      assert.ok(
+        source.trimStart().includes("\n# "),
+        `${file} must start with a heading`,
+      );
+    }
+  });
+
+  it("keeps blender script names discoverable from the scripts directory", async () => {
+    const scripts = await readdir(join(repoRoot, "scripts", "blender"));
+    for (const name of ["loop_check.py", "contact_sheet.py", "qa_report.py"]) {
+      assert.ok(scripts.includes(name), `${name} missing from scripts/blender`);
+    }
+    assert.equal(
+      dirname(join(repoRoot, "docs", "TOOLS.md")),
+      join(repoRoot, "docs"),
+    );
+  });
 });

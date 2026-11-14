@@ -46,27 +46,27 @@ Rules:
 
 ## 3. Error codes
 
-| Code | Raised by | Meaning |
-| --- | --- | --- |
-| `invalid_request` | all | Parameters fail the tool's own validation rules |
-| `pin_not_found` | `scaffold` | No pin matches the requested id |
-| `template_missing` | `scaffold` | Pin has no template, or the template directory is absent |
-| `destination_not_empty` | `scaffold` | Destination exists and is not an empty directory |
-| `destination_outside_root` | `scaffold`, `run`, `assets_check` | Resolved path escapes the project root |
-| `task_not_allowed` | `run` | Task id is not in the allowlist |
-| `unsafe_argument` | `run` | Extra argument is not in the allowlist |
-| `project_not_found` | `run` | Project root lacks the Gradle wrapper |
-| `spawn_failed` | `run` | The wrapper could not be started |
-| `baseline_hash_mismatch` | `assets_check` | Baseline screenshot bytes differ from the declared SHA-256 |
-| `model_texture_missing` | `assets_check` | Model JSON references a texture that does not exist |
-| `lang_key_missing` | `assets_check` | A comparison locale lacks a key present in the baseline |
-| `lang_placeholder_mismatch` | `assets_check` | Ordered printf placeholders differ from the baseline locale |
-| `png_invalid` | `assets_check` | PNG signature, IHDR, or CRC is invalid |
-| `png_too_large` | `assets_check` | PNG exceeds byte, edge, or pixel limits |
-| `file_missing` | `assets_check` | A requested texture, model, or lang file is absent |
-| `json_invalid` | `assets_check` | A model or lang file is not valid JSON |
-| `dimension_mismatch` | `assets_check` | Texture dimensions differ from the `WxH` expectation |
-| `pins_invalid` | `target_info`, `scaffold` | `targets/pins.json` is absent or schema-invalid |
+| Code                        | Raised by                         | Meaning                                                     |
+| --------------------------- | --------------------------------- | ----------------------------------------------------------- |
+| `invalid_request`           | all                               | Parameters fail the tool's own validation rules             |
+| `pin_not_found`             | `scaffold`                        | No pin matches the requested id                             |
+| `template_missing`          | `scaffold`                        | Pin has no template, or the template directory is absent    |
+| `destination_not_empty`     | `scaffold`                        | Destination exists and is not an empty directory            |
+| `destination_outside_root`  | `scaffold`, `run`, `assets_check` | Resolved path escapes the project root                      |
+| `task_not_allowed`          | `run`                             | Task id is not in the allowlist                             |
+| `unsafe_argument`           | `run`                             | Extra argument is not in the allowlist                      |
+| `project_not_found`         | `run`                             | Project root lacks the Gradle wrapper                       |
+| `spawn_failed`              | `run`                             | The wrapper could not be started                            |
+| `baseline_hash_mismatch`    | `assets_check`                    | Baseline screenshot bytes differ from the declared SHA-256  |
+| `model_texture_missing`     | `assets_check`                    | Model JSON references a texture that does not exist         |
+| `lang_key_missing`          | `assets_check`                    | A comparison locale lacks a key present in the baseline     |
+| `lang_placeholder_mismatch` | `assets_check`                    | Ordered printf placeholders differ from the baseline locale |
+| `png_invalid`               | `assets_check`                    | PNG signature, IHDR, or CRC is invalid                      |
+| `png_too_large`             | `assets_check`                    | PNG exceeds byte, edge, or pixel limits                     |
+| `file_missing`              | `assets_check`                    | A requested texture, model, or lang file is absent          |
+| `json_invalid`              | `assets_check`                    | A model or lang file is not valid JSON                      |
+| `dimension_mismatch`        | `assets_check`                    | Texture dimensions differ from the `WxH` expectation        |
+| `pins_invalid`              | `target_info`, `scaffold`         | `targets/pins.json` is absent or schema-invalid             |
 
 Codes are stable identifiers. Adding a code is a compatible change; renaming one is
 not.
@@ -79,9 +79,9 @@ Parameters:
 
 ```jsonc
 {
-  "id": "java-fabric-1.21.1",   // optional, exact match
-  "minecraft": "1.21.1",        // optional, exact match
-  "loader": "fabric"            // optional, exact match
+  "id": "java-fabric-1.21.1", // optional, exact match
+  "minecraft": "1.21.1", // optional, exact match
+  "loader": "fabric", // optional, exact match
 }
 ```
 
@@ -89,12 +89,27 @@ Value:
 
 ```jsonc
 {
-  "pins": [ { "id": "java-fabric-1.21.1", "minecraft": "1.21.1", "loader": "fabric",
-              "loaderVersion": "0.20.1", "apiVersion": "0.116.17+1.21.1",
-              "gradlePlugin": "net.fabricmc.fabric-loom-remap",
-              "gradlePluginVersion": "1.17.21", "jdk": 21, "gradle": "9.8.2",
-              "mappings": "mojang", "template": "fabric-1.21.1" } ],
-  "tools": ["minecraft_target_info", "minecraft_project_scaffold", "minecraft_run", "minecraft_assets_check"]
+  "pins": [
+    {
+      "id": "java-fabric-1.21.1",
+      "minecraft": "1.21.1",
+      "loader": "fabric",
+      "loaderVersion": "0.20.1",
+      "apiVersion": "0.116.17+1.21.1",
+      "gradlePlugin": "net.fabricmc.fabric-loom-remap",
+      "gradlePluginVersion": "1.17.21",
+      "jdk": 21,
+      "gradle": "9.8.2",
+      "mappings": "mojang",
+      "template": "fabric-1.21.1",
+    },
+  ],
+  "tools": [
+    "minecraft_target_info",
+    "minecraft_project_scaffold",
+    "minecraft_run",
+    "minecraft_assets_check",
+  ],
 }
 ```
 
@@ -109,11 +124,17 @@ Parameters:
 
 ```jsonc
 {
-  "destination": "ruby-tools",             // required, relative to the host cwd
-  "pinId": "java-fabric-1.21.1",           // optional, defaults to that pin
-  "mod": { "modId": "ruby_tools", "javaPackage": "dev.voxellume.ruby",
-           "name": "Ruby Tools", "version": "1.0.0",
-           "description": "…", "authors": ["Voxellume"], "license": "MIT" }
+  "destination": "ruby-tools", // required, relative to the host cwd
+  "pinId": "java-fabric-1.21.1", // optional, defaults to that pin
+  "mod": {
+    "modId": "ruby_tools",
+    "javaPackage": "dev.voxellume.ruby",
+    "name": "Ruby Tools",
+    "version": "1.0.0",
+    "description": "…",
+    "authors": ["Voxellume"],
+    "license": "MIT",
+  },
 }
 ```
 
@@ -128,9 +149,15 @@ Validation:
 Value:
 
 ```jsonc
-{ "destination": "ruby-tools", "pinId": "java-fabric-1.21.1",
-  "files": ["gradle.properties", "src/main/java/dev/voxellume/ruby/ExampleMod.java"],
-  "notes": ["class names kept as ExampleMod/ExampleModClient"] }
+{
+  "destination": "ruby-tools",
+  "pinId": "java-fabric-1.21.1",
+  "files": [
+    "gradle.properties",
+    "src/main/java/dev/voxellume/ruby/ExampleMod.java",
+  ],
+  "notes": ["class names kept as ExampleMod/ExampleModClient"],
+}
 ```
 
 Rules:
@@ -152,8 +179,13 @@ Runs one allowlisted Gradle task in a scaffolded project. Approval class: `exec`
 Parameters:
 
 ```jsonc
-{ "projectRoot": "ruby-tools", "task": "build",
-  "extraArgs": ["--offline"], "timeoutSeconds": 900, "stopOnLog": "Done \\(" }
+{
+  "projectRoot": "ruby-tools",
+  "task": "build",
+  "extraArgs": ["--offline"],
+  "timeoutSeconds": 900,
+  "stopOnLog": "Done \\(",
+}
 ```
 
 - `task` ∈ `build | clean | test | runServer | runClient | runGametest | genSources`
@@ -166,9 +198,16 @@ Parameters:
 Execution rules:
 
 - argv is exactly `["./gradlew" | "gradlew.bat", "--no-daemon", "--console=plain",
-  ...TASK_ARGS[task], ...extraArgs]`. No shell. Nothing else is appended.
-- The environment is `process.env` minus keys matching
-  `/TOKEN|SECRET|PASSWORD|CREDENTIAL/i`.
+...TASK_ARGS[task], ...extraArgs]`. No shell. Nothing else is appended.
+- The environment is `process.env` reduced to an explicit allowlist of toolchain
+  and OS variables (`PATH`, `PATHEXT`, `SystemRoot`, `windir`, `ComSpec`, `TEMP`,
+  `TMP`, `TMPDIR`, `HOME`, `USERPROFILE`, `USERNAME`, `USER`, `LOGNAME`, `SHELL`,
+  `LANG`, `LC_ALL`, `TZ`, `JAVA_HOME`, `GRADLE_USER_HOME`, `GRADLE_OPTS`,
+  `JAVA_TOOL_OPTIONS`, `_JAVA_OPTIONS`, `PROCESSOR_ARCHITECTURE`,
+  `NUMBER_OF_PROCESSORS`, `OS`, and any key starting with `XDG_`). Everything
+  else is dropped.
+- On win32 the wrapper runs through an absolute `cmd.exe`; a wrapper path
+  containing `& | < > ^ % ! "` is `unsafe_argument`.
 - Output is capped at 16 MiB; on overflow the process tree is killed.
 - The full log is written to `<projectRoot>/.voxellume/logs/<task>-<timestamp>.log`.
 - Killing targets the whole process tree.
@@ -176,10 +215,15 @@ Execution rules:
 Value:
 
 ```jsonc
-{ "task": "build", "argv": ["./gradlew", "--no-daemon", "--console=plain", "build"],
-  "status": "exited", "exitCode": 0, "durationMs": 41231,
+{
+  "task": "build",
+  "argv": ["./gradlew", "--no-daemon", "--console=plain", "build"],
+  "status": "exited",
+  "exitCode": 0,
+  "durationMs": 41231,
   "logPath": ".voxellume/logs/build-2026-01-01T00-00-00-000Z.log",
-  "tail": ["BUILD SUCCESSFUL in 41s"] }
+  "tail": ["BUILD SUCCESSFUL in 41s"],
+}
 ```
 
 `status` ∈ `exited | stopped_by_log | timed_out | cancelled | output_limit_reached | spawn_failed`.
@@ -198,12 +242,18 @@ Parameters (all paths relative to `projectRoot`, all sections optional):
   "projectRoot": "ruby-tools",
   "textures": ["src/main/resources/assets/ruby_tools/textures/item/ruby.png"],
   "models": ["src/main/resources/assets/ruby_tools/models/item/ruby.json"],
-  "lang": { "baseline": "src/main/resources/assets/ruby_tools/lang/en_us.json",
-            "compare": ["src/main/resources/assets/ruby_tools/lang/de_de.json"],
-            "requiredKeys": ["item.ruby_tools.ruby"] },
-  "diff": { "baseline": ".artifacts/shot-before.png",
-            "baselineSha256": "…", "capture": ".artifacts/shot-after.png",
-            "threshold": 0.1, "maxDifferentPixels": 64 }
+  "lang": {
+    "baseline": "src/main/resources/assets/ruby_tools/lang/en_us.json",
+    "compare": ["src/main/resources/assets/ruby_tools/lang/de_de.json"],
+    "requiredKeys": ["item.ruby_tools.ruby"],
+  },
+  "diff": {
+    "baseline": ".artifacts/shot-before.png",
+    "baselineSha256": "…",
+    "capture": ".artifacts/shot-after.png",
+    "threshold": 0.1,
+    "maxDifferentPixels": 64,
+  },
 }
 ```
 
@@ -225,8 +275,12 @@ Rules:
 Value:
 
 ```jsonc
-{ "textures": [{ "path": "…", "status": "ok", "findings": [] }],
-  "models": [], "lang": [], "diff": { "differentPixels": 0, "status": "ok" } }
+{
+  "textures": [{ "path": "…", "status": "ok", "findings": [] }],
+  "models": [],
+  "lang": [],
+  "diff": { "differentPixels": 0, "status": "ok" },
+}
 ```
 
 ## 8. Trust boundaries
@@ -235,8 +289,11 @@ Value:
   the declared root (`cwd` for scaffold/run/assets). Escapes are `destination_outside_root`.
 - **Processes.** Only allowlisted argv arrays are executed, never shell strings.
   Only Gradle tasks in the allowlist are reachable. Output and runtime are bounded.
-- **Secrets.** The child environment is scrubbed of token-like variables. Tool
-  results never echo environment values.
+- **Secrets.** The child environment is reduced to an explicit allowlist of
+  toolchain and OS variables; every other variable is dropped. Tool results never
+  echo environment values.
+- **Time of check to time of use.** A path is validated once, so a concurrent
+  filesystem change inside the validated root is outside the plugin's guarantee.
 - **Network.** The plugin makes no network requests. Gradle may, as part of the
   build; that is the project's own toolchain.
 - **Blockbench.** Reached over loopback only, with `risky_eval` disabled. The plugin

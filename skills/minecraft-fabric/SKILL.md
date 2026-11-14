@@ -1,33 +1,50 @@
 ---
 name: minecraft-fabric
-description: Implement or review Fabric vertical slices using project-local Loom, mappings, source sets, metadata, entrypoints, events, networking, and datagen.
+description: Use when implementing or reviewing a Fabric mod slice: Loom build, source sets, metadata, entrypoints, events, networking, and datagen.
 ---
 
 # Fabric implementation
 
-Read the vendored [Fabric procedure](../../THIRD_PARTY/siredvin-minecraft-modding-skills/skills/fabric-modding/SKILL.md) and [version contracts](../../THIRD_PARTY/siredvin-minecraft-modding-skills/skills/fabric-modding/references/version-contracts.md). Pack `target.json`, `docs.json`, and `verification.json` outrank examples; never copy versions or API shapes without target evidence. Apply [Jahrome's Fabric notes](../../THIRD_PARTY/jahrome-minecraft-agent-skills/.agents/skills/minecraft-modding/references/fabric-api.md) only when its labeled release and mappings match. `minecraft-targets` owns support; `minecraft-verification` owns execution and evidence.
+The project layout comes from `templates/fabric-1.21.1`. Vendored procedure:
+[Fabric modding](../../THIRD_PARTY/siredvin-minecraft-modding-skills/skills/fabric-modding/SKILL.md)
+and its
+[version contracts](../../THIRD_PARTY/siredvin-minecraft-modding-skills/skills/fabric-modding/references/version-contracts.md).
+The pin from `minecraft_target_info` outranks any example.
 
 ## Inputs
 
-- Validated ModSpec slice, acceptance IDs, owned paths, and staging root.
-- Supported exact pack ID/revision/hash and existing-project inspection.
-- Focused public check and pack-owned verification contract.
+- The pin chosen by `minecraft-targets`, and a project created with
+  `minecraft_project_scaffold`.
+- One behaviour to add, stated as a check you can run.
 
 ## Procedure
 
-1. **Bind the project contract.** Inspect effective Gradle properties, catalogs, convention plugins, and build scripts. Record version owners, Loom plugin, Java toolchain, mappings, dependencies, modules, and source sets. Preserve working compatibility wrappers and the remapping boundary.
-   **Complete when:** decisions cite pack/project evidence and version owners remain singular.
-2. **Wire source sets and metadata.** Discover `splitEnvironmentSourceSets()` and `loom.mods` before placing code. Align `fabric.mod.json` ID, namespace, environment, dependencies, `main`/`client`/optional `fabric-datagen` entrypoints, mixin configs, and access widener with actual files. Keep client classes out of common initialization.
-   **Complete when:** every declaration resolves to an owned file in the correct source set.
-3. **Use the narrowest behavior hook.** Register mapping-appropriate identifiers and singleton objects during initialization with target-required keys. Prefer Fabric API callbacks and vanilla extension points. Add a mixin only for named uncovered behavior, with minimal injection and side-correct config.
-   **Complete when:** each acceptance names its registry/event/mixin hook; each mixin records why callbacks cannot cover it.
-4. **Separate sides and validate networking.** Distinguish physical classloading from logical state. Register payload codecs and directional receivers with the exact API; isolate client receivers. On the logical server, authorize senders and validate identifiers, counts, ranges, distances, positions, loaded chunks, and entities before main-thread mutation.
-   **Complete when:** every payload documents direction, codec, receiver side, thread handoff, and server validation.
-5. **Connect resources and datagen.** Keep editable assets outside runtime resources, generated output in its configured source set, and handwritten JSON separate. Wire configured datagen providers; trace models, blockstates, lang, recipes, loot, tags, and registry data to acceptance IDs.
-   **Complete when:** every runtime reference has one source/generator owner; generated files remain unedited.
-6. **Run focused red-green.** The orchestrator dispatches `mod-game-worker` for the red public check, `mod-offline-worker` implements minimally, then the game worker reruns focused and static checks using pack-fixed commands. Only the game worker launches Gradle or games.
-   **Complete when:** red/green evidence exists, or a preserved diagnostic blocks success.
+1. Read `gradle.properties`, `build.gradle`, and `settings.gradle` before editing.
+   Record the Loom plugin, the Java toolchain, mappings, and loader versions. Change
+   them only to match the pin.
+2. Wire source sets and metadata. With split source sets, client classes belong in the
+   client set. Keep `fabric.mod.json` `id`, entrypoints, mixin configs, and the access
+   widener consistent with the files that exist.
+3. Use the narrowest hook. Prefer Fabric API events and vanilla extension points.
+   Add a mixin only for behaviour nothing else covers, with minimal injection and the
+   config scoped to the right side.
+4. Separate sides. Client-only imports never load on a dedicated server. Register
+   payload codecs and directional receivers explicitly, and validate identifiers,
+   counts, ranges, and positions on the server before trusting a packet.
+5. Keep resources owned. Assets go under `src/main/resources/assets/<modid>/`; data
+   under `src/main/resources/data/<modid>/`. Generated files are written by datagen
+   providers, never hand-edited.
+6. Prove the slice with `minecraft_run`: `build` for compilation, then the task that
+   exercises the behaviour (`runServer`, `runGametest`, or `runClient`). See
+   `minecraft-verification` for the proof table.
+
+## Rules
+
+- One build change at a time; rerun `build` after each.
+- Never edit `build/` or `.gradle/`.
+- Versions come from the pin. Do not copy a version from a tutorial.
 
 ## Output
 
-Return evidence-linked implementation decisions, owned files, registry/event/side/network/datagen choices, and a ledger of acceptance ID, check ID, requested/executed status, and diagnostics. Hand the staged candidate to `minecraft-verification`; focused checks establish no build, runtime, production-JAR, or visual support.
+Return the files changed, the loader decisions with their reason, and the
+`minecraft_run` results that prove the slice.

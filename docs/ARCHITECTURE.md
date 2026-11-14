@@ -81,22 +81,22 @@ log or on disk.
 ## 5. Non-goals
 
 - No evidence manifests, transaction journals, staging roots, or rollback.
-- No target qualification matrix or status catalog.
+- No target status catalog, support labels, or qualification records.
 - No bundled MCP server, no site, no installer, no release automation beyond CI.
 - No runtime dependency on Blockbench or Blender; both are optional and documented.
 
 ## 6. Testing
 
-| Layer | Test kind | Location |
-| --- | --- | --- |
-| envelope, pins | unit | `tests/unit/{results,pins}.test.ts` |
-| scaffold substitution | unit on a minimal fixture | `tests/unit/scaffold.test.ts` |
-| scaffold on the real template | integration | `tests/integration/scaffold-template.test.ts` |
-| run process control | unit with stub wrappers | `tests/unit/run.test.ts` |
-| assets | unit with generated PNGs | `tests/unit/{assets-check,png-visual}.test.ts` |
-| host adapters | integration with fake hosts | `tests/integration/{omp,dsh}-adapter.test.ts` |
-| docs links | integration | `tests/integration/capability-docs.test.ts` |
-| real Fabric build + server | live, opt-in | `tests/live/fabric-build.test.ts` |
+| Layer                         | Test kind                   | Location                                       |
+| ----------------------------- | --------------------------- | ---------------------------------------------- |
+| envelope, pins                | unit                        | `tests/unit/{results,pins}.test.ts`            |
+| scaffold substitution         | unit on a minimal fixture   | `tests/unit/scaffold.test.ts`                  |
+| scaffold on the real template | integration                 | `tests/integration/scaffold-template.test.ts`  |
+| run process control           | unit with stub wrappers     | `tests/unit/run.test.ts`                       |
+| assets                        | unit with generated PNGs    | `tests/unit/{assets-check,png-visual}.test.ts` |
+| host adapters                 | integration with fake hosts | `tests/integration/{omp,dsh}-adapter.test.ts`  |
+| docs links                    | integration                 | `tests/integration/capability-docs.test.ts`    |
+| real Fabric build + server    | live, opt-in                | `tests/live/fabric-build.test.ts`              |
 
 `pnpm verify` runs format, lint, typecheck, structure, unit, and integration. The
 live suite runs in CI with JDK 21 and network access, and locally with
