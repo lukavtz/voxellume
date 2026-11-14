@@ -32,6 +32,12 @@ tool closures once; `omp/index.ts` registers them with `approval` classes;
 `dsh/index.ts` wraps them with `defineTool` (its `output.render` is mandatory) and
 registers the prompt section. Adapters translate host arguments, nothing else.
 
+The package is both an OMP plugin and a DSH bundle. `package.json` declares a `pi`
+field pointing OMP at `dist/adapters/omp/index.js`, and a `dsh.bundle.patch` field
+pointing DSH at `cordis.patch.yml`, whose single `insert` row imports this package
+by name and resolves through the root `"."` export to `dist/adapters/dsh/index.js`.
+The same four tools back both entries; neither host gets its own copy of the logic.
+
 **Tools.** `src/core/tools/*` holds the real logic. Each tool is a pure-ish async
 function: parameters in, `ToolResult<T>` out, no host types, no globals, no logging
 side effects beyond the run log. Tools validate before they act and report only what

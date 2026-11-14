@@ -52,8 +52,12 @@ const FORBIDDEN_CORE_DIRS = new Set([
 
 const problems = [];
 
+const PACKED_TARBALL = /^voxellume-\d+\.\d+\.\d+\.tgz$/;
+
 const entries = await readdir(root, { withFileTypes: true });
 for (const entry of entries) {
+  // `pnpm pack` leaves its tarball in the root; .gitignore ignores the same name.
+  if (PACKED_TARBALL.test(entry.name)) continue;
   if (!ALLOWED_TOP_LEVEL.has(entry.name)) {
     problems.push(`unexpected top-level entry: ${entry.name}`);
   }

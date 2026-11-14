@@ -11,6 +11,10 @@
     "dsh": ">=0.2.2-rc.1 <0.3.0"
   },
   "exports": {
+    ".": {
+      "types": "./dist/adapters/dsh/index.d.ts",
+      "import": "./dist/adapters/dsh/index.js"
+    },
     "./omp": {
       "types": "./dist/adapters/omp/index.d.ts",
       "import": "./dist/adapters/omp/index.js"
@@ -28,6 +32,11 @@
     "skills": [
       "./skills"
     ]
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
   },
   "files": [
     "dist",
