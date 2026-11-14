@@ -19,7 +19,10 @@ interface RegisteredTool {
   ) => Promise<{ content: Array<{ type: string; text: string }> }>;
 }
 
-function fakeHost(): { tools: RegisteredTool[]; host: Record<string, unknown> } {
+function fakeHost(): {
+  tools: RegisteredTool[];
+  host: Record<string, unknown>;
+} {
   const tools: RegisteredTool[] = [];
   return {
     tools,
@@ -61,7 +64,10 @@ test("OMP extension registers the four plugin tools with approvals", async (t) =
   for (const tool of tools) assert.ok(tool.description.length > 20);
 
   const info = tools[0]!;
-  const result = await info.execute("call-1", { minecraft: "1.21.1", loader: "fabric" });
+  const result = await info.execute("call-1", {
+    minecraft: "1.21.1",
+    loader: "fabric",
+  });
   const text = result.content[0]?.text ?? "";
   assert.ok(text.includes('"status":"ok"'));
   assert.ok(text.includes("java-fabric-1.21.1"));

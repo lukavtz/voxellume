@@ -36,12 +36,7 @@ export interface DshContext {
 }
 
 type Json =
-  | null
-  | boolean
-  | number
-  | string
-  | Json[]
-  | { readonly [key: string]: Json };
+  null | boolean | number | string | Json[] | { readonly [key: string]: Json };
 
 /** Envelope as lossless JSON, for hosts that hand tools a JSON value. */
 function envelopeJson(result: ToolResult<unknown>): Json {
@@ -127,16 +122,17 @@ function defineTools(tools: ReturnType<typeof createVoxellumeTools>) {
         },
         extraArgs: {
           type: "array",
-          items: { type: "string", enum: ["--offline", "--info", "--stacktrace"] },
+          items: {
+            type: "string",
+            enum: ["--offline", "--info", "--stacktrace"],
+          },
         },
         timeoutSeconds: { type: "integer" },
         stopOnLog: { type: "string" },
       },
       output,
       async execute(args, exec) {
-        return envelopeJson(
-          await tools.run(args as RunRequest, exec.signal),
-        );
+        return envelopeJson(await tools.run(args as RunRequest, exec.signal));
       },
     }),
     defineTool({
@@ -175,7 +171,9 @@ function defineTools(tools: ReturnType<typeof createVoxellumeTools>) {
       output,
       isConcurrencySafe: () => true,
       async execute(args) {
-        return envelopeJson(await tools.checkAssets(args as AssetsCheckRequest));
+        return envelopeJson(
+          await tools.checkAssets(args as AssetsCheckRequest),
+        );
       },
     }),
   ];
@@ -191,7 +189,9 @@ async function procedures(): Promise<string> {
     .sort();
   const bodies: string[] = [];
   for (const skill of names) {
-    bodies.push((await readFile(join(skillsRoot, skill, "SKILL.md"), "utf8")).trim());
+    bodies.push(
+      (await readFile(join(skillsRoot, skill, "SKILL.md"), "utf8")).trim(),
+    );
   }
   return bodies.join("\n\n---\n\n");
 }

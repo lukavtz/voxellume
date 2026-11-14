@@ -28,7 +28,10 @@ test("scaffold produces a coherent project from templates/fabric-1.21.1", async 
     if (result.status !== "ok") return;
 
     const project = join(work, "ruby");
-    const properties = await readFile(join(project, "gradle.properties"), "utf8");
+    const properties = await readFile(
+      join(project, "gradle.properties"),
+      "utf8",
+    );
     assert.ok(properties.includes("minecraft_version=1.21.1"));
     assert.ok(properties.includes("loader_version=0.20.1"));
     assert.ok(properties.includes("loom_version=1.17.21"));
@@ -37,7 +40,10 @@ test("scaffold produces a coherent project from templates/fabric-1.21.1", async 
     assert.equal(properties.includes("com.example"), false);
 
     const metadata = JSON.parse(
-      await readFile(join(project, "src", "main", "resources", "fabric.mod.json"), "utf8"),
+      await readFile(
+        join(project, "src", "main", "resources", "fabric.mod.json"),
+        "utf8",
+      ),
     ) as {
       id: string;
       name: string;
@@ -47,15 +53,31 @@ test("scaffold produces a coherent project from templates/fabric-1.21.1", async 
     };
     assert.equal(metadata.id, "ruby_tools");
     assert.equal(metadata.name, "Ruby Tools");
-    assert.deepEqual(metadata.entrypoints.main, ["dev.voxellume.ruby.ExampleMod"]);
-    assert.deepEqual(metadata.entrypoints.client, ["dev.voxellume.ruby.client.ExampleModClient"]);
-    assert.deepEqual(metadata.mixins, ["ruby_tools.mixins.json", { config: "ruby_tools.client.mixins.json", environment: "client" }]);
+    assert.deepEqual(metadata.entrypoints.main, [
+      "dev.voxellume.ruby.ExampleMod",
+    ]);
+    assert.deepEqual(metadata.entrypoints.client, [
+      "dev.voxellume.ruby.client.ExampleModClient",
+    ]);
+    assert.deepEqual(metadata.mixins, [
+      "ruby_tools.mixins.json",
+      { config: "ruby_tools.client.mixins.json", environment: "client" },
+    ]);
     assert.equal(metadata.icon, "assets/ruby_tools/icon.png");
 
     const templateJar = await readFile(
-      join(packageRoot(), "templates", "fabric-1.21.1", "gradle", "wrapper", "gradle-wrapper.jar"),
+      join(
+        packageRoot(),
+        "templates",
+        "fabric-1.21.1",
+        "gradle",
+        "wrapper",
+        "gradle-wrapper.jar",
+      ),
     );
-    const projectJar = await readFile(join(project, "gradle", "wrapper", "gradle-wrapper.jar"));
+    const projectJar = await readFile(
+      join(project, "gradle", "wrapper", "gradle-wrapper.jar"),
+    );
     assert.equal(Buffer.compare(templateJar, projectJar), 0);
 
     const gradlew = await readFile(join(project, "gradlew"), "utf8");
@@ -64,24 +86,43 @@ test("scaffold produces a coherent project from templates/fabric-1.21.1", async 
     const gradlewBat = await readFile(join(project, "gradlew.bat"));
     assert.ok(gradlewBat.includes(Buffer.from("\r\n")));
 
-    assert.deepEqual(
-      [...result.value.files],
-      await listRecursive(project),
-    );
+    assert.deepEqual([...result.value.files], await listRecursive(project));
 
     const main = await readFile(
-      join(project, "src", "main", "java", "dev", "voxellume", "ruby", "ExampleMod.java"),
+      join(
+        project,
+        "src",
+        "main",
+        "java",
+        "dev",
+        "voxellume",
+        "ruby",
+        "ExampleMod.java",
+      ),
       "utf8",
     );
     assert.ok(main.includes("package dev.voxellume.ruby;"));
     const mixin = await readFile(
-      join(project, "src", "main", "java", "dev", "voxellume", "ruby", "mixin", "ExampleMixin.java"),
+      join(
+        project,
+        "src",
+        "main",
+        "java",
+        "dev",
+        "voxellume",
+        "ruby",
+        "mixin",
+        "ExampleMixin.java",
+      ),
       "utf8",
     );
     assert.ok(mixin.includes("package dev.voxellume.ruby.mixin;"));
     assert.ok(mixin.includes("ruby_tools.mixins.json") === false);
     const mixinConfig = JSON.parse(
-      await readFile(join(project, "src", "main", "resources", "ruby_tools.mixins.json"), "utf8"),
+      await readFile(
+        join(project, "src", "main", "resources", "ruby_tools.mixins.json"),
+        "utf8",
+      ),
     ) as { package: string };
     assert.equal(mixinConfig.package, "dev.voxellume.ruby.mixin");
   } finally {
@@ -94,7 +135,8 @@ async function listRecursive(root: string, prefix = ""): Promise<string[]> {
   const files: string[] = [];
   for (const entry of entries) {
     const relativePath = prefix === "" ? entry.name : `${prefix}/${entry.name}`;
-    if (entry.isDirectory()) files.push(...(await listRecursive(root, relativePath)));
+    if (entry.isDirectory())
+      files.push(...(await listRecursive(root, relativePath)));
     else files.push(relativePath);
   }
   return files.sort();

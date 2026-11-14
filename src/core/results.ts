@@ -19,7 +19,11 @@ export function ok<T>(value: T): ToolSuccess<T> {
 }
 
 export function fail(code: string, detail: string): ToolFailure {
-  return { schemaVersion: TOOL_SCHEMA_VERSION, status: "error", error: { code, detail } };
+  return {
+    schemaVersion: TOOL_SCHEMA_VERSION,
+    status: "error",
+    error: { code, detail },
+  };
 }
 
 export function serializeToolResult(result: ToolResult<unknown>): string {

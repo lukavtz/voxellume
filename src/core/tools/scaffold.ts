@@ -1,8 +1,16 @@
-import { copyFile, mkdir, readdir, readFile, stat, writeFile } from "node:fs/promises";
-import { dirname, join } from "node:path";
+import {
+  copyFile,
+  mkdir,
+  readdir,
+  readFile,
+  stat,
+  writeFile,
+} from "node:fs/promises";
+import { dirname, isAbsolute, join, relative } from "node:path";
 
-import { PathEscapeError, resolveInsideRoot } from "../fs-guard.ts";
-import { PinsError, loadPins, pinsFailure } from "../pins.ts";
+import { CodedError } from "../errors.ts";
+import { resolveInsideRoot } from "../fs-guard.ts";
+import { PinsError, loadPins, pinsInvalid } from "../pins.ts";
 import { fail, ok, type ToolResult } from "../results.ts";
 import {
   applySubstitutions,
@@ -31,28 +39,31 @@ export interface ScaffoldResult {
   readonly notes: readonly string[];
 }
 
-class ScaffoldError extends Error {
-  readonly code: string;
-  constructor(code: string, detail: string) {
-    super(detail);
-    this.name = "ScaffoldError";
-    this.code = code;
-  }
-}
-
 function requireText(value: unknown, field: string): string {
   if (typeof value !== "string" || value.trim() === "") {
-    throw new ScaffoldError("invalid_request", `${field} must be a non-empty string`);
+    throw new CodedError(
+      "invalid_request",
+      `${field} must be a non-empty string`,
+    );
+  }
+  if (/[\r\n]/.test(value)) {
+    throw new CodedError(
+      "invalid_request",
+      `${field} must not contain line breaks`,
+    );
   }
   return value;
 }
 
 function validateIdentity(mod: ModMetadata): void {
   if (!MOD_ID.test(mod.modId ?? "")) {
-    throw new ScaffoldError("invalid_request", "modId must match ^[a-z][a-z0-9_]{1,63}$");
+    throw new CodedError(
+      "invalid_request",
+      "modId must match ^[a-z][a-z0-9_]{1,63}$",
+    );
   }
   if (!JAVA_PACKAGE.test(mod.javaPackage ?? "")) {
-    throw new ScaffoldError(
+    throw new CodedError(
       "invalid_request",
       "javaPackage must match ^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$",
     );
@@ -61,18 +72,27 @@ function validateIdentity(mod: ModMetadata): void {
 
 function validateAuthors(authors: readonly string[]): void {
   if (!Array.isArray(authors) || authors.length === 0) {
-    throw new ScaffoldError("invalid_request", "authors must be a non-empty array of names");
+    throw new CodedError(
+      "invalid_request",
+      "authors must be a non-empty array of names",
+    );
   }
   for (const author of authors) requireText(author, "authors[]");
 }
 
 function validateMod(mod: ModMetadata): void {
   if (typeof mod !== "object" || mod === null) {
-    throw new ScaffoldError("invalid_request", "mod must be an object");
+    throw new CodedError("invalid_request", "mod must be an object");
   }
   validateIdentity(mod);
   for (const field of ["name", "version", "description", "license"] as const) {
     requireText(mod[field], field);
+  }
+  if (/\s/.test(mod.version)) {
+    throw new CodedError(
+      "invalid_request",
+      "version must not contain whitespace",
+    );
   }
   validateAuthors(mod.authors);
 }
@@ -86,11 +106,11 @@ async function prepareDestination(path: string): Promise<void> {
     return;
   }
   if (!info.isDirectory()) {
-    throw new ScaffoldError("destination_not_empty", `${path} is not a directory`);
+    throw new CodedError("destination_not_empty", `${path} is not a directory`);
   }
   const entries = await readdir(path);
   if (entries.length > 0) {
-    throw new ScaffoldError("destination_not_empty", `${path} is not empty`);
+    throw new CodedError("destination_not_empty", `${path} is not empty`);
   }
 }
 
@@ -101,7 +121,8 @@ async function listTemplate(root: string, prefix = ""): Promise<string[]> {
   const files: string[] = [];
   for (const entry of entries) {
     const relativePath = prefix === "" ? entry.name : `${prefix}/${entry.name}`;
-    if (entry.isDirectory()) files.push(...(await listTemplate(root, relativePath)));
+    if (entry.isDirectory())
+      files.push(...(await listTemplate(root, relativePath)));
     else files.push(relativePath);
   }
   return files.sort();
@@ -116,20 +137,32 @@ async function resolveTemplate(
     pins = await loadPins(join(packageRoot, "targets", "pins.json"));
   } catch (error) {
     if (error instanceof PinsError) throw error;
-    throw new PinsError(String(error));
+    throw pinsInvalid(String(error));
   }
   const pin = pins.find((entry) => entry.id === pinId);
   if (pin === undefined) {
-    throw new ScaffoldError("pin_not_found", pinId);
+    throw new CodedError("pin_not_found", pinId);
   }
   if (pin.template === null) {
-    throw new ScaffoldError("template_missing", `pin ${pinId} has no template`);
+    throw new CodedError("template_missing", `pin ${pinId} has no template`);
   }
-  const templateDir = join(packageRoot, "templates", pin.template);
+  const templatesDir = join(packageRoot, "templates");
+  const templateDir = join(templatesDir, pin.template);
+  const inside = relative(templatesDir, templateDir);
+  if (inside.startsWith("..") || isAbsolute(inside)) {
+    throw new CodedError(
+      "template_missing",
+      `pin ${pinId} has an invalid template path`,
+    );
+  }
   try {
-    if (!(await stat(templateDir)).isDirectory()) throw new Error("not a directory");
+    if (!(await stat(templateDir)).isDirectory())
+      throw new Error("not a directory");
   } catch {
-    throw new ScaffoldError("template_missing", `template directory ${pin.template} is absent`);
+    throw new CodedError(
+      "template_missing",
+      `template directory ${pin.template} is absent`,
+    );
   }
   return { pinId, templateDir };
 }
@@ -148,7 +181,10 @@ async function copyTemplate(
     await mkdir(dirname(target), { recursive: true });
     if (isTextPath(templateFile)) {
       const text = await readFile(source, "utf8");
-      const rewritten = normalizeNewlines(applySubstitutions(text, mod), targetRelative);
+      const rewritten = normalizeNewlines(
+        applySubstitutions(text, mod),
+        targetRelative,
+      );
       await writeFile(target, rewritten, "utf8");
     } else {
       await copyFile(source, target);
@@ -163,17 +199,30 @@ export async function scaffold(
   options: { readonly packageRoot: string; readonly cwd: string },
 ): Promise<ToolResult<ScaffoldResult>> {
   try {
-    if (typeof request.destination !== "string" || request.destination.trim() === "") {
-      throw new ScaffoldError("invalid_request", "destination must be a non-empty string");
+    if (
+      typeof request.destination !== "string" ||
+      request.destination.trim() === ""
+    ) {
+      throw new CodedError(
+        "invalid_request",
+        "destination must be a non-empty string",
+      );
     }
     validateMod(request.mod);
     const resolved = await resolveTemplate(
       options.packageRoot,
       request.pinId ?? DEFAULT_PIN,
     );
-    const destination = await resolveInsideRoot(options.cwd, request.destination);
+    const destination = await resolveInsideRoot(
+      options.cwd,
+      request.destination,
+    );
     await prepareDestination(destination);
-    const files = await copyTemplate(resolved.templateDir, destination, request.mod);
+    const files = await copyTemplate(
+      resolved.templateDir,
+      destination,
+      request.mod,
+    );
     return ok({
       destination: request.destination,
       pinId: resolved.pinId,
@@ -181,12 +230,7 @@ export async function scaffold(
       notes: ["class names kept as ExampleMod/ExampleModClient"],
     });
   } catch (error) {
-    if (error instanceof ScaffoldError || error instanceof PathEscapeError) {
-      return fail(error.code, error.message);
-    }
-    if (error instanceof PinsError) {
-      return pinsFailure(error);
-    }
+    if (error instanceof CodedError) return fail(error.code, error.message);
     throw error;
   }
 }

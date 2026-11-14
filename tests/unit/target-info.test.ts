@@ -18,7 +18,10 @@ test("targetInfo resolves the working Fabric pin from the shipped pins file", as
 });
 
 test("targetInfo returns an empty list for an unknown version instead of failing", async () => {
-  const result = await targetInfo({ minecraft: "9.9" }, { packageRoot: packageRoot() });
+  const result = await targetInfo(
+    { minecraft: "9.9" },
+    { packageRoot: packageRoot() },
+  );
   assert.equal(result.status, "ok");
   if (result.status !== "ok") return;
   assert.deepEqual(result.value.pins, []);
@@ -32,7 +35,10 @@ test("targetInfo reports every shipped pin when no filter is given", async () =>
 });
 
 test("targetInfo converts a missing pins file into a pins_invalid failure", async () => {
-  const result = await targetInfo({}, { packageRoot: "/nonexistent-voxellume-root" });
+  const result = await targetInfo(
+    {},
+    { packageRoot: "/nonexistent-voxellume-root" },
+  );
   assert.equal(result.status, "error");
   if (result.status !== "error") return;
   assert.equal(result.error.code, "pins_invalid");

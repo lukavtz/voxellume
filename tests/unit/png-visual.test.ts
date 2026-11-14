@@ -29,13 +29,17 @@ function png(width: number, height: number, pixels: readonly Rgba[]): Buffer {
 }
 
 function codeOf(error: unknown): string {
-  assert.ok(error instanceof AssetError, `expected AssetError, got ${String(error)}`);
+  assert.ok(
+    error instanceof AssetError,
+    `expected AssetError, got ${String(error)}`,
+  );
   return error.code;
 }
 
 test("inspectPng rejects a buffer without a PNG signature", () => {
-  assert.throws(() => inspectPng(Buffer.from("not a png at all, definitely not")), (error: unknown) =>
-    codeOf(error) === "invalid_png",
+  assert.throws(
+    () => inspectPng(Buffer.from("not a png at all, definitely not")),
+    (error: unknown) => codeOf(error) === "invalid_png",
   );
 });
 
@@ -43,7 +47,10 @@ test("inspectPng enforces the declared pixel budget before decoding", () => {
   const bytes = Buffer.from(png(1, 1, [RED]));
   bytes.writeUInt32BE(PNG_DEFAULT_LIMITS.maxEdge + 1, 16);
   bytes.writeUInt32BE(PNG_DEFAULT_LIMITS.maxEdge + 1, 20);
-  assert.throws(() => inspectPng(bytes), (error: unknown) => codeOf(error) === "pixel_limit_exceeded");
+  assert.throws(
+    () => inspectPng(bytes),
+    (error: unknown) => codeOf(error) === "pixel_limit_exceeded",
+  );
 });
 
 test("inspectPng enforces the byte cap", () => {
@@ -63,27 +70,38 @@ test("inspectPng reports dimensions and hash", () => {
 
 test("inspectPng rejects an image whose header declares a missing body", () => {
   const bytes = png(2, 2, [RED]).subarray(0, 33);
-  assert.throws(() => inspectPng(bytes), (error: unknown) => codeOf(error) === "invalid_png");
+  assert.throws(
+    () => inspectPng(bytes),
+    (error: unknown) => codeOf(error) === "invalid_png",
+  );
 });
 
 test("compareVisualBaseline counts a single changed pixel", () => {
   const baseline = inspectPng(png(2, 2, [RED, RED, RED, RED]));
   const actual = inspectPng(png(2, 2, [RED, RED, RED, GREEN]));
-  assert.deepEqual(compareVisualBaseline({ baseline, actual, threshold: 0.1 }), {
-    status: "failed",
-    checkClass: "visual_diff",
-    width: 2,
-    height: 2,
-    differentPixels: 1,
-    totalPixels: 4,
-  });
+  assert.deepEqual(
+    compareVisualBaseline({ baseline, actual, threshold: 0.1 }),
+    {
+      status: "failed",
+      checkClass: "visual_diff",
+      width: 2,
+      height: 2,
+      differentPixels: 1,
+      totalPixels: 4,
+    },
+  );
 });
 
 test("compareVisualBaseline honours a pixel budget", () => {
   const baseline = inspectPng(png(2, 2, [RED, RED, RED, RED]));
   const actual = inspectPng(png(2, 2, [RED, RED, RED, GREEN]));
   assert.equal(
-    compareVisualBaseline({ baseline, actual, threshold: 0.1, maxDifferentPixels: 1 }).status,
+    compareVisualBaseline({
+      baseline,
+      actual,
+      threshold: 0.1,
+      maxDifferentPixels: 1,
+    }).status,
     "passed",
   );
 });
@@ -92,11 +110,13 @@ test("compareVisualBaseline rejects different sizes and bad thresholds", () => {
   const small = inspectPng(png(2, 2, [RED]));
   const large = inspectPng(png(4, 4, [RED]));
   assert.throws(
-    () => compareVisualBaseline({ baseline: small, actual: large, threshold: 0.1 }),
+    () =>
+      compareVisualBaseline({ baseline: small, actual: large, threshold: 0.1 }),
     (error: unknown) => codeOf(error) === "visual_dimension_mismatch",
   );
   assert.throws(
-    () => compareVisualBaseline({ baseline: small, actual: small, threshold: 2 }),
+    () =>
+      compareVisualBaseline({ baseline: small, actual: small, threshold: 2 }),
     (error: unknown) => codeOf(error) === "invalid_visual_threshold",
   );
 });

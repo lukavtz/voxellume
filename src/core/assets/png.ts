@@ -2,6 +2,8 @@ import { createHash } from "node:crypto";
 
 import { PNG } from "pngjs";
 
+import { CodedError } from "../errors.ts";
+
 export const PNG_DEFAULT_LIMITS = Object.freeze({
   maxBytes: 16 * 1024 * 1024,
   maxEdge: 4096,
@@ -21,14 +23,7 @@ export interface InspectedPng {
   readonly sha256: string;
 }
 
-export class AssetError extends Error {
-  readonly code: string;
-  constructor(code: string, detail: string) {
-    super(detail);
-    this.name = "AssetError";
-    this.code = code;
-  }
-}
+export { CodedError as AssetError };
 
 const SIGNATURE = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
 
@@ -36,25 +31,34 @@ function resolveLimits(requested?: Partial<PngLimits>): PngLimits {
   const limits: PngLimits = { ...PNG_DEFAULT_LIMITS, ...requested };
   for (const [name, limit] of Object.entries(limits)) {
     if (!Number.isSafeInteger(limit) || limit <= 0) {
-      throw new AssetError("invalid_png_limits", `${name} must be a positive integer`);
+      throw new CodedError(
+        "invalid_png_limits",
+        `${name} must be a positive integer`,
+      );
     }
   }
   return limits;
 }
 
-function assertHeader(source: Buffer): { readonly width: number; readonly height: number } {
+function assertHeader(source: Buffer): {
+  readonly width: number;
+  readonly height: number;
+} {
   if (
     source.length < 33 ||
     !source.subarray(0, 8).equals(SIGNATURE) ||
     source.readUInt32BE(8) !== 13 ||
     source.subarray(12, 16).toString("ascii") !== "IHDR"
   ) {
-    throw new AssetError("invalid_png", "PNG signature or IHDR is invalid");
+    throw new CodedError("invalid_png", "PNG signature or IHDR is invalid");
   }
   const width = source.readUInt32BE(16);
   const height = source.readUInt32BE(20);
   if (width === 0 || height === 0) {
-    throw new AssetError("invalid_dimensions", "PNG dimensions must be nonzero");
+    throw new CodedError(
+      "invalid_dimensions",
+      "PNG dimensions must be nonzero",
+    );
   }
   return { width, height };
 }
@@ -65,10 +69,16 @@ function assertWithinLimits(
   limits: PngLimits,
 ): void {
   if (width * height > limits.maxPixels) {
-    throw new AssetError("pixel_limit_exceeded", "PNG exceeds the decoded pixel limit");
+    throw new CodedError(
+      "pixel_limit_exceeded",
+      "PNG exceeds the decoded pixel limit",
+    );
   }
   if (width > limits.maxEdge || height > limits.maxEdge) {
-    throw new AssetError("dimension_limit_exceeded", "PNG exceeds the decoded edge limit");
+    throw new CodedError(
+      "dimension_limit_exceeded",
+      "PNG exceeds the decoded edge limit",
+    );
   }
 }
 
@@ -81,10 +91,13 @@ function decode(
   try {
     decoded = PNG.sync.read(source, { checkCRC: true });
   } catch (error) {
-    throw new AssetError("invalid_png", `PNG decode failed: ${String(error)}`);
+    throw new CodedError("invalid_png", `PNG decode failed: ${String(error)}`);
   }
   if (decoded.width !== width || decoded.height !== height) {
-    throw new AssetError("invalid_png", "Decoded PNG dimensions differ from IHDR");
+    throw new CodedError(
+      "invalid_png",
+      "Decoded PNG dimensions differ from IHDR",
+    );
   }
   return {
     data: decoded.data,
@@ -100,7 +113,7 @@ export function inspectPng(
   const limits = resolveLimits(requestedLimits);
   const source = Buffer.isBuffer(bytes) ? bytes : Buffer.from(bytes);
   if (source.byteLength > limits.maxBytes) {
-    throw new AssetError("input_too_large", "PNG exceeds the input byte limit");
+    throw new CodedError("input_too_large", "PNG exceeds the input byte limit");
   }
   const { width, height } = assertHeader(source);
   assertWithinLimits(width, height, limits);

@@ -75,7 +75,10 @@ test("DSH adapter registers four tools and one prompt section", async (t) => {
     ],
   );
   const info = definitions[0]!;
-  const value = (await info.execute({ minecraft: "1.21.1", loader: "fabric" })) as {
+  const value = (await info.execute({
+    minecraft: "1.21.1",
+    loader: "fabric",
+  })) as {
     status: string;
     value: { pins: Array<{ id: string }> };
   };

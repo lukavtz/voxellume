@@ -45,13 +45,14 @@ export function applySubstitutions(text: string, mod: ModMetadata): string {
     ["assets/modid", `assets/${mod.modId}`],
     ['"modid"', `"${mod.modId}"`],
     ["modid", mod.modId],
+    ['"name": "Example Mod"', `"name": ${JSON.stringify(mod.name)}`],
     ["Example Mod", mod.name],
     [
       "This is an example description! Tell everyone what your mod is about!",
-      mod.description,
+      JSON.stringify(mod.description).slice(1, -1),
     ],
-    ['"Me!"', `"${mod.authors[0] ?? ""}"`],
-    ['"license": "CC0-1.0"', `"license": "${mod.license}"`],
+    ['"Me!"', JSON.stringify(mod.authors[0] ?? "")],
+    ['"license": "CC0-1.0"', `"license": ${JSON.stringify(mod.license)}`],
     ["version=1.0.0", `version=${mod.version}`],
   ];
   let result = text;
@@ -66,14 +67,28 @@ export function renamePath(relativePath: string, mod: ModMetadata): string {
   const packagePath = mod.javaPackage.split(".").join("/");
   const prefixes: readonly (readonly [string, string])[] = [
     ["src/main/java/com/example/", `src/main/java/${packagePath}/`],
-    ["src/client/java/com/example/client/", `src/client/java/${packagePath}/client/`],
-    ["src/main/resources/assets/modid/", `src/main/resources/assets/${mod.modId}/`],
-    ["src/client/resources/modid.client.mixins.json", `src/client/resources/${mod.modId}.client.mixins.json`],
-    ["src/main/resources/modid.mixins.json", `src/main/resources/${mod.modId}.mixins.json`],
+    [
+      "src/client/java/com/example/client/",
+      `src/client/java/${packagePath}/client/`,
+    ],
+    [
+      "src/main/resources/assets/modid/",
+      `src/main/resources/assets/${mod.modId}/`,
+    ],
+    [
+      "src/client/resources/modid.client.mixins.json",
+      `src/client/resources/${mod.modId}.client.mixins.json`,
+    ],
+    [
+      "src/main/resources/modid.mixins.json",
+      `src/main/resources/${mod.modId}.mixins.json`,
+    ],
   ];
   for (const [prefix, replacement] of prefixes) {
-    if (relativePath === prefix.replace(/\/$/, "")) return replacement.replace(/\/$/, "");
-    if (relativePath.startsWith(prefix)) return replacement + relativePath.slice(prefix.length);
+    if (relativePath === prefix.replace(/\/$/, ""))
+      return replacement.replace(/\/$/, "");
+    if (relativePath.startsWith(prefix))
+      return replacement + relativePath.slice(prefix.length);
   }
   return relativePath;
 }
@@ -81,5 +96,7 @@ export function renamePath(relativePath: string, mod: ModMetadata): string {
 /** Normalize to LF; Windows batch files keep CRLF. */
 export function normalizeNewlines(text: string, relativePath: string): string {
   const unified = text.replace(/\r\n/g, "\n");
-  return relativePath.endsWith(".bat") ? unified.replace(/\n/g, "\r\n") : unified;
+  return relativePath.endsWith(".bat")
+    ? unified.replace(/\n/g, "\r\n")
+    : unified;
 }

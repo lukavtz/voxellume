@@ -1,8 +1,9 @@
-import { join, basename } from "node:path";
+import { join, basename, relative } from "node:path";
 import { stat } from "node:fs/promises";
 
-import { executeProcess } from "../exec/run-process.ts";
-import { PathEscapeError, resolveInsideRoot } from "../fs-guard.ts";
+import { executeProcess, type ProcessInvocation } from "../exec/run-process.ts";
+import { CodedError } from "../errors.ts";
+import { resolveInsideRoot } from "../fs-guard.ts";
 import { fail, ok, type ToolResult } from "../results.ts";
 
 export const TASK_IDS = [
@@ -27,7 +28,11 @@ export const TASK_ARGS = {
   genSources: ["genSources"],
 } as const satisfies Record<TaskId, readonly string[]>;
 
-export const EXTRA_ARG_ALLOWLIST = ["--offline", "--info", "--stacktrace"] as const;
+export const EXTRA_ARG_ALLOWLIST = [
+  "--offline",
+  "--info",
+  "--stacktrace",
+] as const;
 
 export type RunStatus =
   | "exited"
@@ -58,29 +63,51 @@ export interface RunResult {
 const DEFAULT_TIMEOUT_SECONDS = 900;
 const MAX_TIMEOUT_SECONDS = 3600;
 const MAX_OUTPUT_BYTES = 16 * 1024 * 1024;
-const SECRET_KEY = /TOKEN|SECRET|PASSWORD|CREDENTIAL/i;
-
-class RunError extends Error {
-  readonly code: string;
-  constructor(code: string, detail: string) {
-    super(detail);
-    this.name = "RunError";
-    this.code = code;
-  }
-}
+const CMD_UNSAFE = /[&|<>^%!"]/;
+const ENV_ALLOWLIST = new Set(
+  [
+    "PATH",
+    "PATHEXT",
+    "SystemRoot",
+    "windir",
+    "ComSpec",
+    "TEMP",
+    "TMP",
+    "TMPDIR",
+    "HOME",
+    "USERPROFILE",
+    "USERNAME",
+    "USER",
+    "LOGNAME",
+    "SHELL",
+    "LANG",
+    "LC_ALL",
+    "TZ",
+    "JAVA_HOME",
+    "GRADLE_USER_HOME",
+    "GRADLE_OPTS",
+    "JAVA_TOOL_OPTIONS",
+    "_JAVA_OPTIONS",
+    "PROCESSOR_ARCHITECTURE",
+    "NUMBER_OF_PROCESSORS",
+    "OS",
+  ].map((key) => key.toLowerCase()),
+);
 
 function isTaskId(value: unknown): value is TaskId {
   return typeof value === "string" && Object.hasOwn(TASK_ARGS, value);
 }
 
-function validateExtraArgs(extraArgs: readonly string[] | undefined): readonly string[] {
+function validateExtraArgs(
+  extraArgs: readonly string[] | undefined,
+): readonly string[] {
   if (extraArgs === undefined) return [];
   if (!Array.isArray(extraArgs)) {
-    throw new RunError("invalid_request", "extraArgs must be an array");
+    throw new CodedError("invalid_request", "extraArgs must be an array");
   }
   for (const argument of extraArgs) {
     if (!(EXTRA_ARG_ALLOWLIST as readonly string[]).includes(argument)) {
-      throw new RunError("unsafe_argument", String(argument));
+      throw new CodedError("unsafe_argument", String(argument));
     }
   }
   return extraArgs;
@@ -88,8 +115,12 @@ function validateExtraArgs(extraArgs: readonly string[] | undefined): readonly s
 
 function resolveTimeout(seconds: number | undefined): number {
   if (seconds === undefined) return DEFAULT_TIMEOUT_SECONDS;
-  if (!Number.isInteger(seconds) || seconds < 1 || seconds > MAX_TIMEOUT_SECONDS) {
-    throw new RunError(
+  if (
+    !Number.isInteger(seconds) ||
+    seconds < 1 ||
+    seconds > MAX_TIMEOUT_SECONDS
+  ) {
+    throw new CodedError(
       "invalid_request",
       `timeoutSeconds must be an integer between 1 and ${MAX_TIMEOUT_SECONDS}`,
     );
@@ -100,42 +131,63 @@ function resolveTimeout(seconds: number | undefined): number {
 function compileStopPattern(source: string | undefined): RegExp | undefined {
   if (source === undefined) return undefined;
   if (typeof source !== "string" || source.length > 200) {
-    throw new RunError("invalid_request", "stopOnLog must be a string of at most 200 characters");
+    throw new CodedError(
+      "invalid_request",
+      "stopOnLog must be a string of at most 200 characters",
+    );
   }
   try {
     return new RegExp(source);
   } catch (error) {
-    throw new RunError("invalid_request", `stopOnLog is not a regular expression: ${String(error)}`);
+    throw new CodedError(
+      "invalid_request",
+      `stopOnLog is not a regular expression: ${String(error)}`,
+    );
   }
 }
 
 function scrubEnvironment(source: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
   const env: NodeJS.ProcessEnv = {};
   for (const [key, value] of Object.entries(source)) {
-    if (!SECRET_KEY.test(key)) env[key] = value;
+    const lower = key.toLowerCase();
+    if (ENV_ALLOWLIST.has(lower) || lower.startsWith("xdg_")) env[key] = value;
   }
   return env;
 }
 
-async function resolveProjectRoot(root: string, projectRoot: string): Promise<string> {
+async function resolveProjectRoot(
+  root: string,
+  projectRoot: string,
+): Promise<string> {
   const resolved = await resolveInsideRoot(root, projectRoot);
   const info = await stat(resolved).catch(() => {
-    throw new RunError("project_not_found", `${projectRoot} does not exist`);
+    throw new CodedError("project_not_found", `${projectRoot} does not exist`);
   });
   if (!info.isDirectory()) {
-    throw new RunError("project_not_found", `${projectRoot} is not a directory`);
+    throw new CodedError(
+      "project_not_found",
+      `${projectRoot} is not a directory`,
+    );
   }
   return resolved;
 }
 
-async function wrapperFor(root: string): Promise<{ readonly file: string; readonly name: string }> {
+async function wrapperFor(
+  root: string,
+): Promise<{ readonly file: string; readonly name: string }> {
   const name = process.platform === "win32" ? "gradlew.bat" : "./gradlew";
-  const candidate = join(root, process.platform === "win32" ? "gradlew.bat" : "gradlew");
+  const candidate = join(
+    root,
+    process.platform === "win32" ? "gradlew.bat" : "gradlew",
+  );
   try {
     const info = await stat(candidate);
     if (!info.isFile()) throw new Error("not a file");
   } catch {
-    throw new RunError("project_not_found", `${basename(candidate)} is absent in ${root}`);
+    throw new CodedError(
+      "project_not_found",
+      `${basename(candidate)} is absent in ${root}`,
+    );
   }
   return { file: candidate, name };
 }
@@ -144,46 +196,95 @@ function logStamp(): string {
   return new Date().toISOString().replace(/:/g, "-");
 }
 
+interface RunPlan {
+  readonly task: TaskId;
+  readonly projectRoot: string;
+  readonly wrapper: { readonly file: string; readonly name: string };
+  readonly extraArgs: readonly string[];
+  readonly timeoutMs: number;
+  readonly stopPattern: RegExp | undefined;
+}
+
+/** Validate the request and the project layout before anything is spawned. */
+async function planRun(
+  request: RunRequest,
+  options: { readonly cwd: string },
+): Promise<RunPlan> {
+  if (!isTaskId(request.task)) {
+    throw new CodedError("task_not_allowed", String(request.task));
+  }
+  const extraArgs = validateExtraArgs(request.extraArgs);
+  const timeoutMs = resolveTimeout(request.timeoutSeconds) * 1000;
+  const stopPattern = compileStopPattern(request.stopOnLog);
+  const projectRoot = await resolveProjectRoot(
+    options.cwd,
+    request.projectRoot,
+  );
+  const wrapper = await wrapperFor(projectRoot);
+  if (process.platform === "win32" && CMD_UNSAFE.test(wrapper.file)) {
+    throw new CodedError(
+      "unsafe_argument",
+      relative(options.cwd, wrapper.file).split("\\").join("/"),
+    );
+  }
+  return {
+    task: request.task,
+    projectRoot,
+    wrapper,
+    extraArgs,
+    timeoutMs,
+    stopPattern,
+  };
+}
+
+function invocationFor(
+  plan: RunPlan,
+  argv: readonly string[],
+  relativeLog: string,
+  signal: AbortSignal | undefined,
+): ProcessInvocation {
+  return {
+    file: plan.wrapper.file,
+    args: argv.slice(1),
+    cwd: plan.projectRoot,
+    env: scrubEnvironment(process.env),
+    timeoutMs: plan.timeoutMs,
+    maxOutputBytes: MAX_OUTPUT_BYTES,
+    logPath: join(plan.projectRoot, relativeLog),
+    ...(plan.stopPattern === undefined
+      ? {}
+      : { stopPattern: plan.stopPattern }),
+    ...(signal === undefined ? {} : { signal }),
+    ...(process.platform === "win32"
+      ? { windowsCommandPrefix: ["cmd.exe", "/d", "/c"] }
+      : {}),
+  };
+}
+
 export async function run(
   request: RunRequest,
   options: { readonly cwd: string; readonly signal?: AbortSignal },
 ): Promise<ToolResult<RunResult>> {
   try {
-    if (!isTaskId(request.task)) {
-      throw new RunError("task_not_allowed", String(request.task));
-    }
-    const extraArgs = validateExtraArgs(request.extraArgs);
-    const timeoutMs = resolveTimeout(request.timeoutSeconds) * 1000;
-    const stopPattern = compileStopPattern(request.stopOnLog);
-
-    const projectRoot = await resolveProjectRoot(options.cwd, request.projectRoot);
-    const wrapper = await wrapperFor(projectRoot);
-
-    const logicalArgv = [
-      wrapper.name,
+    const plan = await planRun(request, options);
+    const argv = [
+      plan.wrapper.name,
       "--no-daemon",
       "--console=plain",
-      ...TASK_ARGS[request.task],
-      ...extraArgs,
+      ...TASK_ARGS[plan.task],
+      ...plan.extraArgs,
     ];
-
-    const relativeLog = join(".voxellume", "logs", `${request.task}-${logStamp()}.log`);
-    const outcome = await executeProcess({
-      file: wrapper.file,
-      args: logicalArgv.slice(1),
-      cwd: projectRoot,
-      env: scrubEnvironment(process.env),
-      timeoutMs,
-      maxOutputBytes: MAX_OUTPUT_BYTES,
-      logPath: join(projectRoot, relativeLog),
-      ...(stopPattern === undefined ? {} : { stopPattern }),
-      ...(options.signal === undefined ? {} : { signal: options.signal }),
-      ...(process.platform === "win32" ? { windowsCommandPrefix: ["cmd.exe", "/d", "/c"] } : {}),
-    });
-
+    const relativeLog = join(
+      ".voxellume",
+      "logs",
+      `${plan.task}-${logStamp()}.log`,
+    );
+    const outcome = await executeProcess(
+      invocationFor(plan, argv, relativeLog, options.signal),
+    );
     return ok({
-      task: request.task,
-      argv: logicalArgv,
+      task: plan.task,
+      argv,
       status: outcome.status,
       exitCode: outcome.exitCode,
       durationMs: outcome.durationMs,
@@ -191,9 +292,10 @@ export async function run(
       tail: outcome.tail,
     });
   } catch (error) {
-    if (error instanceof RunError || error instanceof PathEscapeError) {
-      return fail(error.code, error.message);
-    }
-    throw error;
+    if (error instanceof CodedError) return fail(error.code, error.message);
+    return fail(
+      "spawn_failed",
+      error instanceof Error ? error.message : String(error),
+    );
   }
 }

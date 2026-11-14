@@ -5,7 +5,7 @@ import { posix } from "node:path";
 import { AssetError, PNG_DEFAULT_LIMITS, inspectPng } from "../assets/png.ts";
 import { extractPlaceholders, flattenLang } from "../assets/lang.ts";
 import { compareVisualBaseline } from "../assets/visual-diff.ts";
-import { PathEscapeError, resolveInsideRoot } from "../fs-guard.ts";
+import { isPathEscape, resolveInsideRoot } from "../fs-guard.ts";
 import { fail, ok, type ToolResult } from "../results.ts";
 
 export interface AssetsCheckRequest {
@@ -41,7 +41,10 @@ export interface AssetsCheckResult {
   readonly textures: readonly AssetEntry[];
   readonly models: readonly AssetEntry[];
   readonly lang: readonly Finding[];
-  readonly diff: { readonly differentPixels: number; readonly status: "ok" | "failed" } | null;
+  readonly diff: {
+    readonly differentPixels: number;
+    readonly status: "ok" | "failed";
+  } | null;
 }
 
 const TEXTURE_SPEC = /^(.*)::(\d{1,4})x(\d{1,4})$/;
@@ -65,7 +68,8 @@ function mapPngError(error: AssetError): string {
 
 async function readBounded(path: string): Promise<Buffer> {
   const info = await stat(path);
-  if (!info.isFile()) throw new AssetError("file_missing", `${path} is not a file`);
+  if (!info.isFile())
+    throw new AssetError("file_missing", `${path} is not a file`);
   if (info.size > PNG_DEFAULT_LIMITS.maxBytes) {
     throw new AssetError("png_too_large", `${path} exceeds the byte limit`);
   }
@@ -80,8 +84,13 @@ interface TextureExpectation {
 
 function parseTextureEntry(entry: string): TextureExpectation {
   const match = TEXTURE_SPEC.exec(entry);
-  if (match?.[2] === undefined || match[3] === undefined) return { relative: entry };
-  return { relative: match[1] ?? entry, width: Number(match[2]), height: Number(match[3]) };
+  if (match?.[2] === undefined || match[3] === undefined)
+    return { relative: entry };
+  return {
+    relative: match[1] ?? entry,
+    width: Number(match[2]),
+    height: Number(match[3]),
+  };
 }
 
 function dimensionFinding(
@@ -89,15 +98,20 @@ function dimensionFinding(
   width: number,
   height: number,
 ): Finding | undefined {
-  if (expectation.width === undefined || expectation.height === undefined) return undefined;
-  if (width === expectation.width && height === expectation.height) return undefined;
+  if (expectation.width === undefined || expectation.height === undefined)
+    return undefined;
+  if (width === expectation.width && height === expectation.height)
+    return undefined;
   return {
     code: "dimension_mismatch",
     detail: `expected ${expectation.width}x${expectation.height}, got ${width}x${height}`,
   };
 }
 
-async function checkTexture(projectRoot: string, entry: string): Promise<AssetEntry> {
+async function checkTexture(
+  projectRoot: string,
+  entry: string,
+): Promise<AssetEntry> {
   const expectation = parseTextureEntry(entry);
   try {
     const absolute = await resolveInsideRoot(projectRoot, expectation.relative);
@@ -107,9 +121,13 @@ async function checkTexture(projectRoot: string, entry: string): Promise<AssetEn
       ? { path: entry, status: "ok", findings: [] }
       : { path: entry, status: "failed", findings: [finding] };
   } catch (error) {
-    if (error instanceof PathEscapeError) throw error;
+    if (isPathEscape(error)) throw error;
     if (error instanceof AssetError) {
-      return { path: entry, status: "failed", findings: [{ code: mapPngError(error), detail: error.message }] };
+      return {
+        path: entry,
+        status: "failed",
+        findings: [{ code: mapPngError(error), detail: error.message }],
+      };
     }
     return {
       path: entry,
@@ -119,7 +137,11 @@ async function checkTexture(projectRoot: string, entry: string): Promise<AssetEn
   }
 }
 
-async function textureExists(projectRoot: string, namespace: string, texturePath: string): Promise<boolean> {
+async function textureExists(
+  projectRoot: string,
+  namespace: string,
+  texturePath: string,
+): Promise<boolean> {
   const relative = posix.join(
     "src",
     "main",
@@ -129,11 +151,16 @@ async function textureExists(projectRoot: string, namespace: string, texturePath
     "textures",
     `${texturePath}.png`,
   );
-  const absolute = await resolveInsideRoot(projectRoot, relative);
-  return stat(absolute).then(
-    (info) => info.isFile(),
-    () => false,
-  );
+  try {
+    const absolute = await resolveInsideRoot(projectRoot, relative);
+    return await stat(absolute).then(
+      (info) => info.isFile(),
+      () => false,
+    );
+  } catch (error) {
+    if (isPathEscape(error)) return false;
+    throw error;
+  }
 }
 
 async function modelTextureFinding(
@@ -144,15 +171,22 @@ async function modelTextureFinding(
   if (value.startsWith("minecraft:")) return undefined;
   const separator = value.indexOf(":");
   if (separator <= 0) {
-    return { code: "model_texture_missing", detail: `${key}=${value} has no namespace` };
+    return {
+      code: "model_texture_missing",
+      detail: `${key}=${value} has no namespace`,
+    };
   }
   const namespace = value.slice(0, separator);
   const texturePath = value.slice(separator + 1);
-  if (await textureExists(projectRoot, namespace, texturePath)) return undefined;
+  if (await textureExists(projectRoot, namespace, texturePath))
+    return undefined;
   return { code: "model_texture_missing", detail: `${key}=${value}` };
 }
 
-async function checkModel(projectRoot: string, entry: string): Promise<AssetEntry> {
+async function checkModel(
+  projectRoot: string,
+  entry: string,
+): Promise<AssetEntry> {
   const findings: Finding[] = [];
   try {
     const absolute = await resolveInsideRoot(projectRoot, entry);
@@ -165,35 +199,65 @@ async function checkModel(projectRoot: string, entry: string): Promise<AssetEntr
       if (finding !== undefined) findings.push(finding);
     }
   } catch (error) {
-    if (error instanceof PathEscapeError) throw error;
+    if (isPathEscape(error)) throw error;
     const code = error instanceof SyntaxError ? "json_invalid" : "file_missing";
-    return { path: entry, status: "failed", findings: [{ code, detail: (error as Error).message }] };
+    return {
+      path: entry,
+      status: "failed",
+      findings: [{ code, detail: (error as Error).message }],
+    };
   }
-  return { path: entry, status: findings.length === 0 ? "ok" : "failed", findings };
+  return {
+    path: entry,
+    status: findings.length === 0 ? "ok" : "failed",
+    findings,
+  };
 }
 
-async function readLang(projectRoot: string, entry: string): Promise<Map<string, string>> {
-  const absolute = await resolveInsideRoot(projectRoot, entry);
-  const parsed: unknown = JSON.parse(await readFile(absolute, "utf8"));
-  return flattenLang(parsed);
+async function readLang(
+  projectRoot: string,
+  entry: string,
+): Promise<Map<string, string>> {
+  try {
+    const absolute = await resolveInsideRoot(projectRoot, entry);
+    const parsed: unknown = JSON.parse(await readFile(absolute, "utf8"));
+    return flattenLang(parsed);
+  } catch (error) {
+    if (error instanceof AssetError) throw error;
+    const code = error instanceof SyntaxError ? "json_invalid" : "file_missing";
+    throw new AssetError(code, `${entry}: ${(error as Error).message}`);
+  }
 }
 
-async function checkLang(request: NonNullable<AssetsCheckRequest["lang"]>, projectRoot: string): Promise<Finding[]> {
+async function checkLang(
+  request: NonNullable<AssetsCheckRequest["lang"]>,
+  projectRoot: string,
+): Promise<Finding[]> {
   const findings: Finding[] = [];
   const baseline = await readLang(projectRoot, request.baseline);
   for (const key of request.requiredKeys ?? []) {
-    if (!baseline.has(key)) findings.push({ code: "lang_key_missing", detail: key });
+    if (!baseline.has(key))
+      findings.push({ code: "lang_key_missing", detail: key });
   }
   for (const locale of request.compare) {
     const other = await readLang(projectRoot, locale);
     for (const [key, value] of baseline) {
       const translated = other.get(key);
       if (translated === undefined) {
-        findings.push({ code: "lang_key_missing", detail: `${locale}: ${key}` });
+        findings.push({
+          code: "lang_key_missing",
+          detail: `${locale}: ${key}`,
+        });
         continue;
       }
-      if (extractPlaceholders(value).join("\0") !== extractPlaceholders(translated).join("\0")) {
-        findings.push({ code: "lang_placeholder_mismatch", detail: `${locale}: ${key}` });
+      if (
+        extractPlaceholders(value).join("\0") !==
+        extractPlaceholders(translated).join("\0")
+      ) {
+        findings.push({
+          code: "lang_placeholder_mismatch",
+          detail: `${locale}: ${key}`,
+        });
       }
     }
   }
@@ -203,8 +267,13 @@ async function checkLang(request: NonNullable<AssetsCheckRequest["lang"]>, proje
 async function checkDiff(
   request: NonNullable<AssetsCheckRequest["diff"]>,
   projectRoot: string,
-): Promise<{ readonly differentPixels: number; readonly status: "ok" | "failed" }> {
-  const baseline = await readBounded(await resolveInsideRoot(projectRoot, request.baseline));
+): Promise<{
+  readonly differentPixels: number;
+  readonly status: "ok" | "failed";
+}> {
+  const baseline = await readBounded(
+    await resolveInsideRoot(projectRoot, request.baseline),
+  );
   const digest = createHash("sha256").update(baseline).digest("hex");
   if (digest !== request.baselineSha256) {
     throw new AssetError(
@@ -212,7 +281,9 @@ async function checkDiff(
       `baseline sha256 is ${digest}, expected ${request.baselineSha256}`,
     );
   }
-  const capture = await readBounded(await resolveInsideRoot(projectRoot, request.capture));
+  const capture = await readBounded(
+    await resolveInsideRoot(projectRoot, request.capture),
+  );
   const compared = compareVisualBaseline({
     baseline: inspectPng(baseline),
     actual: inspectPng(capture),
@@ -239,25 +310,37 @@ export async function checkAssets(
   options: { readonly cwd: string },
 ): Promise<ToolResult<AssetsCheckResult>> {
   try {
-    if (typeof request.projectRoot !== "string" || request.projectRoot.trim() === "") {
-      throw new AssetError("invalid_request", "projectRoot must be a non-empty string");
+    if (
+      typeof request.projectRoot !== "string" ||
+      request.projectRoot.trim() === ""
+    ) {
+      throw new AssetError(
+        "invalid_request",
+        "projectRoot must be a non-empty string",
+      );
     }
-    const projectRoot = await resolveInsideRoot(options.cwd, request.projectRoot);
+    const projectRoot = await resolveInsideRoot(
+      options.cwd,
+      request.projectRoot,
+    );
     const textures = await mapEntries(request.textures ?? [], (entry) =>
       checkTexture(projectRoot, entry),
     );
     const models = await mapEntries(request.models ?? [], (entry) =>
       checkModel(projectRoot, entry),
     );
-    const lang = request.lang === undefined ? [] : await checkLang(request.lang, projectRoot);
-    const diff = request.diff === undefined ? null : await checkDiff(request.diff, projectRoot);
+    const lang =
+      request.lang === undefined
+        ? []
+        : await checkLang(request.lang, projectRoot);
+    const diff =
+      request.diff === undefined
+        ? null
+        : await checkDiff(request.diff, projectRoot);
     return ok({ textures, models, lang, diff });
   } catch (error) {
     if (error instanceof AssetError) {
       return fail(mapPngError(error), error.message);
-    }
-    if (error instanceof PathEscapeError) {
-      return fail(error.code, error.message);
     }
     throw error;
   }

@@ -21,7 +21,9 @@ export interface VoxellumeTools {
   readonly targetInfo: (
     request: TargetInfoRequest,
   ) => Promise<ToolResult<TargetInfoResult>>;
-  readonly scaffold: (request: ScaffoldRequest) => Promise<ToolResult<ScaffoldResult>>;
+  readonly scaffold: (
+    request: ScaffoldRequest,
+  ) => Promise<ToolResult<ScaffoldResult>>;
   readonly run: (
     request: RunRequest,
     signal?: AbortSignal,

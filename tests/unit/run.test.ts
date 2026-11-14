@@ -1,5 +1,12 @@
 import assert from "node:assert/strict";
-import { chmod, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import {
+  chmod,
+  mkdir,
+  mkdtemp,
+  readFile,
+  rm,
+  writeFile,
+} from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test, { type TestContext } from "node:test";
@@ -11,6 +18,8 @@ const POSIX_STUB = `#!/bin/sh
 cd "$(dirname "$0")"
 ARGV="$*"
 echo "ARGV:$ARGV"
+echo "SECRET:\${VOXELLUME_TEST_SECRET:-unset}"
+echo "PLAIN:\${VOXELLUME_TEST_PLAIN:-unset}"
 LINES=$(cat stub-lines 2>/dev/null || echo 0)
 i=0
 while [ "$i" -lt "$LINES" ]; do i=$((i + 1)); echo "line $i"; done
@@ -23,6 +32,10 @@ exit "$EXIT"
 
 const WINDOWS_STUB = `@echo off
 echo ARGV:%*
+set SECRET=%VOXELLUME_TEST_SECRET%
+if "%SECRET%"=="" (echo SECRET:unset) else (echo SECRET:%SECRET%)
+set PLAIN=%VOXELLUME_TEST_PLAIN%
+if "%PLAIN%"=="" (echo PLAIN:unset) else (echo PLAIN:%PLAIN%)
 set LINES=0
 if exist stub-lines set /p LINES=<stub-lines
 set /a COUNT=0
@@ -75,17 +88,23 @@ test("run executes an allowlisted build and reports the observed exit code", asy
   if (result.status !== "ok") return;
   assert.equal(result.value.status, "exited");
   assert.equal(result.value.exitCode, 0);
-  assert.deepEqual([...result.value.argv], [
-    process.platform === "win32" ? "gradlew.bat" : "./gradlew",
-    "--no-daemon",
-    "--console=plain",
-    "build",
-  ]);
+  assert.deepEqual(
+    [...result.value.argv],
+    [
+      process.platform === "win32" ? "gradlew.bat" : "./gradlew",
+      "--no-daemon",
+      "--console=plain",
+      "build",
+    ],
+  );
   assert.ok(result.value.tail.some((line) => line.includes("READY")));
   assert.ok(result.value.tail.some((line) => line.includes("ARGV:")));
   const log = await readFile(join(root, result.value.logPath), "utf8");
   assert.ok(log.includes("READY"));
-  assert.equal(log.includes("\r"), process.platform === "win32" ? log.includes("\r") : false);
+  assert.equal(
+    log.includes("\r"),
+    process.platform === "win32" ? log.includes("\r") : false,
+  );
 });
 
 test("run reports a non-zero exit code", async (t) => {
@@ -125,7 +144,10 @@ test("run enforces the timeout", async (t) => {
   const root = await stubProject(t);
   await configure(root, { sleep: 30 });
   const started = Date.now();
-  const result = await run({ projectRoot: root, task: "build", timeoutSeconds: 1 }, { cwd: root });
+  const result = await run(
+    { projectRoot: root, task: "build", timeoutSeconds: 1 },
+    { cwd: root },
+  );
   assert.equal(result.status, "ok");
   if (result.status !== "ok") return;
   assert.equal(result.value.status, "timed_out");
@@ -151,7 +173,11 @@ test("run cancels on abort", async (t) => {
 test("run rejects arguments outside the allowlist", async (t) => {
   const root = await stubProject(t);
   const result = await run(
-    { projectRoot: root, task: "build", extraArgs: ["--init-script", "evil.gradle"] },
+    {
+      projectRoot: root,
+      task: "build",
+      extraArgs: ["--init-script", "evil.gradle"],
+    },
     { cwd: root },
   );
   assert.equal(result.status, "error");
@@ -172,7 +198,10 @@ test("run rejects tasks outside the allowlist", async (t) => {
 
 test("run rejects a project root outside the working directory", async (t) => {
   const root = await stubProject(t);
-  const result = await run({ projectRoot: join(root, ".."), task: "build" }, { cwd: root });
+  const result = await run(
+    { projectRoot: join(root, ".."), task: "build" },
+    { cwd: root },
+  );
   assert.equal(result.status, "error");
   if (result.status !== "error") return;
   assert.equal(result.error.code, "destination_outside_root");
@@ -200,6 +229,57 @@ test("run rejects an invalid stop pattern", async (t) => {
   assert.equal(result.error.code, "invalid_request");
 });
 
+test("run drops variables outside the environment allowlist", async (t) => {
+  const root = await stubProject(t);
+  const previous = process.env.VOXELLUME_TEST_SECRET;
+  const previousPlain = process.env.VOXELLUME_TEST_PLAIN;
+  process.env.VOXELLUME_TEST_SECRET = "leak";
+  process.env.VOXELLUME_TEST_PLAIN = "leak-plain";
+  t.after(() => {
+    for (const [key, value] of [
+      ["VOXELLUME_TEST_SECRET", previous],
+      ["VOXELLUME_TEST_PLAIN", previousPlain],
+    ] as const) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
+  });
+  const result = await run({ projectRoot: root, task: "build" }, { cwd: root });
+  assert.equal(result.status, "ok");
+  if (result.status !== "ok") return;
+  const tail = result.value.tail.join("\n");
+  assert.ok(tail.includes("SECRET:unset"), tail);
+  assert.ok(tail.includes("PLAIN:unset"), tail);
+  assert.equal(JSON.stringify(result).includes("leak"), false);
+});
+
+test(
+  "run rejects a win32 wrapper path that cmd.exe would re-parse",
+  { skip: process.platform !== "win32" && "win32 only" },
+  async (t) => {
+    const root = await stubProject(t);
+    const project = join(root, "mod&calc");
+    await mkdir(project, { recursive: true });
+    await writeFile(join(project, "gradlew.bat"), WINDOWS_STUB, "utf8");
+    const result = await run(
+      { projectRoot: project, task: "build" },
+      { cwd: root },
+    );
+    assert.equal(result.status, "error");
+    if (result.status !== "error") return;
+    assert.equal(result.error.code, "unsafe_argument");
+  },
+);
+
+test("run reports spawn_failed when the log directory cannot be created", async (t) => {
+  const root = await stubProject(t);
+  await writeFile(join(root, ".voxellume"), "not a directory", "utf8");
+  const result = await run({ projectRoot: root, task: "build" }, { cwd: root });
+  assert.equal(result.status, "ok");
+  if (result.status !== "ok") return;
+  assert.equal(result.value.status, "spawn_failed");
+});
+
 test("executeProcess stops reading at the output cap", async (t) => {
   const root = await stubProject(t);
   await configure(root, { lines: 5000 });
@@ -211,7 +291,9 @@ test("executeProcess stops reading at the output cap", async (t) => {
     maxOutputBytes: 4096,
     logPath: join(root, "cap.log"),
     env: process.env,
-    ...(process.platform === "win32" ? { windowsCommandPrefix: ["cmd.exe", "/d", "/c"] } : {}),
+    ...(process.platform === "win32"
+      ? { windowsCommandPrefix: ["cmd.exe", "/d", "/c"] }
+      : {}),
   });
   assert.equal(outcome.status, "output_limit_reached");
   assert.ok(outcome.tail.length > 0);
