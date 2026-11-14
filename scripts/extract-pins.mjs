@@ -3,7 +3,10 @@
 import { readdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
-const ROOT = new URL("../", import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1");
+const ROOT = new URL("../", import.meta.url).pathname.replace(
+  /^\/([A-Za-z]:)/,
+  "$1",
+);
 const PACKS = join(ROOT, "target-packs", "java");
 const OUT = join(ROOT, "targets", "pins.json");
 const TEMPLATE_PIN = "java-fabric-1.21.1";
@@ -25,7 +28,8 @@ function text(value, field, optional) {
 }
 
 function pick(value, allowed, field) {
-  if (!allowed.includes(value)) throw new Error(`invalid ${field}: ${String(value)}`);
+  if (!allowed.includes(value))
+    throw new Error(`invalid ${field}: ${String(value)}`);
   return value;
 }
 
@@ -52,10 +56,22 @@ async function readPacks() {
         id,
         minecraft: text(pack.minecraft?.version, `${file} minecraft.version`),
         loader,
-        loaderVersion: text(pack.loader?.version, `${file} loader.version`, true),
-        apiVersion: text(pack.loader?.apiDependencies?.[0]?.version, `${file} api`, true),
+        loaderVersion: text(
+          pack.loader?.version,
+          `${file} loader.version`,
+          true,
+        ),
+        apiVersion: text(
+          pack.loader?.apiDependencies?.[0]?.version,
+          `${file} api`,
+          true,
+        ),
         gradlePlugin: text(plugin.id, `${file} gradle plugin id`, true),
-        gradlePluginVersion: text(plugin.version, `${file} gradle plugin version`, true),
+        gradlePluginVersion: text(
+          plugin.version,
+          `${file} gradle plugin version`,
+          true,
+        ),
         jdk: pick(pack.java?.gradleJvm, [21, 25], `${file} java.gradleJvm`),
         gradle: text(pack.gradle?.version, `${file} gradle.version`, true),
         mappings: pick(pack.mappings?.kind, MAPPINGS, `${file} mappings.kind`),
@@ -63,18 +79,23 @@ async function readPacks() {
       });
     }
   }
-  pins.sort((left, right) => (left.id < right.id ? -1 : left.id > right.id ? 1 : 0));
+  pins.sort((left, right) =>
+    left.id < right.id ? -1 : left.id > right.id ? 1 : 0,
+  );
   return pins;
 }
 
 const pins = await readPacks();
 const seen = new Set();
 for (const pin of pins) {
-  if (seen.has(pin.id)) throw new Error(`duplicate pin id after revision strip: ${pin.id}`);
+  if (seen.has(pin.id))
+    throw new Error(`duplicate pin id after revision strip: ${pin.id}`);
   seen.add(pin.id);
 }
-if (pins.length !== 68) throw new Error(`expected 68 pins, produced ${pins.length}`);
-if (!seen.has(TEMPLATE_PIN)) throw new Error(`missing template pin ${TEMPLATE_PIN}`);
+if (pins.length !== 68)
+  throw new Error(`expected 68 pins, produced ${pins.length}`);
+if (!seen.has(TEMPLATE_PIN))
+  throw new Error(`missing template pin ${TEMPLATE_PIN}`);
 
 await writeFile(
   OUT,

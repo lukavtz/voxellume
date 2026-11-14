@@ -5,6 +5,7 @@
     "dist/**",
     "coverage/**",
     ".artifacts/**",
-    "target-packs/**/templates/**"
+    "templates/**/gradlew",
+    "templates/**/gradlew.bat"
   ]
 }
