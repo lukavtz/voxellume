@@ -63,8 +63,9 @@ Rules:
 | `lang_placeholder_mismatch` | `assets_check` | Ordered printf placeholders differ from the baseline locale |
 | `png_invalid` | `assets_check` | PNG signature, IHDR, or CRC is invalid |
 | `png_too_large` | `assets_check` | PNG exceeds byte, edge, or pixel limits |
-| `png_alpha_required` | `assets_check` | Texture violates the requested alpha policy |
-| `dimension_mismatch` | `assets_check` | Texture or diff dimensions differ from the expectation |
+| `file_missing` | `assets_check` | A requested texture, model, or lang file is absent |
+| `json_invalid` | `assets_check` | A model or lang file is not valid JSON |
+| `dimension_mismatch` | `assets_check` | Texture dimensions differ from the `WxH` expectation |
 | `pins_invalid` | `target_info`, `scaffold` | `targets/pins.json` is absent or schema-invalid |
 
 Codes are stable identifiers. Adding a code is a compatible change; renaming one is
@@ -208,11 +209,9 @@ Parameters (all paths relative to `projectRoot`, all sections optional):
 
 Rules:
 
-- A texture fails when it is not a decodable PNG within limits, or when its
-  dimensions do not match `imageWidth`/`imageHeight` given as `WxH` in the path
-  suffix list `"path::16x16"`; a mismatched edge yields `dimension_mismatch`, a
-  broken file yields `png_invalid`/`png_too_large`, a disallowed alpha value yields
-  `png_alpha_required`.
+- A texture is decoded within `PNG_DEFAULT_LIMITS`. A path may carry an expectation
+  suffix `::WxH`; a mismatched edge yields a `dimension_mismatch` finding, a broken
+  file yields `png_invalid`, and an oversized file yields `png_too_large`.
 - A model fails when a `textures` value is neither `minecraft:*` nor an existing
   file under `<projectRoot>/src/main/resources/assets/<namespace>/textures/…`
   (the value `ns:path` maps to `namespace` `ns`, file `…/textures/path.png`).

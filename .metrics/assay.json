@@ -1,10 +1,10 @@
 {
   "ok": true,
-  "stamp": "2026-11-14T22:55:32.188Z",
+  "stamp": "2026-11-14T23:00:56.507Z",
   "cwd": "D:\\Development\\projects\\AI\\Plugins\\voxellume\\voxellume",
   "threshold": 10,
   "coverage": "skip",
-  "files": 2,
+  "files": 5,
   "reason": "",
   "checks": {
     "crap": {
@@ -24,8 +24,8 @@
     }
   },
   "worst": {
-    "name": "executeProcess",
-    "complexity": 9,
+    "name": "compareVisualBaseline",
+    "complexity": 10,
     "crap": null
   },
   "duplicates": 0

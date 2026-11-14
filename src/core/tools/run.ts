@@ -1,7 +1,8 @@
-import { join, relative, isAbsolute, resolve, basename } from "node:path";
-import { realpath, stat } from "node:fs/promises";
+import { join, basename } from "node:path";
+import { stat } from "node:fs/promises";
 
 import { executeProcess } from "../exec/run-process.ts";
+import { PathEscapeError, resolveInsideRoot } from "../fs-guard.ts";
 import { fail, ok, type ToolResult } from "../results.ts";
 
 export const TASK_ARGS = {
@@ -107,15 +108,10 @@ function scrubEnvironment(source: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
 }
 
 async function resolveProjectRoot(root: string, projectRoot: string): Promise<string> {
-  const realRoot = await realpath(root);
-  const resolved = await realpath(resolve(realRoot, projectRoot)).catch(() => {
+  const resolved = await resolveInsideRoot(root, projectRoot);
+  const info = await stat(resolved).catch(() => {
     throw new RunError("project_not_found", `${projectRoot} does not exist`);
   });
-  const inside = relative(realRoot, resolved);
-  if (inside.startsWith("..") || isAbsolute(inside)) {
-    throw new RunError("destination_outside_root", `${projectRoot} resolves outside the working directory`);
-  }
-  const info = await stat(resolved);
   if (!info.isDirectory()) {
     throw new RunError("project_not_found", `${projectRoot} is not a directory`);
   }
@@ -185,7 +181,9 @@ export async function run(
       tail: outcome.tail,
     });
   } catch (error) {
-    if (error instanceof RunError) return fail(error.code, error.message);
+    if (error instanceof RunError || error instanceof PathEscapeError) {
+      return fail(error.code, error.message);
+    }
     throw error;
   }
 }

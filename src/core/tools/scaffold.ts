@@ -1,6 +1,7 @@
-import { copyFile, mkdir, readdir, readFile, realpath, stat, writeFile } from "node:fs/promises";
-import { basename, dirname, isAbsolute, join, relative, resolve } from "node:path";
+import { copyFile, mkdir, readdir, readFile, stat, writeFile } from "node:fs/promises";
+import { dirname, join } from "node:path";
 
+import { PathEscapeError, resolveInsideRoot } from "../fs-guard.ts";
 import { PinsError, loadPins, pinsFailure } from "../pins.ts";
 import { fail, ok, type ToolResult } from "../results.ts";
 import {
@@ -74,35 +75,6 @@ function validateMod(mod: ModMetadata): void {
     requireText(mod[field], field);
   }
   validateAuthors(mod.authors);
-}
-
-async function resolveInsideRoot(root: string, candidate: string): Promise<string> {
-  const realRoot = await realpath(root);
-  const target = resolve(realRoot, candidate);
-  let probe = target;
-  const missing: string[] = [];
-  for (;;) {
-    try {
-      probe = await realpath(probe);
-      break;
-    } catch {
-      const parent = dirname(probe);
-      if (parent === probe) {
-        throw new ScaffoldError("destination_outside_root", `cannot resolve ${candidate}`);
-      }
-      missing.unshift(basename(probe));
-      probe = parent;
-    }
-  }
-  const resolved = join(probe, ...missing);
-  const inside = relative(realRoot, resolved);
-  if (inside.startsWith("..") || isAbsolute(inside)) {
-    throw new ScaffoldError(
-      "destination_outside_root",
-      `${candidate} resolves outside the working directory`,
-    );
-  }
-  return resolved;
 }
 
 async function prepareDestination(path: string): Promise<void> {
@@ -209,7 +181,7 @@ export async function scaffold(
       notes: ["class names kept as ExampleMod/ExampleModClient"],
     });
   } catch (error) {
-    if (error instanceof ScaffoldError) {
+    if (error instanceof ScaffoldError || error instanceof PathEscapeError) {
       return fail(error.code, error.message);
     }
     if (error instanceof PinsError) {
