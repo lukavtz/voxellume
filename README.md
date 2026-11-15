@@ -56,7 +56,7 @@ After a tarball instead:
 
 ```sh
 pnpm pack
-omp plugin install ./voxellume-0.2.0.tgz
+omp plugin install ./voxellume-0.2.1.tgz
 ```
 
 Verify:
@@ -66,7 +66,7 @@ omp plugin doctor
 omp plugin list --json
 ```
 
-`omp plugin doctor` must print `✔ plugin:voxellume: v0.2.0`, and `omp plugin list
+`omp plugin doctor` must print `✔ plugin:voxellume: v0.2.1`, and `omp plugin list
 --json` must contain a `voxellume` entry. Restart OMP, then call
 `minecraft_target_info` with:
 
@@ -86,7 +86,7 @@ omp plugin uninstall voxellume
 
 ```sh
 pnpm pack
-dsh plugin --profile voxellume add ./voxellume-0.2.0.tgz --ignore-scripts
+dsh plugin --profile voxellume add ./voxellume-0.2.1.tgz --ignore-scripts
 ```
 
 `dsh plugin --profile <name>` forwards to pnpm inside that profile's directory. The
@@ -168,7 +168,7 @@ observed facts: an exit code, a file it opened, or a log line it matched.
 | --------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Plugin listed, tools missing                                    | You linked before `pnpm build`, or the host cached the old load. Run `pnpm build`, relink, restart OMP.                                                                           |
 | `omp plugin doctor` says `No omp/pi manifest`                   | Stale `package.json` in the linked directory, or an old link. Update the checkout and relink with `omp plugin link "$PWD" --scope user`.                                          |
-| DSH warns `declares no dsh.bundle`                              | You installed a tarball packed before v0.2.0. Run `pnpm pack` again and reinstall with `--ignore-scripts`.                                                                        |
+| DSH warns `declares no dsh.bundle`                              | You installed a tarball packed before v0.2.1. Run `pnpm pack` again and reinstall with `--ignore-scripts`.                                                                        |
 | `minecraft_run` returns `spawn_failed`                          | JDK missing, or `gradlew` not executable. Install JDK 21 and rebuild the project with the current version.                                                                        |
 | `minecraft_run` returns `task_not_allowed` or `unsafe_argument` | Only the allowlisted tasks and extra flags exist. Use `build`, `clean`, `test`, `runServer`, `runClient`, `runGametest`, `genSources`, and `--offline`, `--info`, `--stacktrace`. |
 | `pnpm` not found, or `corepack` syntax error on Windows         | Another `pnpm` shim shadows it. Use `pnpm.cmd`, or reinstall pnpm.                                                                                                                |

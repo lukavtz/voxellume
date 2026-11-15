@@ -335,4 +335,4 @@ Value:
 
 - Envelope version: `voxellume-tool-1.0.0`.
 - Pins file: `voxellume-pins-1.0.0`.
-- Package version: `0.2.0`; distribution is git-only (`private: true`).
+- Package version: `0.2.1`; distribution is git-only (`private: true`).
