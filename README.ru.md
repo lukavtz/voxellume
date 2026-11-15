@@ -55,7 +55,7 @@ omp plugin link $PWD --scope user
 
 ```sh
 pnpm pack
-omp plugin install ./voxellume-0.2.0.tgz
+omp plugin install ./voxellume-0.2.1.tgz
 ```
 
 Проверка:
@@ -65,7 +65,7 @@ omp plugin doctor
 omp plugin list --json
 ```
 
-`omp plugin doctor` должен напечатать `✔ plugin:voxellume: v0.2.0`, а `omp plugin
+`omp plugin doctor` должен напечатать `✔ plugin:voxellume: v0.2.1`, а `omp plugin
 list --json` — содержать запись `voxellume`. Перезапустите OMP и вызовите
 `minecraft_target_info` с аргументом:
 
@@ -85,7 +85,7 @@ omp plugin uninstall voxellume
 
 ```sh
 pnpm pack
-dsh plugin --profile voxellume add ./voxellume-0.2.0.tgz --ignore-scripts
+dsh plugin --profile voxellume add ./voxellume-0.2.1.tgz --ignore-scripts
 ```
 
 `dsh plugin --profile <name>` передаёт аргументы в pnpm внутри каталога профиля.
@@ -167,7 +167,7 @@ dsh plugin --profile voxellume remove voxellume
 | --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Плагин в списке, инструментов нет                               | Ссылка создана до `pnpm build`, или хост закешировал старую загрузку. Запустите `pnpm build`, перелинкуйте, перезапустите OMP.                                                     |
 | `omp plugin doctor` пишет `No omp/pi manifest`                  | Устаревший `package.json` в каталоге ссылки или старая ссылка. Обновите клон и перелинкуйте: `omp plugin link "$PWD" --scope user`.                                                |
-| DSH предупреждает `declares no dsh.bundle`                      | Установлен архив, собранный до v0.2.0. Запустите `pnpm pack` снова и переустановите с `--ignore-scripts`.                                                                          |
+| DSH предупреждает `declares no dsh.bundle`                      | Установлен архив, собранный до v0.2.1. Запустите `pnpm pack` снова и переустановите с `--ignore-scripts`.                                                                          |
 | `minecraft_run` вернул `spawn_failed`                           | Нет JDK или `gradlew` не исполняемый. Поставьте JDK 21 и пересоберите проект текущей версией.                                                                                      |
 | `minecraft_run` вернул `task_not_allowed` или `unsafe_argument` | Существуют только разрешённые задачи и флаги. Используйте `build`, `clean`, `test`, `runServer`, `runClient`, `runGametest`, `genSources` и `--offline`, `--info`, `--stacktrace`. |
 | `pnpm` не найден, или на Windows ошибка синтаксиса `corepack`   | Другой шим `pnpm` перекрывает нужный. Используйте `pnpm.cmd` или переустановите pnpm.                                                                                              |
