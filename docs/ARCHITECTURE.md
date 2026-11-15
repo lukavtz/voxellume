@@ -24,8 +24,9 @@ src/core/{results,root}.ts         envelope + package root
 
 **Procedures.** Markdown only. Skills carry ordered agent procedure; they never
 execute anything and never restate tool parameters that live in `docs/TOOLS.md`.
-The Harness adapter concatenates `skills/*/SKILL.md` into one prompt section; OMP
-discovers the same directory natively.
+OMP discovers `skills/`, `agents/`, and `commands/` by directory convention at the
+package root; the DSH adapter receives the same `skills/*/SKILL.md` text through
+`systemPrompt.section`.
 
 **Adapters.** The only host-specific code. `src/adapters/shared.ts` builds the four
 tool closures once; `omp/index.ts` registers them with `approval` classes;
@@ -48,11 +49,12 @@ spawned. It owns argv construction, environment scrubbing, output caps, log file
 timeouts, abort handling, and process-tree termination. Nothing else in the tree may
 call `spawn`, `exec`, or `execFile` for a build.
 
-**Assets.** `src/core/assets/{png,visual-diff,validate-assets}.ts` are pure decoders
-and comparators. They never read from disk; `assets-check.ts` does the bounded reads.
+**Assets.** `src/core/assets/png.ts`, `src/core/assets/visual-diff.ts`, and
+`src/core/assets/lang.ts` are pure decoders and comparators. They never read from
+disk; `assets-check.ts` does the bounded reads.
 
-**Data.** `targets/pins.json` is generated once from the retired target packs by
-`scripts/extract-pins.mjs` and then maintained by hand.
+**Data.** `targets/pins.json` is the only source of target versions; it is maintained
+by hand.
 
 ## 3. Invariants
 

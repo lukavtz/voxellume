@@ -7,8 +7,7 @@
   "license": "MIT",
   "main": "./dist/adapters/dsh/index.js",
   "engines": {
-    "node": ">=24.9.0",
-    "dsh": ">=0.2.2-rc.1 <0.3.0"
+    "node": ">=24.9.0"
   },
   "exports": {
     ".": {
@@ -28,9 +27,6 @@
   "pi": {
     "extensions": [
       "./dist/adapters/omp/index.js"
-    ],
-    "skills": [
-      "./skills"
     ]
   },
   "dsh": {
@@ -47,6 +43,7 @@
     "targets",
     "templates",
     "docs",
+    "scripts",
     "THIRD_PARTY"
   ],
   "scripts": {
@@ -61,7 +58,8 @@
     "test:integration": "node --test --experimental-strip-types \"tests/integration/**/*.test.ts\"",
     "test:live": "node --test --experimental-strip-types --test-timeout=3600000 \"tests/live/**/*.test.ts\"",
     "check:structure": "node scripts/check-structure.mjs",
-    "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm check:structure && pnpm test:unit && pnpm test:integration"
+    "check:pack": "node scripts/check-pack.mjs",
+    "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm build && pnpm check:structure && pnpm check:pack && pnpm test:unit && pnpm test:integration"
   },
   "dependencies": {
     "ajv": "8.20.0",

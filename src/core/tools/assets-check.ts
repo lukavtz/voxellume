@@ -5,8 +5,9 @@ import { posix } from "node:path";
 import { AssetError, PNG_DEFAULT_LIMITS, inspectPng } from "../assets/png.ts";
 import { extractPlaceholders, flattenLang } from "../assets/lang.ts";
 import { compareVisualBaseline } from "../assets/visual-diff.ts";
+import { CodedError, failureOf } from "../errors.ts";
 import { isPathEscape, resolveInsideRoot } from "../fs-guard.ts";
-import { fail, ok, type ToolResult } from "../results.ts";
+import { ok, type ToolResult } from "../results.ts";
 
 export interface AssetsCheckRequest {
   readonly projectRoot: string;
@@ -62,8 +63,8 @@ const PNG_CODE_MAP: Record<string, string> = {
 };
 
 /** Translate a decoder error code into the tool's documented code. */
-function mapPngError(error: AssetError): string {
-  return PNG_CODE_MAP[error.code] ?? error.code;
+function mapPngCode(code: string): string {
+  return PNG_CODE_MAP[code] ?? code;
 }
 
 async function readBounded(path: string): Promise<Buffer> {
@@ -126,7 +127,7 @@ async function checkTexture(
       return {
         path: entry,
         status: "failed",
-        findings: [{ code: mapPngError(error), detail: error.message }],
+        findings: [{ code: mapPngCode(error.code), detail: error.message }],
       };
     }
     return {
@@ -194,7 +195,13 @@ async function checkModel(
       textures?: Record<string, unknown>;
     };
     for (const [key, value] of Object.entries(parsed.textures ?? {})) {
-      if (typeof value !== "string") continue;
+      if (typeof value !== "string") {
+        findings.push({
+          code: "model_texture_missing",
+          detail: `${key}=${typeof value}`,
+        });
+        continue;
+      }
       const finding = await modelTextureFinding(projectRoot, key, value);
       if (finding !== undefined) findings.push(finding);
     }
@@ -229,10 +236,45 @@ async function readLang(
   }
 }
 
+/** True when `value` is an array of strings. */
+function isStringArray(value: unknown): value is readonly string[] {
+  return (
+    Array.isArray(value) && value.every((item) => typeof item === "string")
+  );
+}
+
+/** Reject a malformed `lang` request before any file is read. */
+function validateLangRequest(
+  request: NonNullable<AssetsCheckRequest["lang"]>,
+): void {
+  if (typeof request.baseline !== "string" || request.baseline.trim() === "") {
+    throw new CodedError(
+      "invalid_request",
+      "lang.baseline must be a non-empty string",
+    );
+  }
+  if (!isStringArray(request.compare)) {
+    throw new CodedError(
+      "invalid_request",
+      "lang.compare must be an array of strings",
+    );
+  }
+  if (
+    request.requiredKeys !== undefined &&
+    !isStringArray(request.requiredKeys)
+  ) {
+    throw new CodedError(
+      "invalid_request",
+      "lang.requiredKeys must be an array of strings",
+    );
+  }
+}
+
 async function checkLang(
   request: NonNullable<AssetsCheckRequest["lang"]>,
   projectRoot: string,
 ): Promise<Finding[]> {
+  validateLangRequest(request);
   const findings: Finding[] = [];
   const baseline = await readLang(projectRoot, request.baseline);
   for (const key of request.requiredKeys ?? []) {
@@ -339,9 +381,6 @@ export async function checkAssets(
         : await checkDiff(request.diff, projectRoot);
     return ok({ textures, models, lang, diff });
   } catch (error) {
-    if (error instanceof AssetError) {
-      return fail(mapPngError(error), error.message);
-    }
-    throw error;
+    return failureOf(error, mapPngCode);
   }
 }

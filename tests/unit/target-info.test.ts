@@ -43,3 +43,14 @@ test("targetInfo converts a missing pins file into a pins_invalid failure", asyn
   if (result.status !== "error") return;
   assert.equal(result.error.code, "pins_invalid");
 });
+
+test("targetInfo converts a throw it cannot classify into internal_error", async () => {
+  // A non-string packageRoot makes path.join throw a TypeError: pinsFailure
+  // must still resolve an envelope instead of rejecting.
+  const result = await targetInfo({}, { packageRoot: undefined as never });
+  assert.equal(result.status, "error");
+  if (result.status !== "error") return;
+  assert.equal(result.error.code, "internal_error");
+  assert.equal(result.error.detail.includes("\n"), false);
+  assert.equal(/[A-Za-z]:[\\/]|^\//.test(result.error.detail), false);
+});

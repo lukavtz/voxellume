@@ -2,9 +2,9 @@ import { join, basename, relative } from "node:path";
 import { stat } from "node:fs/promises";
 
 import { executeProcess, type ProcessInvocation } from "../exec/run-process.ts";
-import { CodedError } from "../errors.ts";
+import { CodedError, failureOf } from "../errors.ts";
 import { resolveInsideRoot } from "../fs-guard.ts";
-import { fail, ok, type ToolResult } from "../results.ts";
+import { ok, type ToolResult } from "../results.ts";
 
 export const TASK_IDS = [
   "build",
@@ -292,10 +292,6 @@ export async function run(
       tail: outcome.tail,
     });
   } catch (error) {
-    if (error instanceof CodedError) return fail(error.code, error.message);
-    return fail(
-      "spawn_failed",
-      error instanceof Error ? error.message : String(error),
-    );
+    return failureOf(error);
   }
 }

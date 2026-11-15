@@ -16,6 +16,7 @@ Reference: [docs/TOOLS.md](./docs/TOOLS.md). Contracts:
 | Node.js >= 24.9.0 | everything (build, tests, both hosts)                | `node -v`                        |
 | pnpm 10.x         | install, build, pack                                 | `pnpm -v`                        |
 | JDK 21            | `minecraft_run` builds and runs of Fabric 1.21.1     | `java -version` (must show `21`) |
+| DSH 0.2.2-rc.1+   | the DSH host only                                    | `dsh --version`                  |
 | Blockbench 5.x    | optional: authoring 3D models by hand or by an agent | `blockbench --version`           |
 | Blender           | optional: 3D QA scripts in `scripts/blender/*.py`    | `blender --version`              |
 
@@ -177,5 +178,5 @@ observed facts: an exit code, a file it opened, or a log line it matched.
 Fabric 1.21.1: `build` and `runServer` are exercised by the opt-in live suite
 (`VOXELLUME_LIVE=1 pnpm test:live`, JDK 21 + network), which
 [.github/workflows/live-fabric.yml](./.github/workflows/live-fabric.yml) runs on
-demand. Everything else is unproven until you run it. License:
+demand and weekly. Everything else is unproven until you run it. License:
 [MIT](./LICENSE).

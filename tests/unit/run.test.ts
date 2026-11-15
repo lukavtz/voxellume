@@ -101,9 +101,10 @@ test("run executes an allowlisted build and reports the observed exit code", asy
   assert.ok(result.value.tail.some((line) => line.includes("ARGV:")));
   const log = await readFile(join(root, result.value.logPath), "utf8");
   assert.ok(log.includes("READY"));
-  assert.equal(
-    log.includes("\r"),
-    process.platform === "win32" ? log.includes("\r") : false,
+  const terminator = process.platform === "win32" ? "\r\n" : "\n";
+  assert.ok(
+    log.includes(`READY${terminator}`),
+    `log must keep the child's line ending ${JSON.stringify(terminator)}: ${JSON.stringify(log.slice(-64))}`,
   );
 });
 
@@ -278,6 +279,19 @@ test("run reports spawn_failed when the log directory cannot be created", async 
   assert.equal(result.status, "ok");
   if (result.status !== "ok") return;
   assert.equal(result.value.status, "spawn_failed");
+});
+
+test("run reports internal_error for a throw it cannot classify", async (t) => {
+  const root = await stubProject(t);
+  // A missing projectRoot string throws a TypeError inside path resolution:
+  // no coded error applies, so the envelope must carry internal_error.
+  const result = await run({ task: "build" } as never, { cwd: root });
+  assert.equal(result.status, "error");
+  if (result.status !== "error") return;
+  assert.equal(result.error.code, "internal_error");
+  assert.notEqual(result.error.code, "spawn_failed");
+  assert.ok(result.error.detail.length > 0);
+  assert.equal(result.error.detail.includes("\n"), false);
 });
 
 test("executeProcess stops reading at the output cap", async (t) => {
