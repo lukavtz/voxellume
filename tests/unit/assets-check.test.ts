@@ -120,6 +120,23 @@ test("checkAssets reports an undecodable texture", async (t) => {
   assert.equal(result.value.textures[0]?.findings[0]?.code, "png_invalid");
 });
 
+test("checkAssets reports a missing texture file as file_missing", async (t) => {
+  const root = await project(t);
+  const result = await checkAssets(
+    {
+      projectRoot: root,
+      textures: [
+        "src/main/resources/assets/ruby_tools/textures/item/absent.png::16x16",
+      ],
+    },
+    { cwd: root },
+  );
+  assert.equal(result.status, "ok");
+  if (result.status !== "ok") return;
+  assert.equal(result.value.textures[0]?.status, "failed");
+  assert.equal(result.value.textures[0]?.findings[0]?.code, "file_missing");
+});
+
 test("checkAssets accepts a model whose textures exist", async (t) => {
   const root = await project(t);
   await write(
@@ -186,6 +203,28 @@ test("checkAssets accepts a vanilla texture reference without touching disk", as
   assert.equal(result.status, "ok");
   if (result.status !== "ok") return;
   assert.equal(result.value.models[0]?.status, "ok");
+});
+
+test("checkAssets flags a non-string model texture reference", async (t) => {
+  const root = await project(t);
+  await write(
+    root,
+    "src/main/resources/assets/ruby_tools/models/item/ruby.json",
+    JSON.stringify({ textures: { layer0: 42 } }),
+  );
+  const result = await checkAssets(
+    {
+      projectRoot: root,
+      models: ["src/main/resources/assets/ruby_tools/models/item/ruby.json"],
+    },
+    { cwd: root },
+  );
+  assert.equal(result.status, "ok");
+  if (result.status !== "ok") return;
+  assert.equal(result.value.models[0]?.status, "failed");
+  assert.deepEqual(result.value.models[0]?.findings, [
+    { code: "model_texture_missing", detail: "layer0=number" },
+  ]);
 });
 
 test("checkAssets reports lang keys missing from a locale", async (t) => {
@@ -360,6 +399,22 @@ test("checkAssets rejects paths outside the project root", async (t) => {
   assert.equal(result.status, "error");
   if (result.status !== "error") return;
   assert.equal(result.error.code, "destination_outside_root");
+});
+
+test("checkAssets rejects a lang request without a compare array", async (t) => {
+  const root = await project(t);
+  const result = await checkAssets(
+    {
+      projectRoot: root,
+      lang: {
+        baseline: "src/main/resources/assets/ruby_tools/lang/en_us.json",
+      } as never,
+    },
+    { cwd: root },
+  );
+  assert.equal(result.status, "error");
+  if (result.status !== "error") return;
+  assert.equal(result.error.code, "invalid_request");
 });
 
 test("checkAssets reports malformed lang JSON in the envelope", async (t) => {

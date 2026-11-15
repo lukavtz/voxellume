@@ -9,10 +9,10 @@ import {
 } from "node:fs/promises";
 import { basename, dirname, isAbsolute, join, relative } from "node:path";
 
-import { CodedError } from "../errors.ts";
+import { CodedError, failureOf } from "../errors.ts";
 import { resolveInsideRoot } from "../fs-guard.ts";
 import { PinsError, loadPins, pinsInvalid } from "../pins.ts";
-import { fail, ok, type ToolResult } from "../results.ts";
+import { ok, type ToolResult } from "../results.ts";
 import {
   applySubstitutions,
   isTextPath,
@@ -234,7 +234,6 @@ export async function scaffold(
       notes: ["class names kept as ExampleMod/ExampleModClient"],
     });
   } catch (error) {
-    if (error instanceof CodedError) return fail(error.code, error.message);
-    throw error;
+    return failureOf(error);
   }
 }

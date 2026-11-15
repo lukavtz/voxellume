@@ -41,35 +41,40 @@ Rules:
   stack trace and never contains absolute host paths outside the project root.
 - Hosts serialize the envelope as a single text block. There is no second channel:
   no `details.evidence`, no trailing metadata.
+- No tool rejects. Every failure, including an unexpected one, returns an envelope;
+  an unexpected failure is `internal_error`.
 - A tool that reports `status: "ok"` has observed the fact it reports: an exit code,
   a parsed file, or a hash it computed itself.
 
 ## 3. Error codes
 
-| Code                        | Raised by                         | Meaning                                                     |
-| --------------------------- | --------------------------------- | ----------------------------------------------------------- |
-| `invalid_request`           | all                               | Parameters fail the tool's own validation rules             |
-| `pin_not_found`             | `scaffold`                        | No pin matches the requested id                             |
-| `template_missing`          | `scaffold`                        | Pin has no template, or the template directory is absent    |
-| `destination_not_empty`     | `scaffold`                        | Destination exists and is not an empty directory            |
-| `destination_outside_root`  | `scaffold`, `run`, `assets_check` | Resolved path escapes the project root                      |
-| `task_not_allowed`          | `run`                             | Task id is not in the allowlist                             |
-| `unsafe_argument`           | `run`                             | Extra argument is not in the allowlist                      |
-| `project_not_found`         | `run`                             | Project root lacks the Gradle wrapper                       |
-| `spawn_failed`              | `run`                             | The wrapper could not be started                            |
-| `baseline_hash_mismatch`    | `assets_check`                    | Baseline screenshot bytes differ from the declared SHA-256  |
-| `model_texture_missing`     | `assets_check`                    | Model JSON references a texture that does not exist         |
-| `lang_key_missing`          | `assets_check`                    | A comparison locale lacks a key present in the baseline     |
-| `lang_placeholder_mismatch` | `assets_check`                    | Ordered printf placeholders differ from the baseline locale |
-| `png_invalid`               | `assets_check`                    | PNG signature, IHDR, or CRC is invalid                      |
-| `png_too_large`             | `assets_check`                    | PNG exceeds byte, edge, or pixel limits                     |
-| `file_missing`              | `assets_check`                    | A requested texture, model, or lang file is absent          |
-| `json_invalid`              | `assets_check`                    | A model or lang file is not valid JSON                      |
-| `dimension_mismatch`        | `assets_check`                    | Texture dimensions differ from the `WxH` expectation        |
-| `pins_invalid`              | `target_info`, `scaffold`         | `targets/pins.json` is absent or schema-invalid             |
+| Code                        | Raised by                         | Meaning                                                      |
+| --------------------------- | --------------------------------- | ------------------------------------------------------------ |
+| `invalid_request`           | all                               | Parameters fail the tool's own validation rules              |
+| `pin_not_found`             | `scaffold`                        | No pin matches the requested id                              |
+| `template_missing`          | `scaffold`                        | Pin has no template, or the template directory is absent     |
+| `destination_not_empty`     | `scaffold`                        | Destination exists and is not an empty directory             |
+| `destination_outside_root`  | `scaffold`, `run`, `assets_check` | Resolved path escapes the project root                       |
+| `task_not_allowed`          | `run`                             | Task id is not in the allowlist                              |
+| `unsafe_argument`           | `run`                             | Extra argument is not in the allowlist                       |
+| `project_not_found`         | `run`                             | Project root lacks the Gradle wrapper                        |
+| `baseline_hash_mismatch`    | `assets_check`                    | Baseline screenshot bytes differ from the declared SHA-256   |
+| `model_texture_missing`     | `assets_check`                    | Model texture reference absent, or the value is not a string |
+| `lang_key_missing`          | `assets_check`                    | A comparison locale lacks a key present in the baseline      |
+| `lang_placeholder_mismatch` | `assets_check`                    | Ordered printf placeholders differ from the baseline locale  |
+| `png_invalid`               | `assets_check`                    | PNG signature, IHDR, or CRC is invalid                       |
+| `png_too_large`             | `assets_check`                    | PNG exceeds byte, edge, or pixel limits                      |
+| `file_missing`              | `assets_check`                    | A requested texture, model, or lang file is absent           |
+| `json_invalid`              | `assets_check`                    | A model or lang file is not valid JSON                       |
+| `dimension_mismatch`        | `assets_check`                    | Texture edges, or baseline and capture dimensions, differ    |
+| `pins_invalid`              | `target_info`, `scaffold`         | `targets/pins.json` is absent or schema-invalid              |
+| `internal_error`            | all tools                         | Any failure that is not a coded request error                |
 
 Codes are stable identifiers. Adding a code is a compatible change; renaming one is
-not.
+not. Codes that `assets_check` reports as per-entry findings are `png_invalid`,
+`png_too_large`, `dimension_mismatch`, `model_texture_missing`, `lang_key_missing`,
+and `lang_placeholder_mismatch`; every other code in this table is an envelope
+error.
 
 ## 4. `minecraft_target_info`
 
@@ -142,7 +147,9 @@ Validation:
 
 - `modId ^[a-z][a-z0-9_]{1,63}$`; `javaPackage ^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$`;
   `authors` non-empty with non-empty entries; `name`, `version`, `description`,
-  `license` non-empty. Violation → `invalid_request`.
+  `license` non-empty. `name`, `version`, `description`, `license`, and every
+  `authors[]` entry must not contain a line break; `version` must not contain
+  whitespace. Violation → `invalid_request`.
 - Destination must resolve inside the host cwd → otherwise `destination_outside_root`.
 - Destination must be absent or an empty directory → otherwise `destination_not_empty`.
 
@@ -162,10 +169,18 @@ Value:
 
 Rules:
 
-- Files are copied from the template, then text files are rewritten through an
-  ordered substitution table (`com.example` → package, `modid` → mod id,
-  `Example Mod` → name, `1.0.0` → version, `CC0-1.0` → license, `"Me!"` → first author).
-  Binary files are copied byte-for-byte.
+- Files are copied from the template, then text files are rewritten by splitting on
+  each token of this ordered list and joining with its replacement, first match
+  first: `com.example.client.` → `<package>.client.`; `com.example` → package;
+  `modid.client.mixins.json` → `<modId>.client.mixins.json`; `modid.mixins.json` →
+  `<modId>.mixins.json`; `assets/modid` → `assets/<modId>`; `"modid"` → `"<modId>"`;
+  `modid` → mod id; `"name": "Example Mod"` → the JSON-quoted name; `Example Mod` →
+  name; the example description sentence → the JSON-escaped description; `"Me!"` →
+  the JSON-quoted first author; `"license": "CC0-1.0"` → the JSON-quoted license;
+  `version=1.0.0` → `version=<version>`. Values that land inside JSON strings are
+  emitted with JSON escaping, so quotes and backslashes in `name`, `description`,
+  `license`, or the first author stay valid JSON. Binary files are copied
+  byte-for-byte.
 - Paths that embed the package or the mod id are renamed accordingly.
 - Java class names are **not** renamed. The returned `notes` says so.
 - Text is normalized to LF; `*.bat` keeps CRLF.
@@ -227,7 +242,9 @@ Value:
 ```
 
 `status` ∈ `exited | stopped_by_log | timed_out | cancelled | output_limit_reached | spawn_failed`.
-`exitCode` is `null` unless a real exit status was observed. `tail` holds the last
+`spawn_failed` is a status value, never an error code: a wrapper that exists but
+cannot be started still returns `status: "ok"`. `exitCode` is `null` unless a real
+exit status was observed. `tail` holds the last
 200 lines. `output_limit_reached` means the 16 MiB cap was hit, the process tree was
 killed, and the log holds only the bytes read before the cap.
 
@@ -264,13 +281,26 @@ Rules:
   file yields `png_invalid`, and an oversized file yields `png_too_large`.
 - A model fails when a `textures` value is neither `minecraft:*` nor an existing
   file under `<projectRoot>/src/main/resources/assets/<namespace>/textures/…`
-  (the value `ns:path` maps to `namespace` `ns`, file `…/textures/path.png`).
-- Lang: every key of the baseline must exist in each comparison file
+  (the value `ns:path` maps to `namespace` `ns`, file `…/textures/path.png`). A value
+  that is not a string is a `model_texture_missing` finding whose `detail` is
+  `<key>=<typeof value>`.
+- Lang: `compare` is required, and a `lang` object without it is `invalid_request`.
+  Every key of the baseline must exist in each comparison file
   (`lang_key_missing`), and the ordered printf placeholder sequence must match
   (`lang_placeholder_mismatch`). `requiredKeys` must exist in the baseline.
 - Diff: the baseline file's SHA-256 must equal `baselineSha256` before anything is
   compared (`baseline_hash_mismatch`); the pixel comparison must fit
-  `maxDifferentPixels` at the given `threshold`.
+  `maxDifferentPixels` at the given `threshold`. A baseline and a capture of
+  differing pixel dimensions are `dimension_mismatch`.
+
+Findings versus request errors:
+
+- Per-entry findings, reported inside `textures[].findings` and
+  `models[].findings`: `png_invalid`, `png_too_large`, `dimension_mismatch`,
+  `model_texture_missing`, `lang_key_missing`, `lang_placeholder_mismatch`.
+- Request-level errors, returned as the envelope `error.code`: `invalid_request`,
+  `file_missing`, `json_invalid`, `baseline_hash_mismatch`, `dimension_mismatch`,
+  `destination_outside_root`, `internal_error`.
 
 Value:
 

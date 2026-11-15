@@ -21,7 +21,11 @@ const INLINE_PATH_PREFIXES = [
   "targets/",
   "templates/",
   "scripts/",
+  "src/",
 ];
+
+// Paths inside a scaffolded mod project, not inside this repository.
+const PROJECT_RELATIVE = ["src/main/", "src/test/", "src/client/"];
 
 const LINK = /\[[^\]]*\]\(([^()\s]+)\)/g;
 const INLINE = /`([^`\n]+)`/g;
@@ -51,6 +55,7 @@ function skipped(target: string): boolean {
     target.startsWith("http://") ||
     target.startsWith("https://") ||
     target.startsWith("mailto:") ||
+    PROJECT_RELATIVE.some((prefix) => target.startsWith(prefix)) ||
     target.includes("*") ||
     target.includes("?")
   );

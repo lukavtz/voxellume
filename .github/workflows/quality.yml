@@ -32,6 +32,7 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm check:structure
       - run: pnpm build
+      - run: pnpm check:pack
       - name: Compile Blender scripts
         run: |
           if ! command -v python3 >/dev/null 2>&1; then

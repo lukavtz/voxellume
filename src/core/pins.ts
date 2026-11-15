@@ -4,8 +4,8 @@ import { basename } from "node:path";
 import { Ajv2020 } from "ajv/dist/2020.js";
 import type { AnySchema } from "ajv";
 
-import { CodedError } from "./errors.ts";
-import { TOOL_SCHEMA_VERSION, type ToolFailure } from "./results.ts";
+import { CodedError, failureOf } from "./errors.ts";
+import { type ToolFailure } from "./results.ts";
 
 export const PINS_SCHEMA_VERSION = "voxellume-pins-1.0.0" as const;
 
@@ -155,12 +155,5 @@ export function findPin(
 
 /** Convert a thrown pins failure into a tool error envelope. */
 export function pinsFailure(error: unknown): ToolFailure {
-  if (error instanceof CodedError) {
-    return {
-      schemaVersion: TOOL_SCHEMA_VERSION,
-      status: "error",
-      error: { code: error.code, detail: error.message },
-    };
-  }
-  throw error;
+  return failureOf(error);
 }

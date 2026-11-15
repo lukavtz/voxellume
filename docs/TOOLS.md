@@ -12,7 +12,8 @@ Every tool resolves to one JSON document:
   "error": { "code": "unsafe_argument", "detail": "--init-script" } }
 ```
 
-The hosts serialize that document as a single text block. Error codes are listed
+The hosts serialize that document as a single text block. No tool rejects: an
+unexpected failure comes back as the code `internal_error`. Error codes are listed
 once in [PLUGIN-SPEC.md section 3](PLUGIN-SPEC.md#3-error-codes); each section below
 names only the codes that tool can return.
 
@@ -25,11 +26,11 @@ filtered, plus the list of registered plugin tools. Approval class: `read`.
 
 ### Parameters (all optional, combined with AND)
 
-| Name        | Type   | Meaning                                 |
-| ----------- | ------ | --------------------------------------- |
-| `id`        | string | Exact pin id, e.g. `java-fabric-1.21.1` |
-| `minecraft` | string | Exact Minecraft release, e.g. `1.21.1`  |
-| `loader`    | string | Exact loader, currently `fabric`        |
+| Name        | Type   | Meaning                                                 |
+| ----------- | ------ | ------------------------------------------------------- |
+| `id`        | string | Exact pin id, e.g. `java-fabric-1.21.1`                 |
+| `minecraft` | string | Exact Minecraft release, e.g. `1.21.1`                  |
+| `loader`    | string | Exact loader: `fabric`, `forge`, `neoforge`, or `quilt` |
 
 ### Value
 
@@ -80,7 +81,9 @@ class: `exec`. Writes only inside `destination`.
 (non-empty strings) and `authors` (non-empty array of non-empty strings).
 
 Validation: `modId` matches `^[a-z][a-z0-9_]{1,63}$`; `javaPackage` matches
-`^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$`.
+`^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$`. `name`, `version`, `description`, `license`,
+and every `authors[]` entry are rejected when they contain a line break (`\n` or
+`\r`); `version` is also rejected when it contains any whitespace.
 
 ### Value
 
@@ -176,8 +179,9 @@ Approval class: `exec`.
 ### Rules
 
 argv is exactly `["./gradlew" | "gradlew.bat", "--no-daemon", "--console=plain",
-...task args, ...extraArgs]`, with no shell. The child environment is
-`process.env` minus token-like keys. Output is capped at 16 MiB. A wrapper that
+...task args, ...extraArgs]`, with no shell. The child environment is `process.env`
+reduced to the explicit toolchain and OS allowlist in PLUGIN-SPEC section 6; every
+other variable is dropped. Output is capped at 16 MiB. A wrapper that
 exists but cannot be started is a success envelope with `status: "spawn_failed"` and
 `exitCode: null`; only argument, path, and project checks produce an error envelope.
 See [PLUGIN-SPEC.md section 6](PLUGIN-SPEC.md#6-minecraft_run).
@@ -213,7 +217,7 @@ All paths are relative to `projectRoot`. Every section is optional.
 | `projectRoot` | string     | Scaffolded project directory inside the host cwd                       |
 | `textures`    | `string[]` | Texture paths; an entry may end with `::WxH`                           |
 | `models`      | `string[]` | Model JSON paths                                                       |
-| `lang`        | object     | `{ baseline, compare[], requiredKeys? }`                               |
+| `lang`        | object     | `{ baseline, compare[], requiredKeys? }`; `compare` is required        |
 | `diff`        | object     | `{ baseline, baselineSha256, capture, threshold, maxDifferentPixels }` |
 
 ### Value
@@ -229,19 +233,30 @@ All paths are relative to `projectRoot`. Every section is optional.
 
 ### Error codes
 
-Findings: `png_invalid`, `png_too_large`, `dimension_mismatch`, `file_missing`,
-`json_invalid`, `model_texture_missing`, `lang_key_missing`,
-`lang_placeholder_mismatch`, `baseline_hash_mismatch`.
-Request-level errors: `destination_outside_root` — a requested path escapes
-`projectRoot`; `invalid_request` — malformed section or out-of-range diff budget.
+Per-entry findings, reported inside `textures[].findings` and `models[].findings` and
+never as an envelope error: `png_invalid`, `png_too_large`, `dimension_mismatch` (a
+`::WxH` edge mismatch), `model_texture_missing`, `lang_key_missing`,
+`lang_placeholder_mismatch`.
+
+Request-level errors, returned as the envelope `error.code`: `invalid_request` — a
+malformed section, an out-of-range diff budget, or a `lang` object without a
+`compare` array; `file_missing` — a requested file is absent; `json_invalid` — a model
+or lang file is not valid JSON; `baseline_hash_mismatch` — the baseline bytes differ
+from `baselineSha256`; `dimension_mismatch` — the baseline and the capture have
+different pixel dimensions; `destination_outside_root` — a requested path escapes
+`projectRoot`; `internal_error` — any failure that is not a coded request error.
 
 ### Rules
 
-A `textures` entry `::WxH` asserts both edges. A model texture value must be
-`minecraft:…` or resolve under
-`<projectRoot>/src/main/resources/assets/<namespace>/textures/`. Lang compares the
-baseline key set and the ordered printf placeholder sequence. Diff verifies the
-baseline file's SHA-256 before comparing pixels. See
+`textures` entries are checked within `PNG_DEFAULT_LIMITS`; an entry may end with
+`::WxH`, which asserts both edges. A model's `textures` values must be `minecraft:…`
+or resolve under
+`<projectRoot>/src/main/resources/assets/<namespace>/textures/`; a value that is not a
+string is a `model_texture_missing` finding whose `detail` is
+`<key>=<typeof value>`. `lang.compare` is required: a `lang` object without it is
+`invalid_request`. Lang compares the baseline key set and the ordered printf
+placeholder sequence; the baseline must also carry every `requiredKeys` entry. Diff
+verifies the baseline file's SHA-256 before comparing pixels. See
 [PLUGIN-SPEC.md section 7](PLUGIN-SPEC.md#7-minecraft_assets_check).
 
 ### Examples

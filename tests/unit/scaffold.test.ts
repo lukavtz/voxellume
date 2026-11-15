@@ -290,3 +290,30 @@ test("scaffold escapes a quoted mod name for JSON", async () => {
   ) as Record<string, unknown>;
   assert.equal(metadata["name"], 'A "quoted" name');
 });
+
+test("scaffold reports internal_error for a throw it cannot classify", async () => {
+  const root = await mkdtemp(join(tmpdir(), "voxellume-pkg-"));
+  await mkdir(join(root, "targets"), { recursive: true });
+  await writeFile(
+    join(root, "targets", "pins.json"),
+    await readFile(fixturePins),
+  );
+  await cp(fixtureRoot, join(root, "templates", "fabric-1.21.1"), {
+    recursive: true,
+  });
+  try {
+    // A non-string cwd makes path resolution throw a TypeError: no coded error
+    // applies, so the envelope must carry internal_error instead of rejecting.
+    const result = await scaffold(
+      { destination: "unclassified", mod },
+      { packageRoot: root, cwd: undefined as never },
+    );
+    assert.equal(result.status, "error");
+    if (result.status !== "error") return;
+    assert.equal(result.error.code, "internal_error");
+    assert.equal(result.error.detail.includes("\n"), false);
+    assert.equal(result.error.detail.includes(root), false);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});

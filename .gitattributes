@@ -3,18 +3,10 @@
 
 # Windows scripts must keep CRLF so cmd.exe and Gradle parse them.
 *.bat text eol=crlf
-*.cmd text eol=crlf
-*.ps1 text eol=crlf
 
 # Binary artifacts are never normalized.
 *.jar binary
 *.png binary
-*.bbmodel binary
-*.zip binary
-*.gz binary
-*.blend binary
-*.nbt binary
-*.class binary
 
 # Vendored sources retain upstream whitespace byte-for-byte.
 THIRD_PARTY/** -whitespace
